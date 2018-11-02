@@ -27,7 +27,7 @@ function main() {
     var path = d3.geoPath()
         .projection(projection);
     
-    d3.json("../data/geojson/world-countries-lowres.geojson", function(error, jsondata) {
+    d3.json("data/geojson/world-countries-lowres.geojson", function(error, jsondata) {
         console.log("processing countries")
         svgCountries.selectAll("path")
             .data(jsondata.features)
