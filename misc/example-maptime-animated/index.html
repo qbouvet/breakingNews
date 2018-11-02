@@ -1,0 +1,67 @@
+<!- https://github.com/maptime-ams/animated-borders-d3js#step-1-empty-website ->
+<!DOCTYPE html>
+<html lang="en">
+    
+    
+    
+<head>  
+    <title>Super Duper dynamic map demonstration</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!- imports ->
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="static/colors.js"></script>
+    <script src="static/chroniton.js"></script>
+    <link href="static/chroniton.css" rel="stylesheet">
+    <!- style ->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        path {
+          stroke: #666;
+          fill: none;
+          fill-opacity: 0.6;
+          stroke-width: 2px;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+        #boundary path {
+          stroke-dasharray: 3, 5;
+        }
+        #slider {
+            position: absolute;
+            left: 50%;
+            margin-left: -300px;
+            bottom: 20px;
+            width: 600px;
+            height: 50px;
+        }
+    </style>
+</head>
+
+
+
+<body>
+    <!- div and h1 must ABSOLUTELY be after svg. Why ?? ->
+    <svg>
+        <g id="boundary"></g>
+        <g id="states"></g>
+    </svg>    
+    <h1>United States in <span id="year">1790</span></h1>
+    <div id="slider"></div>
+    <!- main.js ->
+    <script src="demo-main.js"></script>
+</body>
+
+
+
+</html>
