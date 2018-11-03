@@ -1,0 +1,42 @@
+<!- Displays a world map
+    This needs to be served via a local http server : accessing
+    data files will trop XSS protections in the browser otherwise
+ ->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+<head>
+    <title>World map</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!- D3 ->
+        <script src='https://d3js.org/d3.v4.min.js' charset="utf-8"></script>
+    <!- fancy projections -> 
+        <script src="https://d3js.org/d3-array.v1.min.js"></script>
+        <script src="https://d3js.org/d3-geo.v1.min.js"></script>
+    <!- Style ->
+        <link href="css/index.css" rel="stylesheet">
+</head>
+
+
+
+<body>
+    <h1>Some interactive text : <span id="interactiveSpan">1790</span></h1>
+    <div id="chronitonSlider"></div>
+    <svg id="worldmap">
+        <g id="countries"></g>
+    </svg>
+    <!- Main ->
+    <script src='scripts/worldmap.js'></script>
+</body>
+
+
+
+</html>
