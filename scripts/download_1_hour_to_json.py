@@ -18,7 +18,7 @@ import os
 yyyymmddhh = sys.argv[1]
 
 # Constants
-data_folder ='./../data/gdelt-json/'
+data_folder ='./../data/gdeltjson/'
 base_URL = 'http://data.gdeltproject.org/gdeltv2/'
 events_URL = '.export'
 mentions_URL = '.mentions'
@@ -66,15 +66,12 @@ def to_clean_json(filename, GDELT_type):
     header = header_events if(GDELT_type == events_URL) else header_mentions
     df.columns = header
     
-    if (GDELT_type == events_URL):
-        df.index = df['ID']
-        df.drop(['ID'], inplace=True, axis=1)
-    else:
+    if (GDELT_type == mentions_URL):
         df = df.groupby(['ID']).apply(lambda x: set(x['Source'].values))
         
     # Write json
     json_name = data_folder + filename.split('.')[0] + GDELT_type + '.json'
-    df.to_json(json_name, orient='index')
+    df.to_json(json_name, orient='records')
     
 def delete_csv():
     dir_name = "./"
