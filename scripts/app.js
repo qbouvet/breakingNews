@@ -57,7 +57,7 @@ class worldmap {
         // check datasets exist
         if (this.outlineData == undefined || this.overlayData == undefined) {
             console.log("[WARN] map redraw() failed because of undefined data (this is likely to happen once at initialization of the object)")
-            //log("outlineData : ", this.outlineData, "\n", "overlayData : ", this.overlayData)
+            log("outlineData : ", this.outlineData, "\n", "overlayData : ", this.overlayData)
             return
         }
         
@@ -90,12 +90,13 @@ class worldmap {
             .append("circle")
             .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0] )
             .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1] )
-            .attr("r", "6px")
+            .attr("r", "3px")
             .attr("fill", "red");
         
         selection.exit()
-            .transition(3000)
+            .transition(1000)
             .attr("fill", "black")
+            .attr("r", "1px")
             .remove()
     }
 
@@ -104,8 +105,9 @@ class worldmap {
 
 function main() {
     
-    datasets = ["data/gdeltjson/sample2.json",
-                "data/gdeltjson/sample1.json",
+    datasets = ["data/gdeltjson/sample1.json", 
+                "data/gdeltjson/sample2.json",
+                "data/gdeltjson/sample3.json",
                 "data/gdeltjson/20181105140000.export.json", 
                 "data/gdeltjson/20181105141500.export.json", 
                 "data/gdeltjson/20181105143000.export.json", 
@@ -120,7 +122,11 @@ function main() {
     d3.json("data/geojson/world.json", (error, json) => map.updateOutline(json));
     
     // load overlay 
-    d3.json(datasets[dsindex], (error, json) => map.updateOverlay(json));
+    d3.json(datasets[dsindex], (error, json) => {
+            log("loading", datasets[dsindex])
+            log(error)
+            map.updateOverlay(json)
+        });
     
     // doesn't work -> Maybe we need to remove all data and add it again 
     // (like, if it's already full of data, nothing will happen when you 
@@ -128,10 +134,14 @@ function main() {
     // window.addEventListener('resize', () => map.redraw())
     
     
-    d3.select("#changeDatasetButton")
+    d3.select("#mainSvg")
         .on("click", () => {
-            dsindex = (dsindex + 1) % 4;  
-            d3.json(datasets[dsindex], (error, json) => map.updateOverlay(json));
+            dsindex = (dsindex + 1) % 8;  
+            d3.json(datasets[dsindex], (error, json) => {
+                log("loading", datasets[dsindex])
+                log(error)
+                map.updateOverlay(json)
+            });
         });
     
     

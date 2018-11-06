@@ -1,22 +1,4 @@
 [{
-	"ID": 800160434,
-	"#Mentions": 2,
-	"#Sources": 1,
-	"#Articles": 2,
-	"CountryCode": "MX",
-	"Lat": 82.265625,
-	"Long": 58.81374171570782,
-	"Date": 20181105143000
-}, {
-	"ID": 800160435,
-	"#Mentions": 1,
-	"#Sources": 1,
-	"#Articles": 1,
-	"CountryCode": "AF",
-	"Lat": 84.375,
-	"Long": -20.632784250388013,
-	"Date": 20181105143000
-}, {
 	"ID": 800160436,
 	"#Mentions": 1,
 	"#Sources": 1,
