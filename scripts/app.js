@@ -7,12 +7,17 @@ function whenDocumentLoaded(action) {
 	}
 }
 
-function info () {
-    var args = Array.prototype.slice.call(arguments);
-    args.unshift("[INFO]" + " ")
-    console.log.apply(console, args);
+function logger (prefix="") {
+    return function () {
+        var args = Array.prototype.slice.call(arguments);
+        args.unshift(prefix)
+        console.log.apply(console, args);
+    }
 }
-var log = console.log;
+var log = logger("");
+var info = logger("[INFO]")
+var warn = logger("[WARN]")
+var err = logger("[ERR]")
 
 
 
@@ -28,7 +33,6 @@ class worldmap {
             //  - d3.geoMercator().scale(1).translate([0, 0])
             //  - d3.geoLarrivee().translate([(w/2)-60, (h/2)+60]).scale(170)
             //  - d3.geoEckert5().translate([(w/2)-50, (h/2)+40]).scale(250)
-        //this.projection = d3.geoMercator().scale(1).translate([0, 0])
         this.projection = d3.geoLarrivee().translate([(this.w/2)-60, (this.h/2)+70]).scale(190)
         this.path = d3.geoPath().projection(this.projection);
             // datasets
@@ -38,25 +42,35 @@ class worldmap {
     
         /* Load new data for the countries outline
          */
-    updateOutline (json) {
-        info(" updating countries outline");
-        this.outlineData = json
-        this.redraw()
+    updateOutline (jsonpath) {
+        d3.json(jsonpath, (error, json) => {
+            log(" Map : updating outline with : ", jsonpath);
+            if (error != null) {
+                err(error)
+            }
+            this.outlineData = json
+            this.redraw()
+        });
     }
     
         /* Load new data for the overlay
          */
-    updateOverlay (json) {
-        info("Map : updating overlay");
-        this.overlayData = json
-        this.redraw()
+    updateOverlay (jsonpath) {
+        d3.json(jsonpath, (error, json) => {
+            log(" Map = updating overlay with : ", jsonpath);
+            if (error != null) {
+                err(error)
+            }
+            this.overlayData = json
+            this.redraw()
+        });
     }
     
     redraw () {
-        info("Redrawing map")
+        log("Redrawing map")
         // check datasets exist
         if (this.outlineData == undefined || this.overlayData == undefined) {
-            console.log("[WARN] map redraw() failed because of undefined data (this is likely to happen once at initialization of the object)")
+            warn("map redraw() failed because of undefined data (this is likely to happen once at initialization of the object)")
             log("outlineData : ", this.outlineData, "\n", "overlayData : ", this.overlayData)
             return
         }
@@ -72,9 +86,8 @@ class worldmap {
             // Obtain new projection
         //this.projection.scale(scale).translate(translate);
         //this.path = d3.geoPath().projection(this.projection);
-        
-        info("svg size :", this.w, this.h)
-        info("Transformation : scale=", scale, "translate=", translate)
+        //info("svg size :", this.w, this.h)
+        //info("Transformation : scale=", scale, "translate=", translate)
 
         this.svg.selectAll("path")
             .data(this.outlineData.features)
@@ -83,21 +96,24 @@ class worldmap {
                 .attr("d", this.path);
             
         // 2. Draw overlay 
-        let selection = this.svg.selectAll("circle")
-            .data(this.overlayData)
-            
-        selection.enter()
-            .append("circle")
-            .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0] )
-            .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1] )
-            .attr("r", "3px")
-            .attr("fill", "red");
         
-        selection.exit()
-            .transition(1000)
-            .attr("fill", "black")
-            .attr("r", "1px")
-            .remove()
+        this.svg.selectAll("circle")
+            .data([])
+            .exit()
+                .transition(1000)
+                .attr("fill", "black")
+                .attr("r", "1px")
+                .remove()
+            
+        this.svg.selectAll("circle")
+            .data(this.overlayData)
+            .enter()
+                .append("circle")
+                .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0] )
+                .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1] )
+                .attr("r", "6px")
+                .attr("fill", "red")
+        
     }
 
 }
@@ -105,13 +121,13 @@ class worldmap {
 
 function main() {
     
-    datasets = ["data/gdeltjson/sample1.json", 
-                "data/gdeltjson/sample2.json",
-                "data/gdeltjson/sample3.json",
-                "data/gdeltjson/20181105140000.export.json", 
-                "data/gdeltjson/20181105141500.export.json", 
-                "data/gdeltjson/20181105143000.export.json", 
-                "data/gdeltjson/20181105144500.export.json", ]
+    let datasets = ["data/gdeltjson/sample3.json",
+                    "data/gdeltjson/sample2.json",
+                    "data/gdeltjson/sample1.json",
+                    "data/gdeltjson/sample3.json",
+                    "data/gdeltjson/sample2.json",
+                    "data/gdeltjson/sample1.json"
+                    ]
     let dsindex = 0;
 
     // Map object
@@ -119,29 +135,20 @@ function main() {
     const map = new worldmap(mainSvg)
 
     // Load world map
-    d3.json("data/geojson/world.json", (error, json) => map.updateOutline(json));
+    map.updateOutline("data/geojson/world.json")
     
     // load overlay 
-    d3.json(datasets[dsindex], (error, json) => {
-            log("loading", datasets[dsindex])
-            log(error)
-            map.updateOverlay(json)
-        });
+    map.updateOverlay(datasets[dsindex])
     
     // doesn't work -> Maybe we need to remove all data and add it again 
     // (like, if it's already full of data, nothing will happen when you 
     //  enter() the same data, even with a newer projection)
     // window.addEventListener('resize', () => map.redraw())
     
-    
     d3.select("#mainSvg")
         .on("click", () => {
-            dsindex = (dsindex + 1) % 8;  
-            d3.json(datasets[dsindex], (error, json) => {
-                log("loading", datasets[dsindex])
-                log(error)
-                map.updateOverlay(json)
-            });
+            dsindex = (dsindex + 1) % datasets.length;  
+            map.updateOverlay(datasets[dsindex]);
         });
     
     
