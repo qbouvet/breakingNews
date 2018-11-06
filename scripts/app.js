@@ -19,6 +19,10 @@ var info = logger("[INFO]")
 var warn = logger("[WARN]")
 var err = logger("[ERR]")
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 
     /* A worldmap object
@@ -66,7 +70,7 @@ class worldmap {
         });
     }
     
-    redraw () {
+    async redraw () {
         log("Redrawing map")
         // check datasets exist
         if (this.outlineData == undefined || this.overlayData == undefined) {
@@ -104,6 +108,8 @@ class worldmap {
                 .attr("fill", "black")
                 .attr("r", "1px")
                 .remove()
+        
+        await sleep (500)
             
         this.svg.selectAll("circle")
             .data(this.overlayData)
@@ -113,6 +119,11 @@ class worldmap {
                 .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1] )
                 .attr("r", "6px")
                 .attr("fill", "red")
+            .exit()
+                .transition(1000)
+                .attr("fill", "black")
+                .attr("r", "1px")
+                .remove()
         
     }
 
@@ -121,12 +132,11 @@ class worldmap {
 
 function main() {
     
-    let datasets = ["data/gdeltjson/sample3.json",
+    let datasets = ["data/gdeltjson/sample1.json",
                     "data/gdeltjson/sample2.json",
-                    "data/gdeltjson/sample1.json",
                     "data/gdeltjson/sample3.json",
-                    "data/gdeltjson/sample2.json",
-                    "data/gdeltjson/sample1.json"
+                    "data/gdeltjson/20181105140000.export.json",
+                    "data/gdeltjson/20181105141500.export.json"
                     ]
     let dsindex = 0;
 
