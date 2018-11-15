@@ -29,8 +29,7 @@ function sleep(ms) {
      */ 
 class worldmap {
     
-    constructor (svg, outlinejson) {
-        
+    constructor (svg) {
         this.svg = svg
 
             // Scaling is now done when drawing the outline 
@@ -91,7 +90,7 @@ class worldmap {
                 .transition().duration(500)
                     .attr("fill", "black")
                     .attr("r", "9px") 
-                .transition().duration(2000)
+                .transition().duration(500)
                     .attr("r", "1px")
                 .remove();   
             // update selection
@@ -128,7 +127,7 @@ class worldmap {
                 if (error != null) {err(error)}
                 log("Map : updating overlay -> ", jsonpath);
                 if (this.outlineData !== undefined) {
-                    // draw the overlay *only* after the outline
+                    // draw the overlay *only* after the outline has been drawn
                     _draw(overlayData)
                 }
                 this.overlayData = overlayData
@@ -143,7 +142,6 @@ function make_bar_chart(){
 
     var svgWidth = document.getElementsByClassName("visualize-source")[0].offsetWidth, svgHeight = 200, barPadding = 5;
     var barWidth = (svgWidth / dataset.length);
-
 
     var svg = d3.selectAll('.bar-chart')
         .attr("width", svgWidth)
