@@ -11,7 +11,7 @@ function whenDocumentLoaded(action) {
     Logging framework
  */
 function logger(prefix="") {
-    return () => {
+    return function() {
         let args = Array.prototype.slice.call(arguments);
         args.unshift(prefix);
         console.log.apply(console, args);
@@ -231,18 +231,45 @@ class DataLoader {
 
 }
 
-// TODO: implement
-class WeekWalker {
+/*
+    This class manages the timeflow over the week covered by the dataset, returning incremental timestamps
+ */
+class TimeManager {
 
-    constructor(initTimestamp) {
-        this.timestamp = initTimestamp;
+    constructor() {
+
+        // Initial date of our dataset
+        this.INIT_DATE = new Date(2018, 10, 5, 0, 0);
+        this.END_DATE = new Date(2018, 10, 12, 0, 0);
+        this.time = this.INIT_DATE;
+    }
+
+    dateToTimestamp(date) {
+
+        // Transform to string with leading zeros
+        let pad = (num, size) => {
+            let s = num+"";
+            while (s.length < size) s = "0" + s;
+            return s;
+        };
+
+        return date.getFullYear() + pad(date.getMonth() + 1, 2) +
+            pad(date.getDate(), 2) + pad(date.getHours(), 2) +
+            pad(date.getMinutes(), 2) + "00";
     }
 
     next() {
 
-        let toReturn = this.timestamp;
+        // Data set is over
+        if (this.time.getTime() === this.END_DATE.getTime()) {
+            return undefined;
+        }
 
-        // Increment timestamp
+        // Get timestamp of current time
+        let toReturn = this.dateToTimestamp(this.time);
+
+        // Increment time by 15 minutes
+        this.time = new Date(this.time.getTime() + 15*60000);
 
         return toReturn;
     }
@@ -260,25 +287,21 @@ function main() {
     // Create Map object
     const map = new Worldmap(mainSvg);
 
-    // FIXME: remove
-    let t = ['20181105000000', '20181105001500', '20181105003000', '20181105004500'];
-
-    // First update and draw
+    // Outline and draw
     map.updateOutline(loader.loadMapOutline());
-    map.updateOverlay(loader.loadEvents(t[0], 1));
     map.draw();
 
+    // Init time manager that will walk over week // TODO: detect end of week (undefined timestamp)
+    const timeManager = new TimeManager();
 
     // Change file on click
-    let i = 0;
     d3.select("#mainSvg")
         .on("click", () => {
-            i = (i + 1) % t.length;
-            map.updateOverlay(loader.loadEvents(t[i], 1));
+            let t = timeManager.next();
+            info(t);
+            map.updateOverlay(loader.loadEvents(t, 1));
             map.draw();
         });
-
-
 }
 
 whenDocumentLoaded(main);
