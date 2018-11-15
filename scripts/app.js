@@ -14,10 +14,10 @@ function logger (prefix="") {
         console.log.apply(console, args);
     }
 }
-var log = logger("");
-var info = logger("[INFO]")
-var warn = logger("[WARN]")
-var err = logger("[ERR]")
+const log = logger("");
+const info = logger("[INFO]")
+const warn = logger("[WARN]")
+const err = logger("[ERR]")
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -29,102 +29,111 @@ function sleep(ms) {
      */ 
 class worldmap {
     
-    constructor (svg) {
+    constructor (svg, outlinejson) {
+        
         this.svg = svg
-        this.w = this.svg.style("width").replace("px", "");
-        this.h = this.svg.style("height").replace("px", "");
-            // Init projection and path. Other good looking options : 
-            //  - d3.geoMercator().scale(1).translate([0, 0])
-            //  - d3.geoLarrivee().translate([(w/2)-60, (h/2)+60]).scale(170)
-            //  - d3.geoEckert5().translate([(w/2)-50, (h/2)+40]).scale(250)
-        this.projection = d3.geoLarrivee().translate([(this.w/2)-60, (this.h/2)+70]).scale(190)
-        this.path = d3.geoPath().projection(this.projection);
+
+            // Scaling is now done when drawing the outline 
+            // since we need the dataset to compute boundaries
+        this.projection = undefined;
+        this.path = undefined;
+        this.outlineReady = false;
+        
             // datasets
         this.outlineData = undefined;
         this.overlayData = undefined;
     }
     
-        /* Load new data for the countries outline
+        /*  Draws the countries outline, with or without new data-
          */
-    updateOutline (jsonpath) {
-        d3.json(jsonpath, (error, json) => {
-            log(" Map : updating outline with : ", jsonpath);
-            if (error != null) {
-                err(error)
-            }
-            this.outlineData = json
-            this.redraw()
-        });
-    }
-    
-        /* Load new data for the overlay
-         */
-    updateOverlay (jsonpath) {
-        d3.json(jsonpath, (error, json) => {
-            log(" Map = updating overlay with : ", jsonpath);
-            if (error != null) {
-                err(error)
-            }
-            this.overlayData = json
-            this.redraw()
-        });
-    }
-    
-    async redraw () {
-        log("Redrawing map")
-        // check datasets exist
-        if (this.outlineData == undefined || this.overlayData == undefined) {
-            warn("map redraw() failed because of undefined data (this is likely to happen once at initialization of the object)")
-            log("outlineData : ", this.outlineData, "\n", "overlayData : ", this.overlayData)
-            return
-        }
-        
-        // 1. Draw outline        
-            // Compute projection scale and translation based on geo json bounds
-        const b = this.path.bounds(this.outlineData);
-        this.w = this.svg.style("width").replace("px", "");
-        this.h = this.svg.style("height").replace("px", "");
-            // use this only with mercator transform
-        const scale = .95 / Math.max((b[1][0] - b[0][0]) / this.w, (b[1][1] - b[0][1]) / this.h);
-        const translate = [(this.w - scale * (b[1][0] + b[0][0])) / 2, (this.h - scale * (b[1][1] + b[0][1])) / 2];
-            // Obtain new projection
-        //this.projection.scale(scale).translate(translate);
-        //this.path = d3.geoPath().projection(this.projection);
-        //info("svg size :", this.w, this.h)
-        //info("Transformation : scale=", scale, "translate=", translate)
+    drawOutline (jsonpath=null) {
+        var _draw = (outlineData) => {
+            log ("Map : drawing outline")
 
-        this.svg.selectAll("path")
-            .data(this.outlineData.features)
-            .enter()
-                .append("path")
-                .attr("d", this.path);
-            
-        // 2. Draw overlay 
+                // scaling should be done at each draw
+            this.w = this.svg.style("width").replace("px", "");
+            this.h = this.svg.style("height").replace("px", "");
+            this.projection = d3.geoLarrivee().fitSize([this.w, this.h], outlineData)
+            this.path = d3.geoPath().projection(this.projection);
+
+            this.svg.selectAll("path")
+                .data(outlineData.features)
+                .enter()
+                    .append("path")
+                    .attr("d", this.path);
+                    
+            this.outlineReady = true;
+            if (this.overlayData != undefined) {
+                this.drawOverlay()
+            }
+        }
+        if (jsonpath===null) {_draw(this.outlineData)}
+        else {
+            d3.json(jsonpath, (error, outlineData) => {
+                if (error != null) {err(error)}
+                log("Map : updating outline -> ", jsonpath);
+                _draw(outlineData)
+                this.outlineData = outlineData
+            });
+        }
+    }
         
-        this.svg.selectAll("circle")
-            .data([])
-            .exit()
-                .transition(1000)
-                .attr("fill", "black")
-                .attr("r", "1px")
-                .remove()
-        
-        await sleep (500)
-            
-        this.svg.selectAll("circle")
-            .data(this.overlayData)
-            .enter()
+        /*  Draws the overlay, with or without new data
+         *  Complete data update sequence
+         */
+    drawOverlay (jsonpath=null) {
+        var _draw = (overlayData) => {
+            var selection = d3.select("#mainSvg")
+                .selectAll("circle")
+                .data(overlayData)
+            // exit selection
+            selection.exit()    
+                .transition().duration(500)
+                    .attr("fill", "black")
+                    .attr("r", "9px") 
+                .transition().duration(2000)
+                    .attr("r", "1px")
+                .remove();   
+            // update selection
+            selection         
+                .transition().duration(500)     // 1. copy of exit() selection 
+                    .attr("fill", "black")
+                    .attr("r", "9px") 
+                .transition().duration(500)
+                    .attr("r", "1px")
+                /*.transition().duration(10)
+                    // !! hidden must absolutely be kept in it own transition
+                    .attr("visibility", "hidden")  */
+                .transition().duration(500)     // 2. quickly move the invisible point to their correct position
+                    .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0] )
+                    .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1] )
+                .transition().duration(3000)    // 3. copy of enter() selection
+                    .attr("fill", "green") 
+                    .attr("r", "6px")    
+            // enter selection
+            selection.enter()   
                 .append("circle")
                 .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0] )
                 .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1] )
-                .attr("r", "6px")
-                .attr("fill", "red")
-            .exit()
-                .transition(1000)
-                .attr("fill", "black")
-                .attr("r", "1px")
-                .remove()
-        
+                .attr("r", "0px")   
+                .attr("fill", "grey")
+                .transition().duration(3000)
+                    .delay(1500)
+                    .attr("r", "6px")
+                    .attr("fill", "red")
+        }
+        if (jsonpath===null) {_draw(this.overlayData)}
+        else {
+            d3.json(jsonpath, (error, overlayData) => {
+                if (error != null) {err(error)}
+                log("Map : updating overlay -> ", jsonpath);
+                if (this.outlineData !== undefined) {
+                    // draw the overlay *only* after the outline
+                    _draw(overlayData)
+                }
+                this.overlayData = overlayData
+            });
+        }
     }
 
 }
@@ -159,9 +168,7 @@ function make_bar_chart(){
 
 function main() {
     
-    let datasets = ["data/gdeltjson/sample1.json",
-                    "data/gdeltjson/sample2.json",
-                    "data/gdeltjson/sample3.json",
+    let datasets = ["data/gdeltjson/sample3.json",
                     "data/gdeltjson/20181105140000.export.json",
                     "data/gdeltjson/20181105141500.export.json"
                     ]
@@ -172,10 +179,10 @@ function main() {
     const map = new worldmap(mainSvg)
 
     // Load world map
-    map.updateOutline("data/geojson/world.json")
+    map.drawOutline("data/geojson/world.json")
     
     // load overlay 
-    map.updateOverlay(datasets[dsindex])
+    map.drawOverlay(datasets[dsindex])
     
     // doesn't work -> Maybe we need to remove all data and add it again 
     // (like, if it's already full of data, nothing will happen when you 
@@ -185,17 +192,13 @@ function main() {
     d3.select("#mainSvg")
         .on("click", () => {
             dsindex = (dsindex + 1) % datasets.length;  
-            map.updateOverlay(datasets[dsindex]);
+            map.drawOverlay(datasets[dsindex]);
         });
     
     //make a bar chart as place holder
     make_bar_chart()
-
-
-
-    
-
 }
 
 whenDocumentLoaded(main);
+
 
