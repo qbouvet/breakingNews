@@ -7,196 +7,279 @@ function whenDocumentLoaded(action) {
 	}
 }
 
-function logger (prefix="") {
-    return function () {
-        var args = Array.prototype.slice.call(arguments);
-        args.unshift(prefix)
+/*
+    Logging framework
+ */
+function logger(prefix="") {
+    return () => {
+        let args = Array.prototype.slice.call(arguments);
+        args.unshift(prefix);
         console.log.apply(console, args);
     }
 }
+
 const log = logger("");
-const info = logger("[INFO]")
-const warn = logger("[WARN]")
-const err = logger("[ERR]")
+const info = logger("[INFO]");
+const warn = logger("[WARN]");
+const err = logger("[ERR]");
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-
-
-    /* A worldmap object
-     */ 
-class worldmap {
+/*
+    A worldmap object
+ */
+class Worldmap {
     
-    constructor (svg) {
-        this.svg = svg
+    constructor(svg) {
 
-            // Scaling is now done when drawing the outline 
-            // since we need the dataset to compute boundaries
+        this.svg = svg;
+
+        // Scaling is now done when drawing the outline since we need the dataset to compute boundaries
         this.projection = undefined;
         this.path = undefined;
-        this.outlineReady = false;
-        
-            // datasets
-        this.outlineData = undefined;
-        this.overlayData = undefined;
+
+        // Data sets (initialize with dummy promises)
+        this.outlineData = new Promise((resolve) => {resolve();});
+        this.overlayData = new Promise((resolve) => {resolve();});
     }
-    
-        /*  Draws the countries outline, with or without new data-
-         */
-    drawOutline (jsonpath=null) {
-        var _draw = (outlineData) => {
-            log ("Map : drawing outline")
 
-                // scaling should be done at each draw
-            this.w = this.svg.style("width").replace("px", "");
-            this.h = this.svg.style("height").replace("px", "");
-            this.projection = d3.geoLarrivee().fitSize([this.w, this.h], outlineData)
-            this.path = d3.geoPath().projection(this.projection);
+    /*
+        Load new data for the countries outline, data promise is attached to field
+     */
+    updateOutline(data_promise) {
+        this.outlineData = data_promise;
+    }
 
-            this.svg.selectAll("path")
-                .data(outlineData.features)
-                .enter()
-                    .append("path")
-                    .attr("d", this.path);
-                    
-            this.outlineReady = true;
-            if (this.overlayData != undefined) {
-                this.drawOverlay()
+    /*
+       Load new data for the  overlay, data promise is attached to field
+     */
+    updateOverlay(data_promise) {
+        this.overlayData = data_promise;
+    }
+
+    /*
+        Resolves data promises and acts according to results
+     */
+    draw() {
+
+        Promise.all([this.outlineData, this.overlayData]).then((results) => {
+
+            if (results[0] === undefined) {
+
+                // Draw nothing if no outline nor overlay was set yet
+                err('Draw called on map without outline data');
+
+            } else if (results[1] === undefined) {
+
+                // Draw only outline if no overlay has been set yet
+                info('Draw called on map without events');
+                this.drawOutline(results[0])
+
+            } else {
+
+                // Draw both outline and overlay
+                this.drawOutline(results[0]);
+                this.drawOverlay(results[1]);
             }
-        }
-        if (jsonpath===null) {_draw(this.outlineData)}
-        else {
-            d3.json(jsonpath, (error, outlineData) => {
-                if (error != null) {err(error)}
-                log("Map : updating outline -> ", jsonpath);
-                _draw(outlineData)
-                this.outlineData = outlineData
-            });
-        }
+
+        })
     }
-        
-        /*  Draws the overlay, with or without new data
-         *  Complete data update sequence
-         */
-    drawOverlay (jsonpath=null) {
-        var _draw = (overlayData) => {
-            var selection = d3.select("#mainSvg")
-                .selectAll("circle")
-                .data(overlayData)
-            // exit selection
-            selection.exit()    
-                .transition().duration(500)
-                    .attr("fill", "black")
-                    .attr("r", "9px") 
-                .transition().duration(500)
-                    .attr("r", "1px")
-                .remove();   
-            // update selection
-            selection         
-                .transition().duration(500)     // 1. copy of exit() selection 
-                    .attr("fill", "black")
-                    .attr("r", "9px") 
-                .transition().duration(500)
-                    .attr("r", "1px")
-                /*.transition().duration(10)
-                    // !! hidden must absolutely be kept in it own transition
-                    .attr("visibility", "hidden")  */
-                .transition().duration(500)     // 2. quickly move the invisible point to their correct position
-                    .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0] )
-                    .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1] )
-                .transition().duration(3000)    // 3. copy of enter() selection
-                    .attr("fill", "green") 
-                    .attr("r", "6px")    
-            // enter selection
-            selection.enter()   
-                .append("circle")
+
+    /*
+        Draws the countries outline
+     */
+    drawOutline(outlineData) {
+
+        // Get svg dimensions
+        this.w = this.svg.style("width").replace("px", "");
+        this.h = this.svg.style("height").replace("px", "");
+
+        // Define projections and path generator
+        this.projection = d3.geoLarrivee().fitSize([this.w, this.h], outlineData);
+        this.path = d3.geoPath().projection(this.projection);
+
+        // Join data
+        this.svg.selectAll("path")
+            .data(outlineData.features)
+            .enter()
+            .append("path")
+            .attr("d", this.path);
+    }
+
+    /*
+        Draws the overlay, with or without new data, complete data update sequence
+     */
+    drawOverlay(overlayData) {
+
+        let selection = this.svg
+            .selectAll("circle")
+            .data(overlayData);
+
+
+        // Exit
+        selection.exit()
+            .transition().duration(100)
+                .attr("fill", "red")
+                .attr("r", "3px")
+            .transition().duration(100)
+                .attr("r", "1px")
+            .remove();
+
+        // Update
+        selection
+            .transition().duration(100)     // 1. copy of exit() selection
+                .attr("fill", "red")
+                .attr("r", "3px")
+            .transition().duration(100)
+                .attr("r", "1px")
+            /*.transition().duration(10)
+                // !! hidden must absolutely be kept in it own transition
+                .attr("visibility", "hidden")  */
+            .transition().duration(100)     // 2. quickly move the invisible point to their correct position
                 .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0] )
                 .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1] )
-                .attr("r", "0px")   
-                .attr("fill", "grey")
-                .transition().duration(3000)
-                    .delay(1500)
-                    .attr("r", "6px")
-                    .attr("fill", "red")
-        }
-        if (jsonpath===null) {_draw(this.overlayData)}
-        else {
-            d3.json(jsonpath, (error, overlayData) => {
-                if (error != null) {err(error)}
-                log("Map : updating overlay -> ", jsonpath);
-                if (this.outlineData !== undefined) {
-                    // draw the overlay *only* after the outline has been drawn
-                    _draw(overlayData)
-                }
-                this.overlayData = overlayData
-            });
-        }
+            .transition().duration(500)    // 3. copy of enter() selection
+                .attr("fill", "green")
+                .attr("r", "3px");
+
+
+        // Enter
+        selection.enter()
+            .append("circle")
+            .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0] )
+            .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1] )
+            .attr("r", "0px")
+            .attr("fill", "grey")
+            .transition()
+                .duration(500)
+                .delay(100)
+                .attr("r", "3px")
+                .attr("fill", "green");
     }
 
 }
 
-function make_bar_chart(){
-    var dataset = [80, 100, 56, 120, 180, 30, 40, 120, 160];
+/*
+    Use this class to get the paths to data files. If project directory structure changes, this is the only place to modify.
+ */
+class DataPaths {
 
-    var svgWidth = document.getElementsByClassName("visualize-source")[0].offsetWidth, svgHeight = 200, barPadding = 5;
-    var barWidth = (svgWidth / dataset.length);
+    // Initializes path variables
+    constructor() {
 
-    var svg = d3.selectAll('.bar-chart')
-        .attr("width", svgWidth)
-        .attr("height", svgHeight);
-        
-    var barChart = svg.selectAll("rect")
-        .data(dataset)
-        .enter()
-        .append("rect")
-        .attr("y", function(d) {
-             return svgHeight - d 
-        })
-        .attr("height", function(d) { 
-            return d; 
-        })
-        .attr("width", barWidth - barPadding)
-        .attr("transform", function (d, i) {
-            var translate = [barWidth * i, 0]; 
-            return "translate("+ translate +")";
-        });
+        // Folders
+        this.DATA_FOLDER = 'data/';
+        this.MAP_FOLDER = 'geojson/';
+        this.GDELT_FOLDER = 'gdelt/';
+
+        // Gdelt folders
+        this.EVENTS = 'events/';
+        this.MENTIONS = 'mentions/';
+        this.CLASS_FOLDERS = {
+            1:'VERBAL_COOPERATION/',
+            2:'MATERIAL_COOPERATION/',
+            3:'VERBAL_CONFLICT/',
+            4:'MATERIAL_CONFLICT/'
+        };
+
+        // Files
+        this.WORLDMAP = 'world';
+
+        // Others
+        this.JSON = '.json';
+    }
+
+    // Return path to geojson
+    mapOutline() {
+        return this.DATA_FOLDER + this.MAP_FOLDER + this.WORLDMAP + this.JSON;
+    }
+
+    // Return path to an event update file
+    eventUpdate(timestamp, category) {
+        return this.DATA_FOLDER + this.GDELT_FOLDER + this.EVENTS + this.CLASS_FOLDERS[category] + timestamp + this.JSON;
+    }
+
 }
 
+/*
+    This class loads the json files containing data and returns promises with the data
+ */
+class DataLoader {
+
+    constructor() {
+        this.dataPaths = new DataPaths();
+    }
+
+    // Load outline data and return it wrapped in promise
+    loadMapOutline() {
+        return this.load(this.dataPaths.mapOutline());
+    }
+
+    loadEvents(timestamp, category) {
+        return this.load(this.dataPaths.eventUpdate(timestamp, category));
+    }
+
+    load(path) {
+        return new Promise(function(resolve, reject) {
+            d3.json(path, function(error, data) {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(data);
+                }
+            });
+        });
+    }
+
+}
+
+// TODO: implement
+class WeekWalker {
+
+    constructor(initTimestamp) {
+        this.timestamp = initTimestamp;
+    }
+
+    next() {
+
+        let toReturn = this.timestamp;
+
+        // Increment timestamp
+
+        return toReturn;
+    }
+}
+
+
 function main() {
-    
-    let datasets = ["data/gdeltjson/sample3.json",
-                    "data/gdeltjson/20181105140000.export.json",
-                    "data/gdeltjson/20181105141500.export.json"
-                    ]
-    let dsindex = 0;
 
-    // Map object
+    // Select main svg
     const mainSvg = d3.select("#mainSvg");
-    const map = new worldmap(mainSvg)
 
-    // Load world map
-    map.drawOutline("data/geojson/world.json")
-    
-    // load overlay 
-    map.drawOverlay(datasets[dsindex])
-    
-    // doesn't work -> Maybe we need to remove all data and add it again 
-    // (like, if it's already full of data, nothing will happen when you 
-    //  enter() the same data, even with a newer projection)
-    // window.addEventListener('resize', () => map.redraw())
-    
+    // Data loading utilities
+    const loader = new DataLoader();
+
+    // Create Map object
+    const map = new Worldmap(mainSvg);
+
+    // FIXME: remove
+    let t = ['20181105000000', '20181105001500', '20181105003000', '20181105004500'];
+
+    // First update and draw
+    map.updateOutline(loader.loadMapOutline());
+    map.updateOverlay(loader.loadEvents(t[0], 1));
+    map.draw();
+
+
+    // Change file on click
+    let i = 0;
     d3.select("#mainSvg")
         .on("click", () => {
-            dsindex = (dsindex + 1) % datasets.length;  
-            map.drawOverlay(datasets[dsindex]);
+            i = (i + 1) % t.length;
+            map.updateOverlay(loader.loadEvents(t[i], 1));
+            map.draw();
         });
-    
-    //make a bar chart as place holder
-    make_bar_chart()
+
+
 }
 
 whenDocumentLoaded(main);
-
 
