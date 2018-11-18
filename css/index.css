@@ -37,8 +37,14 @@ path {
     stroke-width: 1.5px; 
     stroke-linecap: round;
     stroke-linejoin: round;
+        /* keeps width fixed when zooming */
+    vector-effect: non-scaling-stroke;
 }
 
+circle {
+        /* keeps width fixed when zooming */
+    vector-effect: non-scaling-stroke;
+}
 
 path:hover, circle:hover {
   stroke: #002868 !important;
