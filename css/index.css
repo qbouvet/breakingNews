@@ -5,17 +5,17 @@
 }
 
 
-.svg-container { 
+.svg-container {
     display: block;
     /*position: relative;*/
     width: 100%;
     height: 100%;
     padding-bottom: 100%;
-    vertical-align: middle; 
-    overflow: hidden; 
+    vertical-align: middle;
+    overflow: hidden;
 }
 
-.svg-content { 
+.svg-content {
     display: block;
     position: absolute;
     top: 0;
@@ -34,7 +34,7 @@ path {
     stroke: #bbbbbb;
     fill: #000000;
     fill-opacity: 0.8;
-    stroke-width: 1.5px; 
+    stroke-width: 1.5px;
     stroke-linecap: round;
     stroke-linejoin: round;
         /* keeps width fixed when zooming */
@@ -46,16 +46,39 @@ circle {
     vector-effect: non-scaling-stroke;
 }
 
-path:hover, circle:hover {
+/* Tooltip styling
+path:hover {
   stroke: #002868 !important;
   stroke-width:2px;
   stroke-linejoin: round;
   fill: #002868 !important;
   cursor: pointer;
 }
+*/
+
+circle:hover {
+  fill: white !important;
+}
 
 
+/* Tooltip styling
 
+.tooltip-details {
+  color:white;
+}
+*/
+
+div.tooltip {
+  font-family:"avenir next", Arial, sans-serif;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 7px;
+  color: white;
+}
+
+div.tooltip b {
+  color: #FFA51F;
+}
 
 
 /*body {
@@ -297,7 +320,7 @@ a.article, a.article:hover {
     }
 
    #sidebarCollapse.active span:first-of-type {
-        transform: translate(0px, -5px);    
+        transform: translate(0px, -5px);
     }
     #sidebarCollapse.active span:nth-of-type(2) {
         opacity: 1;
@@ -308,5 +331,3 @@ a.article, a.article:hover {
     }
 
 }
-
-

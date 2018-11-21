@@ -2,13 +2,11 @@
 import {log, info, warn, err} from './utils.js';
 
 import {whenDocumentLoaded} from './utils.js';
-import {DataLoader} from './dataloader.js';
+import {DataLoader} from './dataLoader.js';
 import {Worldmap} from './worldmap.js';
 import {TimeManager} from './timeManager.js';
 
 import {sleep} from './utils.js';
-
-
 
 function main() {
 
@@ -21,10 +19,7 @@ function main() {
     // Create Map object
     const map = new Worldmap(mainSvg, loader.loadMapOutline());
 
-    // Outline and draw
-    map.draw();
-
-    // Init time manager that will walk over week 
+    // Init time manager that will walk over week
     // TODO: detect end of week (undefined timestamp)
     const timeManager = new TimeManager();
 
@@ -34,9 +29,7 @@ function main() {
             let t = timeManager.next();
             info(t);
             map.updateOverlay(loader.loadEvents(t, 1));
-            map.draw();
         });
 }
 
 whenDocumentLoaded(main);
-
