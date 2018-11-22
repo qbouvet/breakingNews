@@ -7,7 +7,7 @@ import {eventOnMouseOver, eventOnMouseOut} from './mouseEvents.js'
  */
 export class Worldmap {
 
-constructor(svg, outlineJsonPromise) {
+  constructor(svg, outlineJsonPromise) {
 
         //  g groups drawn elements so that applying a transformation
         //  to g applies it to all its children
