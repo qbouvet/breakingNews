@@ -1,13 +1,11 @@
 
 import {log, info, warn, err} from './utils.js';
-
 import {whenDocumentLoaded} from './utils.js';
-import {DataLoader} from './dataLoader.js';
-import {Worldmap} from './worldmap.js';
-import {TimeManager} from './timeManager.js';
-import {DateSlider} from './dateSlider.js'
 
-import {sleep} from './utils.js';
+import {DataLoader} from './DataLoader.js';
+import {Worldmap} from './Worldmap.js';
+import {TimeManager} from './TimeManager.js';
+import {Slider} from './Slider.js'
 
 function main() {
 
@@ -21,20 +19,26 @@ function main() {
     // Create Map object
     const map = new Worldmap(mainSvg, loader.loadMapOutline());
 
-    // Create DateSlider object
-    const slider = new DateSlider(sliderSvg);
-
-    // Init time manager that will walk over week
-    // TODO: detect end of week (undefined timestamp)
+    // Init time manager that will generate timestamps and dates
     const timeManager = new TimeManager();
 
-    // Change file on click
-    d3.select("#mainSvg")
-        .on("click", () => {
-            let t = timeManager.next();
-            info(t);
-            map.updateOverlay(loader.loadEvents(t, 1));
-        });
+    // Create Slider object and callback for date change
+    let timeUpdateCallback = (sliderTime) => {
+
+      // Translate slider value into update timestamp
+      let date = timeManager.getUpdateDate(sliderTime);
+      let timestamp = timeManager.dateToTimestamp(date);
+
+      // Update clock
+      slider.updateClock(date);
+
+      // Load data
+      info("Loading timestamp " + timestamp);
+      map.updateOverlay(loader.loadEvents(timestamp, 1));
+    };
+
+    // Define slider
+    const slider = new Slider(sliderSvg, timeManager.NUM_UPDATES, timeUpdateCallback);
 }
 
 whenDocumentLoaded(main);

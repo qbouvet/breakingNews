@@ -92,12 +92,6 @@ path:hover {
   font-size: 10px;
 }
 
-.track-inset {
-  stroke: #dcdcdc;
-  stroke-width: 8px;
-  stroke-linecap: round;
-}
-
 .track-overlay {
   pointer-events: stroke;
   stroke-width: 50px;

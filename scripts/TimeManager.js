@@ -9,10 +9,18 @@ export class TimeManager {
 
     constructor() {
 
+        this.msPerUpdate = 15*60000;
+
         // Initial date of our dataset
         this.INIT_DATE = new Date(2018, 10, 5, 0, 0);
         this.END_DATE = new Date(2018, 10, 12, 0, 0);
-        this.time = this.INIT_DATE;
+
+        // Init number of updates
+        this.NUM_UPDATES = (this.END_DATE - this.INIT_DATE)/this.msPerUpdate;
+    }
+
+    getUpdateDate(sliderValue) {
+      return new Date(this.INIT_DATE.getTime() + this.msPerUpdate*sliderValue);
     }
 
     dateToTimestamp(date) {
@@ -27,21 +35,5 @@ export class TimeManager {
         return date.getFullYear() + pad(date.getMonth() + 1, 2) +
             pad(date.getDate(), 2) + pad(date.getHours(), 2) +
             pad(date.getMinutes(), 2) + "00";
-    }
-
-    next() {
-
-        // Data set is over
-        if (this.time.getTime() === this.END_DATE.getTime()) {
-            return undefined;
-        }
-
-        // Get timestamp of current time
-        let toReturn = this.dateToTimestamp(this.time);
-
-        // Increment time by 15 minutes
-        this.time = new Date(this.time.getTime() + 15*60000);
-
-        return toReturn;
     }
 }

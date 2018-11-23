@@ -7,10 +7,6 @@ function whenDocumentLoaded(action) {
 	}
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 function logger(prefix="") {
     return function() {
         let args = Array.prototype.slice.call(arguments);
@@ -23,10 +19,7 @@ const info = logger("[INFO]");
 const warn = logger("[WARN]");
 const err = logger("[ERR]");
 
-
-
 export {
-    whenDocumentLoaded, 
-    sleep,
+    whenDocumentLoaded,
     log, info, warn, err
 }
