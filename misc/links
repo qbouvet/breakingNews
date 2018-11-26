@@ -1,0 +1,14 @@
+            Some blocks.org demos we may need at some point 
+
+select-to-zoom      https://bl.ocks.org/jroetman/9b4c0599a4996edef0ab
+
+panzoom             https://coderwall.com/p/psogia/simplest-way-to-add-zoom-pan-on-d3-js
+                    https://bl.ocks.org/mbostock/eec4a6cda2f573574a11 
+                        ^ feels faster             
+                    https://bl.ocks.org/mbostock/8fadc5ac9c2a9e7c5ba2
+
+heatmap / contour   https://bl.ocks.org/mbostock/4241134
+                    https://bl.ocks.org/mbostock/3074470
+
+non-D3 heatmap      http://bl.ocks.org/d3noob/8973028
+                    http://www.d3noob.org/2014/02/generate-heatmap-with-leafletheat-and.html
