@@ -71,10 +71,7 @@ export class Worldmap {
     applyZoom () {
         const transform = d3.event.transform;
         this.currentZoomTransform = transform;
-        this.g.selectAll('path')
-            .attr('transform', transform);
-        this.g.selectAll('circle')
-            .attr('transform', transform);
+        this.g.attr('transform', transform);
     }
 
     /*
@@ -111,7 +108,6 @@ export class Worldmap {
             .append("circle")
               .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0])
               .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1])
-              .attr("transform", this.currentZoomTransform)
               .attr("r", "0px")
               .attr("fill", "grey");
 
