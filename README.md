@@ -19,6 +19,12 @@ TODO
 	Time Slider
 		(?) Allows user to select start time for the animation
 		dragging back should remove events
+		
+	Improvements/visuals/misc
+		style slide bar and "clock" div
+		differentiate events that just appeared
+		distribute event appearance over progression step (not all update at once)
+		keep an event counter somewhere (by category, etc)
 	
 
 IN PROGRESS 
