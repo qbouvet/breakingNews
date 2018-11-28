@@ -26,6 +26,7 @@ TODO
 		differentiate events that just appeared
 		distribute event appearance over progression step (not all update at once)
 		keep an event counter somewhere (by category, etc)
+		faster/slower buttons beside play, to speed up timeline
 	
 
 IN PROGRESS 
