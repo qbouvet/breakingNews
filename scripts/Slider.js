@@ -92,7 +92,8 @@ export class Slider {
   */
   update(v) {
 
-    // Get slider value
+    // Get slider value, keep older value
+    let oldCurrentValue = this.currentValue;
     this.currentValue = Math.floor(this.sliderRange(v));
 
     // Update handle position and clock text
@@ -111,7 +112,7 @@ export class Slider {
     }
 
     // Call update callbacks
-    this.updateCallback(this.currentValue);
+    this.updateCallback(this.currentValue, oldCurrentValue);
   }
 
   /*

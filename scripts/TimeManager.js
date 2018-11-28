@@ -19,6 +19,22 @@ export class TimeManager {
         this.NUM_UPDATES = (this.END_DATE - this.INIT_DATE)/this.msPerUpdate;
     }
 
+    getSortedUpdateDateList(oldSliderValue, newSliderValue) {
+
+      let updateStep = (newSliderValue > oldSliderValue) ? 1 : -1;
+
+      let dateList = []
+      let currentSliderValue = oldSliderValue;
+
+      while (currentSliderValue != newSliderValue) {
+          currentSliderValue += updateStep;
+          let date = this.getUpdateDate(currentSliderValue);
+          dateList.push(date);
+      }
+
+      return dateList;
+    }
+
     getUpdateDate(sliderValue) {
       return new Date(this.INIT_DATE.getTime() + this.msPerUpdate*sliderValue);
     }

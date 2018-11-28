@@ -20,6 +20,7 @@ function eventOnMouseOut(d, tooltip) {
     .style("opacity", 0);
 }
 
+// TODO: remove
 function eventOnMouseClick(d, that) {
   console.log(that)
   console.log("d: ", d)

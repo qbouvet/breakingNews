@@ -13,28 +13,27 @@ function main() {
     const mainSvg = d3.select("#mainSvg");
     const sliderSvg = d3.select("#playSvg");
 
-    // Data loading utilities
-    const loader = new DataLoader();
-
     // Create Map object
-    const map = new Worldmap(mainSvg, loader.loadMapOutline());
+    const map = new Worldmap(mainSvg);
 
     // Init time manager that will generate timestamps and dates
     const timeManager = new TimeManager();
 
     // Create Slider object and callback for date change
-    let timeUpdateCallback = (sliderTime) => {
+    let timeUpdateCallback = (sliderTime, oldTime) => {
 
-      // Translate slider value into update timestamp
-      let date = timeManager.getUpdateDate(sliderTime);
-      let timestamp = timeManager.dateToTimestamp(date);
+      // Detect direction of change
+      let isForward = (sliderTime > oldTime);
 
-      // Update clock
-      slider.updateClock(date);
+      // Get ordered update list from TimeManager
+      let dateList = timeManager.getSortedUpdateDateList(oldTime, sliderTime);
 
-      // Load data
-      info("Loading timestamp " + timestamp);
-      map.updateOverlay(loader.loadEvents(timestamp, 1));
+      // Update map accordingly
+      dateList.forEach((d) => {
+        slider.updateClock(d);
+        map.updateEvents(timeManager.dateToTimestamp(d), isForward);
+      })
+
     };
 
     // Define slider
