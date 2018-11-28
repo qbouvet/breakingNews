@@ -25,7 +25,6 @@ function eventOnMouseClick(d, that) {
   console.log("d: ", d)
   console.log("event id: ", d.ID)
   make_bar_chart()
-
 }
 
 function tooltipHTML(d) {
