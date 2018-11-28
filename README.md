@@ -16,17 +16,15 @@ TODO
 		find suitable data structure
 		add the "selection box" component
 	
-	Time slider
-		Play button starts the animation
-		Triggers the load of new data files & matching animation
+	Time Slider
 		(?) Allows user to select start time for the animation
+		dragging back should remove events
 	
 
 IN PROGRESS 
 
-	Gauthier	Events tooltips/info
-	Tobia		Questionnaire : data insight
-	Quentin		Questionnaire : design
+	Quentin : 	bugfix : panzoom perforamnce problem
+			bugfix : events appear at the wrong place after panning
 
 DONE 
 
@@ -65,6 +63,12 @@ DONE
 		dot events grow smaller / change color to indicate age
 	
 	map pan / zoom
+	
+	Time slider
+		Play button starts the animation
+		Triggers the load of new data files & matching animation
+	
+	events tooltips with basic infos
 		
 		
 		

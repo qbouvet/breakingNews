@@ -1,5 +1,5 @@
 import {EventCodes} from './eventCodes.js'
-
+import {make_bar_chart} from './displaySources.js'
 
 function eventOnMouseOver(d, tooltip) {
 
@@ -20,6 +20,14 @@ function eventOnMouseOut(d, tooltip) {
     .style("opacity", 0);
 }
 
+function eventOnMouseClick(d, that) {
+  console.log(that)
+  console.log("d: ", d)
+  console.log("event id: ", d.ID)
+  make_bar_chart()
+
+}
+
 function tooltipHTML(d) {
 
   let ec = new EventCodes();
@@ -31,5 +39,6 @@ function tooltipHTML(d) {
 }
 
 export {
-    eventOnMouseOver, eventOnMouseOut
+    eventOnMouseOver, eventOnMouseOut,
+    eventOnMouseClick
 }

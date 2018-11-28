@@ -1,0 +1,37 @@
+
+	The goal of our visualization is to display how news outlets report events aroung the world. We wante to show several aspects of this : 
+- Broadly speaking, looking at the entire world or just a region, which news outlets are the most active in terms of number of articles ? number of events covered ?
+- Taking a particular news outlet, which area does it cover ? Does it mostly report events happening in Europe, or rather in America, etc ?
+- Still on a particular outlet, how does the time of the day change the previous data ? Does European news outlet X “go dark" during european nightime, or does it shift its cover to America, Asia, ... as the day goes on ? The goal of this is to distinguish local/national news outlets from those with international cover.
+
+
+
+	With these goals in mind, recall our initial visualization involved the following visual elements : 
+- A world map 
+- Events popping up as time passes, shown as dots
+- Markers representing the news outlets, which were located at the "average locations of events reported", and moved interactively as more and more events were added.
+- Animations (arrows moving, blinking, ...) showing when a news outlet reports an event
+	
+	Wireframe 3 shows the prototype descriped here (while wireframes 1-2 show earlier ideas).
+
+
+
+	We made several changes to this design, to adress several of its flaws.
+
+	Firstly, most news marker would end up in the middle of the atlantic, all overlapping. Most importantly, the notion of "average location" is biased depending on the way you arrange the continents on the map (i.e., do you split the world map on the atlantic ocean, or the pacific ocean ? Both way are geographically correct, yet would show different visual results).
+For these reasons, we abandonned the news outlets map marker entirely, and replaced them by highlighting the events a news outlet reported on the map.
+
+	Secondly, nothing in our original prototype, except temporary animations, allowed the user to visualize the level of activity of the news source. For this, we add a new component to our visualization : a section with sources' activity graphs. This section would allows two things : display the activity of user-selected sources, if the user selects sources; and display the activity of the most active sources if there is no user-selected source.
+
+	Thirdly, this graph section allows us to have better interactivity in our visualization. Selecting a timeframe (by click and drag) on the graph of a news outlet will highlight on the map the events reported by the news outlet only during this timeframe. This allows the user to identify key periods during an average day for a news outlet : It would be interesting to discover, for example, a news outlet covering mostly american events, but operating during russian daytime. For this reason, we would also like to implement a moving night/day overlay to our map.
+
+	Wireframes 4 to 7 show the prototype with these new changes, respectively 
+at the start; once the user starts the visualization; when souces activity graphs show up (either most active or user selected); and finally when the user selects a timeframe on the source graph.
+
+
+
+
+
+
+
+
