@@ -5,6 +5,8 @@ function eventOnMouseOver(d, tooltip) {
 
   tooltip.transition()
     .duration(100)
+    //.style("opacity", 0.9)
+    .style("visibility", "visible")
     .style("opacity", 0.9)
     .style("background", "black");
 
@@ -14,10 +16,11 @@ function eventOnMouseOver(d, tooltip) {
 }
 
 function eventOnMouseOut(d, tooltip) {
-
+    
   tooltip.transition()
-    .duration(100)
-    .style("opacity", 0);
+        .duration(100)
+        //.style("opacity", 0)
+        .style("visibility", "hidden");
 }
 
 function eventOnMouseClick(d, that) {
