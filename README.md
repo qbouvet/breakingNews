@@ -22,6 +22,7 @@ TODO
 		
 	Improvements/visuals/misc
 		style slide bar and "clock" div
+		add slidebar tooltip to show date where mouse is hovering
 		differentiate events that just appeared
 		distribute event appearance over progression step (not all update at once)
 		keep an event counter somewhere (by category, etc)
