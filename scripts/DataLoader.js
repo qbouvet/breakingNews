@@ -17,12 +17,6 @@ class DataPaths {
         // Gdelt folders
         this.EVENTS = 'events/';
         this.MENTIONS = 'mentions/';
-        this.CLASS_FOLDERS = {
-            1:'VERBAL_COOPERATION/',
-            2:'MATERIAL_COOPERATION/',
-            3:'VERBAL_CONFLICT/',
-            4:'MATERIAL_CONFLICT/'
-        };
 
         // Files
         this.WORLDMAP = 'world-nofiji-nohawaii';
@@ -38,7 +32,7 @@ class DataPaths {
 
     // Return path to an event update file
     eventUpdate(timestamp, category) {
-        return this.DATA_FOLDER + this.GDELT_FOLDER + this.EVENTS + this.CLASS_FOLDERS[category] + timestamp + this.JSON;
+        return this.DATA_FOLDER + this.GDELT_FOLDER + this.EVENTS + timestamp + this.JSON;
     }
 }
 
@@ -57,8 +51,8 @@ export class DataLoader {
         return this.load(this.dataPaths.mapOutline());
     }
 
-    loadEvents(timestamp, category) {
-        return this.load(this.dataPaths.eventUpdate(timestamp, category));
+    loadEvents(timestamp) {
+        return this.load(this.dataPaths.eventUpdate(timestamp));
     }
 
     load(path) {
@@ -73,4 +67,3 @@ export class DataLoader {
         });
     }
 }
-

@@ -49,6 +49,11 @@ export class Worldmap {
         this.loadedEvents = {};
         this.flatEvents = [];
 
+        // Categories selection
+        this.currentCategories = new Set();
+        this.selectionRadiusFunct = (d) => this.currentCategories.has(d["Class"]) ? "1px" : "0px";
+        this.selectionColorFunct = (d) => this.currentCategories.has(d["Class"]) ? "orange" : "gray";
+
         // Define the div for the tooltip
         this.tooltip = d3.select("body")
           .append("div")
@@ -56,6 +61,27 @@ export class Worldmap {
             .style("opacity", 0);
 
         info ("Constructed worldmap");
+
+    }
+
+    updateCategory(category, checked) {
+
+      if (checked) {
+        this.currentCategories.add(category);
+      } else {
+        this.currentCategories.delete(category);
+      }
+
+      // Update circles if events are already there
+      if (this.flatEvents.length > 0) {
+
+        this.g.selectAll("circle")
+          .transition()
+            .duration(1000)
+            .delay(100)
+            .attr("fill", this.selectionColorFunct)
+            .attr("r", this.selectionRadiusFunct);
+        }
     }
 
     /*
@@ -85,7 +111,7 @@ export class Worldmap {
         info("Loading from file " + timestamp);
 
         // Load data // FIXME: remove category
-        let data_promise = this.loader.loadEvents(timestamp, 1);
+        let data_promise = this.loader.loadEvents(timestamp);
 
         // Make sure outline already resolved
         Promise.all([this.outlinePromise, data_promise]).then((results) => {
@@ -144,31 +170,38 @@ export class Worldmap {
      */
     drawOverlay() {
 
-        // Enter data
-        let events = this.g
-            .selectAll("circle")
-            .data(this.flatEvents);
+      // Enter data
+      let events = this.g
+          .selectAll("circle")
+          .data(this.flatEvents);
 
-        events.exit().remove();
+      events.exit().remove();
 
-        // Enter Selection
-        let circles = events.enter()
-            .append("circle")
-              .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0])
-              .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1])
-              .attr("r", "0px")
-              .attr("fill", "grey");
+      // Enter Selection
+      let circles = events.enter()
+          .append("circle")
+            .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0])
+            .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1])
+            .attr("r", "0px")
+            .attr("fill", "grey");
 
-        circles.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
-               .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
-               .on('click', (d) => eventOnMouseClick(d, this));
+      circles.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
+             .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
+             .on('click', (d) => eventOnMouseClick(d, this));
 
-        // Need to separate transition otherwise Tooltips don't work
-        circles.transition()
-              .duration(500)
-              .delay(200)
-              .attr("fill", "orange")
-              .attr("r", "1px");
+      // Need to separate transition otherwise Tooltips don't work
+
+      // Full entering transition // TODO: move all durations and consts to a separate place
+      circles
+        .transition()
+          .duration(750)
+          .delay(100)
+          .attr("fill", (d) => this.currentCategories.has(d["Class"]) ? "red" : "gray")
+          .attr("r", (d) => this.currentCategories.has(d["Class"]) ? "2px" : "0px")
+        .transition()
+          .duration(1000)
+          .attr("fill", this.selectionColorFunct)
+          .attr("r", this.selectionRadiusFunct);
     }
 
 }

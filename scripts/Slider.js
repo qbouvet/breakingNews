@@ -120,7 +120,7 @@ export class Slider {
   */
   flow() {
 
-    const updateDelay = 3000;
+    const updateDelay = 2000;
 
     // Define interval callback
     let cb = (elapsed) => {

@@ -38,6 +38,17 @@ function main() {
 
     // Define slider
     const slider = new Slider(sliderSvg, timeManager.NUM_UPDATES, timeUpdateCallback);
+
+    // Define selection buttons behavior // FIXME: just temp example, we need to decide on data
+    let categories = [1, 2, 3, 4];
+    for (const c of categories) {
+
+      let checkbox = d3.select("#c" + c);
+      checkbox.on("change", () => {
+          map.updateCategory(c, checkbox.property("checked"));
+        });
+    }
+
 }
 
 whenDocumentLoaded(main);
