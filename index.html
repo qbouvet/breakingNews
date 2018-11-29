@@ -15,6 +15,10 @@
     <script src="https://d3js.org/d3-array.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <!-- chromo scales -->
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <!-- Tooltips-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js"></script>
     <!-- jQuery CDN - Slim version (=without AJAX) -->
@@ -74,22 +78,31 @@
 
     <div class="wrapper">
         <div id="content">
-            <div class="container-map container-fluid">
-                <svg xmlns="http://www.w3.org/2000/svg" id="mainSvg" height=85vh width=100% viewBox="0 0 1121 276.25" preserveAspectRatio="xMinYMin meet"> <!-- class="svg-content"> -->
-                </svg>
+
+          <form action="">
+            <input id="c1" type="checkbox" name="1">VERBAL_COOPERATION </input>
+            <input id="c2" type="checkbox" name="2">MATERIAL_COOPERATION </input>
+            <input id="c3" type="checkbox" name="3">VERBAL_CONFLICT </input>
+            <input id="c4" type="checkbox" name="4">MATERIAL_CONFLICT </input>
+          </form>
+
+          <div class="container-map container-fluid">
+              <svg xmlns="http://www.w3.org/2000/svg" id="mainSvg" height=85vh width=100% viewBox="0 0 1121 276.25" preserveAspectRatio="xMinYMin meet"> <!-- class="svg-content"> -->
+              </svg>
+          </div>
+
+          <div class="container-play">
+            <div class="container-fluid">
+
+              <div id="play-clock">Test</div>
+
+              <svg xmlns="http://www.w3.org/2000/svg" id="playSvg" height=10vh width=100% preserveAspectRatio="xMinYMin meet"> <!-- class="svg-content"> -->
+              </svg>
+
+              <button class="btn btn-warning" id="play-btn">Play</button>
+
             </div>
-            <div class="container-play">
-              <div class="container-fluid">
-
-                <div id="play-clock">Test</div>
-
-                <svg xmlns="http://www.w3.org/2000/svg" id="playSvg" height=10vh width=100% preserveAspectRatio="xMinYMin meet"> <!-- class="svg-content"> -->
-                </svg>
-
-                <button class="btn btn-warning" id="play-btn">Play</button>
-
-              </div>
-            </div>
+          </div>
         </div>
 
         <nav id="sidebar">
