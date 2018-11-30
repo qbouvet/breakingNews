@@ -31,8 +31,13 @@ class DataPaths {
     }
 
     // Return path to an event update file
-    eventUpdate(timestamp, category) {
+    eventUpdate(timestamp) {
         return this.DATA_FOLDER + this.GDELT_FOLDER + this.EVENTS + timestamp + this.JSON;
+    }
+
+    // Return path to a mention update file
+    mentionUpdate(timestamp) {
+        return this.DATA_FOLDER + this.GDELT_FOLDER + this.MENTIONS + timestamp + this.JSON;
     }
 }
 
@@ -53,6 +58,10 @@ export class DataLoader {
 
     loadEvents(timestamp) {
         return this.load(this.dataPaths.eventUpdate(timestamp));
+    }
+
+    loadMentions(timestamp) {
+        return this.load(this.dataPaths.mentionUpdate(timestamp));
     }
 
     load(path) {
