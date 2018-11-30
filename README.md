@@ -6,33 +6,46 @@ https://atobywankenobi.github.io/data-viz-project/
 
 TODO 
 		
-	Interactive visualization : selection on source graphs shows something on the map
-		select-to-zoom on the time series will show the 
+	Interactive visualization : 
+		select-to-zoom on the time series will show the area of attention of the outlet
 	
 	Source statistics in right panel
 		After selecting 1-5 outlets, show a time-serie of their number of publications
 		
-	Filter data by source and event type/CAMEO code
-		find suitable data structure
-		add the "selection box" component
-	
 	Time Slider
 		(?) Allows user to select start time for the animation
-		dragging back should remove events
+	
+	visual improvements 
+		"fixed" layout without scroll on the page & see all at once
+			no need for the header bar
+			larger sources placeholder
+		style time slider
+		add clock
+		add day/night overlay
+		deeper zoom
+		points should not scale with zoom
 		
-	Improvements/visuals/misc
+		
+	misc
 		style slide bar and "clock" div
 		add slidebar tooltip to show date where mouse is hovering
-		differentiate events that just appeared
-		distribute event appearance over progression step (not all update at once)
-		keep an event counter somewhere (by category, etc)
+		keep an event/mention counter somewhere (by category, etc)
 		faster/slower buttons beside play, to speed up timeline
+		add small random offset to events locations so that they don't "stack"
+		verticakl "looped scroll" on the 
 	
 
 IN PROGRESS 
 
-	Quentin : 	bugfix : panzoom perforamnce problem
-			bugfix : events appear at the wrong place after panning
+	Gauthier
+		Outlets' graph
+	
+	Tobya
+		Updata dataset
+	
+	Quentin
+		new layout
+	
 
 DONE 
 
@@ -77,6 +90,13 @@ DONE
 		Triggers the load of new data files & matching animation
 	
 	events tooltips with basic infos
+		
+	Time Slider
+		dragging back should remove events
+	
+	Filter data by source and event type/CAMEO code
+		find suitable data structure
+		add the "selection box" component
 		
 		
 		
