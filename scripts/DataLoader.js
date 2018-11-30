@@ -31,7 +31,7 @@ class DataPaths {
     }
 
     // Return path to an event update file
-    eventUpdate(timestamp, category) {
+    eventUpdate(timestamp) {
         return this.DATA_FOLDER + this.GDELT_FOLDER + this.EVENTS + timestamp + this.JSON;
     }
 }

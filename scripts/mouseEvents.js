@@ -5,7 +5,6 @@ function eventOnMouseOver(d, tooltip) {
 
   tooltip.transition()
     .duration(100)
-    //.style("opacity", 0.9)
     .style("visibility", "visible")
     .style("opacity", 0.9)
     .style("background", "black");
@@ -16,7 +15,7 @@ function eventOnMouseOver(d, tooltip) {
 }
 
 function eventOnMouseOut(d, tooltip) {
-    
+
   tooltip.transition()
         .duration(100)
         //.style("opacity", 0)
@@ -29,6 +28,9 @@ function eventOnMouseClick(d, that) {
   console.log("d: ", d)
   console.log("event id: ", d.ID)
   make_bar_chart()
+
+  // Open event in new tab
+  window.open(d['Source']);
 }
 
 function tooltipHTML(d) {
@@ -36,9 +38,10 @@ function tooltipHTML(d) {
   let ec = new EventCodes();
 
   return "<b>Global Event ID:</b> " + d['ID'] + " </br>" +
+    "<b>Location:</b> " + d['Action_Location'] + " </br>" +
     "<b>Actor 1:</b> " + d['Actor1'] + " </br>" +
     "<b>Actor 2:</b> " + d['Actor2'] + " </br>" +
-    "<b>Action:</b> " + ec.codes[d['Code']].name + " </br>";
+    "<b>Type:</b> " + ec.codes[d['Code']].name + " </br>";
 }
 
 export {

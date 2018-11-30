@@ -32,6 +32,7 @@ function main() {
       dateList.forEach((d) => {
         slider.updateClock(d);
         map.updateEvents(timeManager.dateToTimestamp(d), isForward);
+        
       })
 
     };

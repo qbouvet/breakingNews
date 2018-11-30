@@ -11,8 +11,8 @@ CSV = '.CSV'
 ZIP = '.zip'
 
 # Event table
-E_cols = [0, 6, 7, 16, 17, 26, 29, 52, 56, 57, 59, 60]
-E_names = ['ID', 'Actor1', 'Actor1_Country', 'Actor2', 'Actor2_Country', 'Code', 'Class', 'Action_Location', 'Lat', 'Long', 'Timestamp', 'Source']
+E_cols = [0, 6, 16, 26, 29, 52, 56, 57, 59, 60]
+E_names = ['ID', 'Actor1', 'Actor2', 'Code', 'Class', 'Action_Location', 'Lat', 'Long', 'Timestamp', 'Source']
 E_not_nan = ['Actor1', 'Actor2', 'Code', 'Class', 'Lat', 'Long']
 
 # Mentions
