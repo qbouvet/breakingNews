@@ -1,8 +1,80 @@
 
+function add_charts(data) {
+    data.forEach(
+    (value, mention) => {
+        var objTo = document.getElementsByClassName('active')[1]
+
+        var divtest = document.createElement("div");
+        divtest.className = "visualize-source-container"
+
+        var divtest0 = document.createElement("div");
+        divtest0.className = "visualize-source-mention"
+
+        var divtest1 = document.createElement("div");        
+        divtest1.className = "visualize-source-mention-chart"
+
+        var svgtest0 = document.createElement("svg")
+        svgtest0.className = "bar-chart"
+        svgtest0.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+
+        divtest1.appendChild(svgtest0)
+        divtest.appendChild(divtest0)
+        divtest.appendChild(divtest1)
+        objTo.appendChild(divtest)
+    })
+}
+
+function addDiv(data) {
+    var source_container = document.getElementsByClassName('visualize-source-container')
+
+    if (source_container.length === 0){
+        add_charts(data)
+        data.forEach((value, mention) => {make_bar_chart(value)})
+    } else {
+
+        var index_container = 0
+        data.forEach(
+            (value, mention) => {
+                var chart_container = source_container[index_container]
+                $(chart_container).empty()
+
+                var divtest0 = document.createElement("div");
+                divtest0.className = "visualize-source-mention"
+                divtest0.innerHTML = "1"
+
+                var divtest1 = document.createElement("div");
+                divtest1.className = "visualize-source-mention-chart"
+
+                var svgtest0 = document.createElement("svg")
+                svgtest0.className = "bar-chart"
+
+                chart_container.appendChild(divtest0)
+
+                divtest1.appendChild(svgtest0)
+                chart_container.appendChild(divtest1)
+
+                make_bar_chart(value)
+
+                index_container++
+        })
+    }
+}
+
+function display_source(data){
+    var arr = Array.from(data)
+    console.log(arr[0])
+    console.log("values: ", data.values())
+    console.log("keys: ", data.keys())
+
+    addDiv(data)
+}
+
 function make_bar_chart(dataset){
     
     dataset = Array.from(dataset)
-    var svgWidth = document.getElementsByClassName("visualize-source")[0].offsetWidth, svgHeight = 200, barPadding = 0;
+    var svgWidth = document.getElementsByClassName("visualize-source-mention-chart")[0].offsetWidth;
+    var svgHeight = document.getElementsByClassName("visualize-source-mention-chart")[0].offsetHeight;
+    var barPadding = 0;
     var barWidth = (svgWidth / dataset.length);
 
     var svg = d3.selectAll('.bar-chart')
@@ -14,10 +86,10 @@ function make_bar_chart(dataset){
         .enter()
         .append("rect")
         .attr("y", function(d) {
-        return svgHeight - d 
+            return svgHeight - d 
         })
         .attr("height", function(d) { 
-        return d; 
+            return d; 
         })
         .attr("width", barWidth - barPadding)
         .attr("transform", function (d, i) {
@@ -199,5 +271,6 @@ function make_line_chart(){
     });
 }
  export {
-    make_bar_chart, make_line_chart
+    make_bar_chart, make_line_chart,
+    display_source
 }
