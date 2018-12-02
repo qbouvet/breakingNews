@@ -68,7 +68,7 @@
                 </div>
             </div>
 
-            <div class="app-panel settingsdiv">
+            <div class="app-panel" id="settingsdiv">
 
             </div>
 
@@ -96,12 +96,12 @@
     <!-- Handles the collapse-settings button -->
     <script type="text/javascript">
         document.querySelector("#btn-collapse-settings").addEventListener("click", () => {
-            const settingsdiv = document.querySelector(".settingsdiv")
-            const visibility = settingsdiv.style.visibility
-            if (visibility === "hidden" || visibility === "collapse") {
-                settingsdiv.style.visibility = "visible"
+            const settingsdiv = document.querySelector("#settingsdiv")
+            const display = settingsdiv.style.display
+            if (display === "none") {
+                settingsdiv.style.display = "block"
             } else { // NB : at the very first click, the field is empty
-                settingsdiv.style.visibility = "collapse"
+                settingsdiv.style.display = "none"
             }
         })
     </script>

@@ -52,13 +52,6 @@ body {
 }
 
 /*  TODO : remove when settings are done */
-.settingsdiv {
-        /*will be toggled by the collapse-settings button */
-    height : 26%;
-    visibility : visible;
-        /* debug */
-    /*background-color: purple;*/
-}
 .sidebardiv {
     background-color: green;
         /* Position
@@ -111,6 +104,9 @@ body {
         /* misc style */
     white-space: nowrap;
     padding: 2px;
+        /* divide space between children */
+    display : flex;
+    flex-direction: column;
 }
 
 .right-panel-split {
@@ -118,51 +114,45 @@ body {
     padding: 2px;
     width: 100%;
     min-height: 100%;
-    min-width: 20%%;
+    min-width: 20%;
 }
 
 /* ---------------------------------------------------
-    MAPDIV & CHILDREN
-    Here, we want to allocate vertical space so that :
-    - map-controls gets what he needs
-    - map-canva get everything if map-control is collapsed
+    LEFT-PANEL-SPLIT CHILDREN
+    we want them setup so that :
+    - settingsdiv get the space it needs
+    - mapdiv gets all the rest
+    - settingsdiv can collapse and give its space to mapdiv
 ----------------------------------------------------- */
 
 #mapdiv {
-    height : 75%;
-        /* for children positioning / sizing */
-    display : flex;
-    flex-direction : column;
+    flex : 1 1 auto;
+    height : 78%;
         /* debug */
     border : solid green 3px;
 }
 
-#map-controls {
-        /* position & size */
-    /*flex: 0 0 initial;*/
-    height : 50px ;
-    width : 100%;
-        /* children layout */
-    display : flex;
-    flex-direction: row;
+#settingsdiv {
+    flex : 0 0 22%;
+    /*height : 22%;*/
+        /*will be toggled by the collapse-settings button
+            visibility : collapse would be better, but unsupported by chrome */
+    display : block;
         /* debug */
-    border : solid red 2px;
+    background-color: purple;
 }
+
+/* ---------------------------------------------------
+    MAP AND EVENTS STYLE
+----------------------------------------------------- */
 
 #map-canva {
         /* position & size */
-    /*flex: 0 0 auto;*/
     height : calc( 100% - 50px ) ;
     width : 100%;
         /* debug */
     border : solid yellow 3px;
 }
-
-
-
-/* ---------------------------------------------------
-    MAP AND EVENTS STYLE
------------------------------------------------------ */
 
 #mainSvg{
         /* size, relative to parent (#map-canva)
@@ -213,6 +203,18 @@ circle:hover {
 /* ---------------------------------------------------
     MAP CONTROLS & TIMESLIDER STYLE
 ----------------------------------------------------- */
+
+#map-controls {
+        /* position & size */
+    /*flex: 0 0 initial;*/
+    height : 50px ;
+    width : 100%;
+        /* children layout */
+    display : flex;
+    flex-direction: row;
+        /* debug */
+    border : solid red 2px;
+}
 
 #btn-play {
     flex : 0 0 auto;
