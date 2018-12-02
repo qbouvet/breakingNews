@@ -1,6 +1,6 @@
 import {log, info, warn, err} from './utils.js'
 import {DataLoader} from './DataLoader.js';
-import {make_bar_chart} from './displaySources.js'
+import {make_bar_chart, display_source} from './displaySources.js'
 
 function count_mentions(mentions) {
 	var counts = {}
@@ -18,6 +18,33 @@ function count_mentions(mentions) {
 	return mapSort1
 }
 
+function make_history(mentions, historyMentions) {
+	mentions.forEach(
+		(value, mention) => {
+			if (mention in historyMentions) {
+				historyMentions[mention].push(value)
+			} else {
+				historyMentions[mention] = [value]
+			}
+	})
+	return historyMentions
+}
+
+function take_top_history(top_mentions, historyMentions) {
+	var top_mentions_map = new Map()
+	top_mentions.forEach(
+		(value, mention) => {
+			if (mention in historyMentions) {
+				top_mentions_map.set(mention, historyMentions[mention])
+			}
+			else {
+				console.log("there is a big problem")
+			}
+	})
+
+	return top_mentions_map
+}
+
 export class MentionHandler {
 
     // Initializes path variables
@@ -25,6 +52,7 @@ export class MentionHandler {
     	this.loader = new DataLoader();
     	this.loadedMentions = {};
     	this.counterMentions = {};
+    	this.historyMentions = {};
     	this.cumulativeMentions = [];
     	this.currentTimestamps = new Set();
     }
@@ -66,15 +94,15 @@ export class MentionHandler {
 
           var source_cumulative_frequency = count_mentions(this.cumulativeMentions);
           var source_frequency = count_mentions(result);
-          info(source_cumulative_frequency)
-          info(source_frequency)
+
+		  this.historyMentions = make_history(source_frequency, this.historyMentions)
+
           var bars_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0,5));
           var bars = new Map(Array.from(source_frequency).slice(0,5));
 
-          info(bars)
-          // info(bars_cumulative)
-
-          make_bar_chart(bars.values())
+          var top_history = take_top_history(bars_cumulative, this.historyMentions)
+          
+          display_source(top_history)
 
         });
       }
