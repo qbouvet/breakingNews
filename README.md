@@ -31,8 +31,12 @@ TODO
 
 IN PROGRESS 
 
-	Quentin : 	bugfix : panzoom perforamnce problem
-			bugfix : events appear at the wrong place after panning
+	Layout 
+        Proportional, 2-panel resizable layout
+            SVG map should maximize into the available space while retaining aspect ratio
+            # SVG map should scale with panel redimensioning
+            # SVG map should not scale with panel redimensioning once zoomed in
+            Settings menu, tabbed, collapsable
 
 DONE 
 

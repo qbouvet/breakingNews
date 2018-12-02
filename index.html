@@ -17,15 +17,19 @@
     <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
     <!-- Tooltips-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js"></script>
-    <!-- jQuery CDN - Slim version (=without AJAX) -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <!-- Popper.JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <!-- 2-panel layout : JQuery lib & resizable plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://rawgit.com/RickStrahl/jquery-resizable/master/src/jquery-resizable.js"></script>
 
+    <!-- jQuery CDN - Slim version (=without AJAX)
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    -->
 
     <!-- Style -->
-    <link href="css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
@@ -33,102 +37,76 @@
 
 
 
-<body class="bg-light">
+<body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="panels-container">
 
-        <a class="navbar-brand" href="#">Breaking News</a>
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="left-panel-split">
 
-        <div id="navbarNavDropdown" class="navbar-collapse collapse">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Features</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Pricing</a>
-                </li>
-
-            </ul>
-
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <button type="button" id="sidebarCollapse" class="navbar-btn">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-                    <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fas fa-align-justify"></i>
-                    </button>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <div class="wrapper">
-        <div id="content">
-            <div class="container-map container-fluid">
-                <svg xmlns="http://www.w3.org/2000/svg" id="mainSvg" height=85vh width=100% viewBox="0 0 1121 276.25" preserveAspectRatio="xMinYMin meet"> <!-- class="svg-content"> -->
-                </svg>
+            <div class="app-panel" id="mapdiv">
+                <!-- This will scale with the panel -->
+                <div  id="map-canva">
+                    <svg    xmlns="http://www.w3.org/2000/svg"
+                            id="mainSvg"
+                            viewBox="220 45 560 350"
+                            preserveAspectRatio="xMidYMid meet"
+                    >
+                        <g id="mapContent"></g>
+                    </svg>
+                </div>
+                <!-- This should not -->
+                <div id="map-controls">
+                    <button class="btn btn-icon" id="btn-reset"></button>
+                    <button class="btn btn-icon" id="btn-play"></button>
+                    <svg    xmlns="http://www.w3.org/2000/svg"
+                            preserveAspectRatio="xMidYMid meet"
+                            id="svg-timeslider"
+                    >
+                    </svg>
+                    <button class="btn btn-icon" id="btn-collapse-settings"></button>
+                </div>
             </div>
-            <div class="container-play">
-              <div class="container-fluid">
 
-                <div id="play-clock">Test</div>
+            <div class="app-panel settingsdiv">
 
-                <svg xmlns="http://www.w3.org/2000/svg" id="playSvg" height=10vh width=100% preserveAspectRatio="xMinYMin meet"> <!-- class="svg-content"> -->
-                </svg>
+            </div>
 
-                <button class="btn btn-warning" id="play-btn">Play</button>
+        </div>
 
-              </div>
+        <div class="splitter"></div>
+
+        <div class="right-panel-split">
+            <div class="app-panel sidebardiv ">
+                <p>[SIDEBAE]</p>
             </div>
         </div>
 
-        <nav id="sidebar">
-            <div class="sidebar-header">
-                <h3>PlaceHolder Sources</h3>
-            </div>
-            <ul class="list-unstyled components">
-                <li class="active">
-                    <!-- <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a> -->
-                    <!-- <ul class="collapse list-unstyled" id="homeSubmenu"> -->
-                        <li>
-                            <div class="visualize-source">
-                                <svg class="bar-chart"></svg>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="visualize-source">
-                                <svg class="bar-chart"></svg>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="visualize-source">
-                                <svg class="bar-chart"></svg>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="visualize-source">
-                                <svg class="bar-chart"></svg>
-                            </div>
-                        </li>
-                    <!-- </ul> -->
-                </li>
-            </ul>
-        </nav>
     </div>
 
-    <!-- Main -->
-    <script type='module' src='scripts/app.js'></script>
 
+    <!-- Handles the resizable 2-panel layout -->
+    <script type="text/javascript">
+        $(".left-panel-split").resizable({
+          handleSelector: ".splitter",
+          resizeHeight: false
+        });
+    </script>
+
+    <!-- Handles the collapse-settings button -->
+    <script type="text/javascript">
+        document.querySelector("#btn-collapse-settings").addEventListener("click", () => {
+            const settingsdiv = document.querySelector(".settingsdiv")
+            const visibility = settingsdiv.style.visibility
+            if (visibility === "hidden" || visibility === "collapse") {
+                settingsdiv.style.visibility = "visible"
+            } else { // NB : at the very first click, the field is empty
+                settingsdiv.style.visibility = "collapse"
+            }
+        })
+    </script>
+
+    <!-- toggles the right navbar [?]
     <script type="text/javascript">
         $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {
@@ -137,6 +115,11 @@
             });
         });
     </script>
+    -->
+
+    <!-- Main -->
+    <script type='module' src='scripts/app.js'></script>
+
 </body>
 
 </html>

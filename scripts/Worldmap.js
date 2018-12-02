@@ -34,7 +34,7 @@ export class Worldmap {
             const h = this.svg.style("height").replace("px", "");
             const scale0 = (w - 1) / 2 / Math.PI;
 
-            this.projection = d3.geoLarrivee().fitSize([w, h], result);
+            this.projection = d3.geoLarrivee()//.fitSize([w, h], result);
             this.path = d3.geoPath().projection(this.projection);
 
             // Store data and draw outline
@@ -71,6 +71,9 @@ export class Worldmap {
     applyZoom () {
         const transform = d3.event.transform;
         this.currentZoomTransform = transform;
+        /*if (transform.k > 1.2) {
+            // do something to disable scaling ??
+        }*/
         this.g.attr('transform', transform);
     }
 

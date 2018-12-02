@@ -1,4 +1,6 @@
 
+import {log, info, warn, err} from './utils.js';
+
 /*
   This class implements the slider under the map, that models time flow. It can
   be played/paused, or dragged directly by the user.
@@ -24,7 +26,7 @@ export class Slider {
   initScale(svg, maxVal) {
 
     // Init margin and dimensions
-    this.margin = {top:50, right:50, bottom:0, left:50};
+    this.margin = {top:20, right:20, bottom:0, left:20};
     this.w = svg.style("width").replace("px", "") - this.margin.right - this.margin.left;
     this.h = svg.style("height").replace("px", "") - this.margin.top - this.margin.bottom;
 
@@ -43,10 +45,18 @@ export class Slider {
   */
   initSlider(self) {
 
+    // Coordinate system = SVG viewbox
+        // FIXME : ugly - this doesn't work with d3 selection (that we have in this.svg)
+    /*const vbw = document.querySelector("#svg-timeslider").getAttribute("viewBox").split(" ")
+    const bbox = document.querySelector("#svg-timeslider").getBBox()
+    err(vbw)
+    err(bbox)
+    let transform = "translate(" + vbw[0] + ", " + vbw[1] + ")"*/
+
     // Slider container
     this.slider = this.svg.append('g')
       .attr("class", "slider")
-      .attr("transform", "translate(" + this.margin.left + "," + this.h/2 + ")");
+      .attr("transform", "translate(" + this.margin.left + "," + (this.margin.top + this.h/2) + ")");
 
     // Slider line
     this.slider.append("line")
@@ -80,7 +90,7 @@ export class Slider {
     this.clock = d3.select("#play-clock");
 
     // Define event callbacck
-    this.playButton = d3.select("#play-btn")
+    this.playButton = d3.select("#btn-play")
       .on("click", function() {
           self.flow();
       });
@@ -104,7 +114,8 @@ export class Slider {
       this.playButton.attr('disabled', 'diabled');
       this.moving = false;
       clearInterval(this.interval);
-      this.playButton.text("Play");
+        // FIXME : ugly : can't use the "d3-selected" object, need a document.querySelector() object
+      document.querySelector("#btn-play").style.backgroundImage = "url(../css/play.svg)"
     } else {
 
       this.playButton.attr('disabled', null);
@@ -129,15 +140,17 @@ export class Slider {
 
     // Play pause behavior
     if (this.moving === true) {
-
       this.moving = false;
       clearInterval(this.interval);
-      this.playButton.text("Play");
+        // FIXME : ugly : can't use the "d3-selected" object, need a document.querySelector() object
+      //this.playButton.style.background = "url('./pause.svg')";
+      document.querySelector("#btn-play").style.backgroundImage = "url(../css/play.svg)"
     } else {
-
       this.moving = true;
       this.interval = setInterval(cb, updateDelay);
-      this.playButton.text("Pause");
+        // FIXME : ugly : can't use the "d3-selected" object, need a document.querySelector() object
+      //this.playButton.style.background = "url('./pause.svg')";
+      document.querySelector("#btn-play").style.backgroundImage = "url(../css/pause.svg)";
     }
   }
 
