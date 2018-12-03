@@ -13,7 +13,7 @@ export class TimeManager {
 
         // Initial date of our dataset
         this.INIT_DATE = new Date(2018, 10, 5, 0, 0);
-        this.END_DATE = new Date(2018, 10, 12, 0, 0);
+        this.END_DATE = new Date(2018, 10, 5, 23, 45);
 
         // Init number of updates
         this.NUM_UPDATES = (this.END_DATE - this.INIT_DATE)/this.msPerUpdate;
