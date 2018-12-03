@@ -64,24 +64,37 @@ function addDiv(data) {
     }
 }
 
-function display_source(data){
+function display_source(data, timestamps){
 
     // var mention_number = Array.from(data.values(), (x, y) => x[0][0])
     // var mention_timestamp = Array.from(data.values(), (x, y) => x[0][1])
 
+    // console.log("data: ", data)
     data.forEach((value, source) => {
-        let mention_number = value.map((x) => x[0])
-        let timestamps = value.map( (x) =>x[1])
 
-        console.log("source: ", source)
-        console.log("sum: ", mention_number.reduce((a,b) => a+b))
+
+        console.log("value: ", value)
+        timestamps.forEach( time => {
+            if (value.has(time)){
+                console.log(value.get(time))
+            } else {
+                value.set(time, 0)
+            }
+        })
+        // let mention_number = value.map((x) => x[0])
+        // let timestamps = value.map( (x) =>x[1])
+
+        // console.log("source: ", source)
+        // console.log("sum: ", mention_number.reduce((a,b) => a+b))
     })
 
-    console.log("values: ", data.values())
-    console.log("keys: ", data.keys())
+    console.log("data: ", data)
+
+    // console.log("values: ", data.values())
+    // console.log("keys: ", data.keys())
 
 
-    addDiv(data)
+    // addDiv(data)
 }
 
 function make_bar_chart(dataset){
