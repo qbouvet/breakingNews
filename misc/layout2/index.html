@@ -1,0 +1,81 @@
+<html>
+<head>
+    <title>Simple Split Panels - jquery-resizable</title>
+    <meta charset="utf-8"/>
+    
+    <link rel="stylesheet" href="index.css">
+
+    <!-- JQuery lib & resizable plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://rawgit.com/RickStrahl/jquery-resizable/master/src/jquery-resizable.js"></script>
+    
+    
+    
+</head>
+<body style="">
+    <div class="page-container">
+
+        <h1>
+           jquery-resizable - A simple splitter panel
+        </h1>
+        <hr />
+
+        <p>
+            Simple example that demonstrates how to create slidable two-pane layouts <a href="http://caniuse.com/#search=flexbox">using FlexBox</a> and the resizable plug-in.
+            Note that Flexbox is not required, but used here to keep the layout simple.
+        </p>
+
+        <label>Horizontal Splitter Panes:</label>
+
+        <div class="panel-container">
+
+            <div class="panel-left">
+                left panel
+            </div>
+
+            <div class="splitter">
+            </div>
+
+            <div class="panel-right">
+                right panel
+            </div>
+        </div>
+
+        <label>Vertical Splitter Panes:</label>
+        <div class="panel-container-vertical">
+
+            <div class="panel-top">
+                top panel
+            </div>
+
+            <div class="splitter-horizontal">
+            </div>
+
+            <div class="panel-bottom">
+                bottom panel
+            </div>
+        </div>
+
+
+
+        <hr />
+
+        <p>
+            This example creates two resizables for the horizontal and vertical splitter panes:
+        </p>
+    </div>
+    
+    <script>
+    $(".panel-left").resizable({
+        handleSelector: ".splitter",
+        resizeHeight: false
+    });
+    $(".panel-top").resizable({
+        handleSelector: ".splitter-horizontal",
+        resizeWidth: false
+    });
+    </script>
+
+
+</body>
+</html>

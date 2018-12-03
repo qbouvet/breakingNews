@@ -2,16 +2,18 @@
 import {log, info, warn, err} from './utils.js';
 import {whenDocumentLoaded} from './utils.js';
 
+import {sleep} from './utils.js';
+import {DataLoader} from './DataLoader.js';
 import {Worldmap} from './Worldmap.js';
 import {TimeManager} from './TimeManager.js';
 import {MentionHandler} from './MentionHandler.js';
 import {Slider} from './Slider.js';
 
-function main() {
+async function main() {
 
     // Select svgs
     const mainSvg = d3.select("#mainSvg");
-    const sliderSvg = d3.select("#playSvg");
+    const sliderSvg = d3.select("#svg-timeslider");
 
     // Create Map object
     const map = new Worldmap(mainSvg);
