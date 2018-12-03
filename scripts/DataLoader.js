@@ -25,7 +25,8 @@ class DataPaths {
         };
 
         // Files
-        this.WORLDMAP = 'world-nofiji-nohawaii';
+        //this.WORLDMAP = 'world-nofiji-nohawaii';
+        this.WORLDMAP = 'world';
 
         // Others
         this.JSON = '.json';
@@ -73,4 +74,3 @@ export class DataLoader {
         });
     }
 }
-

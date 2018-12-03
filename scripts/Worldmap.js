@@ -17,7 +17,7 @@ export class Worldmap {
         // Zoom definition
         this.currentZoomTransform = "matrix(1 0 0 1 0 0)"    // identity svg transform
         this.zoom_handler = d3.zoom()
-            .scaleExtent([1,8])
+            .scaleExtent([1,15])
             .on("zoom", this.applyZoom.bind(this))
         this.svg.call(this.zoom_handler)
 
