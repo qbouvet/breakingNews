@@ -4,10 +4,12 @@
 ----------------------------------------------------- */
 
 * {
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
 }
 
+    /* FIXME : PROBABLY USELESS
+     */
 .svg-content {
     display: block;
     position: absolute;
@@ -15,21 +17,188 @@
     left: 0;
     width: 100%;
     height: 100%;
+    /*preserveAspectRatio=none;*/
 }
 
-/* TODO : remove this once scaling is done (this helps for debug) */
-#playSvg {
-  border : solid 2px;
+    /*  Background style
+     */
+body {
+    height : 100%;
+    width : 100%;
+    overflow: auto;
+    background-color: #888888;
 }
 
-/* TODO : remove this once scaling is done (this helps for debug) */
-#mainSvg {
-    border : solid 2px;
+    /*  Top level blocks of the visualization :
+     *  map, graph panel, settings
+     */
+.app-panel{
+    margin : 2px;
+    padding : 2px;
+    border : solid black 2px;
+    border-radius : 4px;
 }
+
+    /* generic style for icon-button */
+.btn-icon {
+        /* positioning */
+    margin : 3px;
+    width : 40px;
+    height : 40px;
+        /* Style -> fullsize background-image */
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+    background-size : 100% 100%;
+}
+
+    /* menu where all children are aligned horizontally*/
+.one-line-menu {
+        /* generic height for all such menues */
+    height : 50px;
+        /* children positioning */
+    display : flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+/* ---------------------------------------------------
+    2-panel layout stuff
+----------------------------------------------------- */
+
+.panels-container {
+        /* children layout */
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    xtouch-action: none;            /* avoid browser level touch actions */
+        /* positioning      */
+    position : absolute;
+    height : 90;
+    padding: 0;
+    margin: 0;
+    width : 100%;
+    height : 100%;
+}
+
+.splitter {
+        /* position & size */
+    flex: 0 0 auto;
+    width: 10px;
+    min-height: 200px;
+        /* Styling */
+    background: url("../css/icons/splitter.png") center center no-repeat #333333;
+    background-size: 40px 40px;
+    border: solid black 1px;
+        /* resize behaviour */
+    cursor: col-resize;
+}
+
+.left-panel-split {
+        /* position & size */
+    flex: 0 0 auto;
+    min-width: 66%;
+    max-width: 80%;
+    height : 100%;
+        /* misc style */
+    white-space: nowrap;
+    padding: 2px;
+        /* divide space between children */
+    display : flex;
+    flex-direction: column;
+}
+
+.right-panel-split {
+    flex: 1 1 auto;
+    padding: 2px;
+    width: 100%;
+    min-height: 100%;
+    min-width: 20%;
+}
+
+/* ---------------------------------------------------
+    LEFT-PANEL-SPLIT CHILDREN
+    we want them setup so that :
+    - settingsdiv get the space it needs
+    - mapdiv gets all the rest
+    - settingsdiv can collapse and give its space to mapdiv
+----------------------------------------------------- */
+
+#mapdiv {
+    flex : 1 1 auto;
+    height : 78%;
+}
+
+#settingsdiv {
+    flex : 0 0 22%;
+    /*height : 22%;*/
+        /*will be toggled by the collapse-settings button
+            visibility : collapse would be better, but unsupported by chrome */
+    display : block;
+}
+
+/* ---------------------------------------------------
+    SIDEBAR-RELATED STYLING
+----------------------------------------------------- */
+
+#menubar { /* typically inherits from one-line-menu */
+        /* left-right align children - NB works with flex */
+    justify-content: space-between;
+}
+
+#btn-info {
+     background-image: url(../css/icons/info.svg);
+        /* right-align with 5px gap */
+     position : relative;
+     top : 0px;
+     /*left : calc(100% - 45px);*/
+}
+
+@font-face {
+  font-family: "SomeCoolFont";
+  src: url("../css/fonts/OldNewspaperTypes.ttf");
+}
+
+#menubar p {
+    /* vh = viewport-related units https://stackoverflow.com/questions/16056591/font-scaling-based-on-width-of-container#answer-19818026 */
+    /* TODO : use svg instead ? https://css-tricks.com/fitting-text-to-a-container/ */
+        /* remove interline */
+    padding: 0;
+    margin: 0;
+    margin-left: 1vw;
+        /* font config */
+    font-size : 1.5vw;
+    font-family: "SomeCoolFont";  /* "must be the last value specified" */
+}
+
+#sidebardiv {
+    background-color: green;
+        /* Position
+    position : absolute;
+    left : 70%;
+    top : 0%;*/
+        /* witdh
+    width : 30%;*/
+    height : 100%;
+}
+
 
 /* ---------------------------------------------------
     MAP AND EVENTS STYLE
 ----------------------------------------------------- */
+
+#map-canva {
+        /* position & size */
+    height : calc( 100% - 50px ) ;
+    width : 100%;
+}
+
+#mainSvg{
+        /* size, relative to parent (#map-canva)
+            (parents size needs to be defined, else, oveflow)*/
+    height : 100% ;
+    width : 100%;
+}
 
 path {
     stroke: #bbbbbb;
@@ -69,19 +238,37 @@ circle:hover {
   stroke: white;
 }
 
-/* Country selection FIXME: need/want this?
-path:hover {
-  stroke: #002868 !important;
-  stroke-width:2px;
-  stroke-linejoin: round;
-  fill: #002868 !important;
-  cursor: pointer;
-}
-*/
 
 /* ---------------------------------------------------
-    PLAY BAR STYLE
+    MAP CONTROLS & TIMESLIDER STYLE
 ----------------------------------------------------- */
+
+#map-controls { /* typically inherits from one-line-menu */
+        /* position & size */
+    width : 100%;
+}
+
+#btn-play {
+    flex : 0 0 auto;
+    background-image: url(../css/icons/play.svg);
+}
+
+#btn-reset {
+    flex : 0 0 auto;
+    background: url(../css/icons/reset.svg);
+}
+
+#btn-collapse-settings {
+    flex : 0 0 auto;
+    background: url(../css/icons/yo.png);
+}
+
+#svg-timeslider {
+        /* Position & size */
+    flex : 0 0 auto;
+    height : 100% ;
+    flex-grow : 1;
+}
 
 .track {
   stroke: #000;
@@ -106,231 +293,4 @@ path:hover {
   stroke: #000;
   stroke-opacity: 0.5;
   stroke-width: 1.25px;
-}
-
-/* ---------------------------------------------------
-    FIXME: from here, not sure what's useful and what's not
------------------------------------------------------ */
-
-.navbar-btn {
-    box-shadow: none;
-    outline: none !important;
-    border: none;
-}
-
-.line {
-    width: 100%;
-    height: 1px;
-    border-bottom: 1px dashed #ddd;
-    margin: 40px 0;
-}
-
-/* ---------------------------------------------------
-    SIDEBAR STYLE
------------------------------------------------------ */
-
-.wrapper {
-    display: flex;
-    width: 100%;
-    align-items: stretch;
-    perspective: 1500px;
-}
-
-
-#sidebar {
-    min-width: 250px;
-    max-width: 250px;
-    background: #7386D5;
-    color: #fff;
-/*    transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
-    transform-origin: bottom left;
-*/}
-
-#sidebar.active {
-    margin-right: 0px;
-    transform: rotateY(90deg);
-    display: none;
-}
-
-#sidebar .sidebar-header {
-    padding: 20px;
-    background: #6d7fcc;
-}
-
-#sidebar ul.components {
-    padding: 20px 0;
-    border-bottom: 1px solid #47748b;
-}
-
-#sidebar ul p {
-    color: #fff;
-    padding: 10px;
-}
-
-#sidebar ul li a {
-    padding: 10px;
-    font-size: 1.1em;
-    display: block;
-}
-#sidebar ul li a:hover {
-    color: #7386D5;
-    background: #fff;
-}
-
-#sidebar ul li.active > a, a[aria-expanded="true"] {
-    color: #fff;
-    background: #6d7fcc;
-}
-
-
-a[data-toggle="collapse"] {
-    position: relative;
-}
-
-.dropdown-toggle::after {
-    display: block;
-    position: absolute;
-    top: 50%;
-    right: 20px;
-    /*transform: translateY(-50%);*/
-}
-
-#sidebar .visualize-source {
-    display: block;
-    background: #ffffff;
-}
-ul ul a {
-    font-size: 0.9em !important;
-    padding-left: 30px !important;
-    background: #6d7fcc;
-}
-
-ul.CTAs {
-    padding: 20px;
-}
-
-ul.CTAs a {
-    text-align: center;
-    font-size: 0.9em !important;
-    display: block;
-    border-radius: 5px;
-    margin-bottom: 5px;
-}
-
-a.download {
-    background: #fff;
-    color: #7386D5;
-}
-
-a.article, a.article:hover {
-    background: #6d7fcc !important;
-    color: #fff !important;
-}
-
-.bar {
-  fill: red; /* changes the background */
-  height: 21px;
-  transition: fill .3s ease;
-  cursor: pointer;
-  font-family: Helvetica, sans-serif;
-}
-.bar text {
-  color: black;
-}
-.bar:hover,
-.bar:focus {
-  fill: black;
-}
-.bar:hover text,
-.bar:focus text {
-  fill: red;
-}
-/* ---------------------------------------------------
-    CONTENT STYLE
------------------------------------------------------ */
-#content {
-    width: 100%;
-    padding: 20px;
-    min-height: 100vh;
-    transition: all 0.3s;
-}
-
-#sidebarCollapse {
-    width: 40px;
-    height: 40px;
-    background: #f5f5f5;
-    cursor: pointer;
-}
-
-#sidebarCollapse span {
-    width: 80%;
-    height: 2px;
-    margin: 0 auto;
-    display: block;
-    background: #555;
-/*    transition: all 0.8s cubic-bezier(0.810, -0.330, 0.345, 1.375);
-    transition-delay: 0.2s;
-*/}
-
-#sidebarCollapse span:first-of-type {
-    transform: rotate(45deg) translate(2px, 2px);
-}
-#sidebarCollapse span:nth-of-type(2) {
-    opacity: 0;
-}
-#sidebarCollapse span:last-of-type {
-    transform: rotate(-45deg) translate(1px, -1px);
-}
-
-#sidebarCollapse.active span {
-    transform: none;
-    opacity: 1;
-    margin: 5px auto;
-}
-
-
-/* ---------------------------------------------------
-    MEDIAQUERIES
------------------------------------------------------ */
-@media (max-width: 768px) {
-    #sidebar {
-        margin-right: 0px;
-        /*transform: rotateY(90deg);*/
-    }
-    #sidebar.active {
-        margin-right: 0;
-        transform: none;
-        display: none;
-    }
-    #sidebarCollapse span:first-of-type,
-    #sidebarCollapse span:nth-of-type(2),
-    #sidebarCollapse span:last-of-type {
-        transform: none;
-        opacity: 1;
-        margin: 5px auto;
-    }
-    #sidebarCollapse.active span {
-        margin: 0 auto;
-    }
-    #sidebarCollapse span:first-of-type {
-        transform: rotate(45deg) translate(5px, 5px);
-    }
-    #sidebarCollapse span:nth-of-type(2) {
-        opacity: 0;
-    }
-    #sidebarCollapse span:last-of-type {
-        transform: rotate(-45deg) translate(5px, -5px);
-    }
-
-   #sidebarCollapse.active span:first-of-type {
-        transform: translate(0px, -5px);
-    }
-    #sidebarCollapse.active span:nth-of-type(2) {
-        opacity: 1;
-        transform: translate(0px, 0px);
-    }
-    #sidebarCollapse.active span:last-of-type {
-        transform: translate(0px, 5px);
-    }
-
 }

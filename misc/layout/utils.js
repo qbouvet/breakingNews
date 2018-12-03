@@ -18,14 +18,8 @@ const log = logger("");
 const info = logger("[INFO]");
 const warn = logger("[WARN]");
 const err = logger("[ERR]");
-const toast = console.warn;
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 export {
     whenDocumentLoaded,
-    log, info, warn, err,
-    sleep
+    log, info, warn, err
 }

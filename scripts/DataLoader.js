@@ -19,7 +19,8 @@ class DataPaths {
         this.MENTIONS = 'mentions/';
 
         // Files
-        this.WORLDMAP = 'world-nofiji-nohawaii';
+        //this.WORLDMAP = 'world-nofiji-nohawaii';
+        this.WORLDMAP = 'world';
 
         // Others
         this.JSON = '.json';

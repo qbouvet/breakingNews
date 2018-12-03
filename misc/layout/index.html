@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="content-Type" content="text/html; charset=utf-8">
+
+    <title>dummy layout</title>
+
+    <link rel="stylesheet" href="index.css">
+
+    <!-- JQuery lib & resizable plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://rawgit.com/RickStrahl/jquery-resizable/master/src/jquery-resizable.js"></script>
+
+</head>
+
+
+
+<body>
+<div class="page-container">
+
+    <div class="split-container">
+        <div class="splitter-left-panel">
+            <div class="mapdiv toplevel-container">
+                <p>[MAP]]</p>
+            </div>
+
+            <div class="settingsdiv toplevel-container">
+                <p>[SETTINGS]</p>
+            </div>
+        </div>
+
+        <div class="splitter"></div>
+
+        <div class="splitter-right-panel">
+            <div class="sidebardiv toplevel-container">
+                <p>[SIDEBAE]</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(".splitter-left-panel").resizable({
+          handleSelector: ".splitter",
+          resizeHeight: false
+        });
+    </script>
+
+    <!-- Main -->
+    <script type='module' src='app.js'></script>
+
+</div>
+</body>
+
+
+
+</html>
