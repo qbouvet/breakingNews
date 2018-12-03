@@ -4,10 +4,12 @@
 ----------------------------------------------------- */
 
 * {
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
 }
 
+    /* FIXME : PROBABLY USELESS
+     */
 .svg-content {
     display: block;
     position: absolute;
@@ -21,9 +23,8 @@
     /*  Background style
      */
 body {
-    /*margin : 20px;*/
-    padding: 0px;
-    margin: 0px;
+    height : 100%;
+    width : 100%;
     overflow: auto;
     background-color: #888888;
 }
@@ -51,16 +52,14 @@ body {
     background-size : 100% 100%;
 }
 
-/*  TODO : remove when settings are done */
-.sidebardiv {
-    background-color: green;
-        /* Position
-    position : absolute;
-    left : 70%;
-    top : 0%;*/
-        /* witdh
-    width : 30%;*/
-    height : 100%;
+    /* menu where all children are aligned horizontally*/
+.one-line-menu {
+        /* generic height for all such menues */
+    height : 50px;
+        /* children positioning */
+    display : flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 /* ---------------------------------------------------
@@ -88,7 +87,7 @@ body {
     width: 10px;
     min-height: 200px;
         /* Styling */
-    background: url("./splitter.png") center center no-repeat #333333;
+    background: url("../css/icons/splitter.png") center center no-repeat #333333;
     background-size: 40px 40px;
     border: solid black 1px;
         /* resize behaviour */
@@ -141,6 +140,51 @@ body {
         /* debug */
     background-color: purple;
 }
+
+/* ---------------------------------------------------
+    SIDEBAR-RELATED STYLING
+----------------------------------------------------- */
+
+#menubar { /* typically inherits from one-line-menu */
+        /* left-right align children - NB works with flex */
+    justify-content: space-between;
+}
+
+#btn-info {
+     background-image: url(../css/icons/info.svg);
+        /* right-align with 5px gap */
+     position : relative;
+     top : 0px;
+     /*left : calc(100% - 45px);*/
+}
+
+@font-face {
+  font-family: "SomeCoolFont";
+  src: url("../css/fonts/OldNewspaperTypes.ttf");
+}
+
+#menubar p {
+    /* vh = viewport-related units https://stackoverflow.com/questions/16056591/font-scaling-based-on-width-of-container#answer-19818026 */
+        /* remove interline */
+    padding: 0;
+    margin: 0;
+    margin-left: 1vw;
+        /* font config */
+    font-size : 1.5vw;
+    font-family: "SomeCoolFont";  /* "must be the last value specified" */
+}
+
+#sidebardiv {
+    background-color: green;
+        /* Position
+    position : absolute;
+    left : 70%;
+    top : 0%;*/
+        /* witdh
+    width : 30%;*/
+    height : 100%;
+}
+
 
 /* ---------------------------------------------------
     MAP AND EVENTS STYLE
@@ -204,31 +248,26 @@ circle:hover {
     MAP CONTROLS & TIMESLIDER STYLE
 ----------------------------------------------------- */
 
-#map-controls {
+#map-controls { /* typically inherits from one-line-menu */
         /* position & size */
-    /*flex: 0 0 initial;*/
-    height : 50px ;
     width : 100%;
-        /* children layout */
-    display : flex;
-    flex-direction: row;
         /* debug */
     border : solid red 2px;
 }
 
 #btn-play {
     flex : 0 0 auto;
-    background-image: url(./play.svg);
+    background-image: url(../css/icons/play.svg);
 }
 
 #btn-reset {
     flex : 0 0 auto;
-    background: url(./reset.svg);
+    background: url(../css/icons/reset.svg);
 }
 
 #btn-collapse-settings {
     flex : 0 0 auto;
-    background: url(./yo.png);
+    background: url(../css/icons/yo.png);
 }
 
 #svg-timeslider {
@@ -263,8 +302,52 @@ circle:hover {
   stroke-width: 1.25px;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* ---------------------------------------------------
-    FIXME: from here, not sure what's useful and what's not
+    FIXME: probably useless
 ----------------------------------------------------- */
 
 .navbar-btn {

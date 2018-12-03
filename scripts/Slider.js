@@ -115,7 +115,7 @@ export class Slider {
       this.moving = false;
       clearInterval(this.interval);
         // FIXME : ugly : can't use the "d3-selected" object, need a document.querySelector() object
-      document.querySelector("#btn-play").style.backgroundImage = "url(../css/play.svg)"
+      document.querySelector("#btn-play").style.backgroundImage = "url(../css/icons/play.svg)"
     } else {
 
       this.playButton.attr('disabled', null);
@@ -144,13 +144,13 @@ export class Slider {
       clearInterval(this.interval);
         // FIXME : ugly : can't use the "d3-selected" object, need a document.querySelector() object
       //this.playButton.style.background = "url('./pause.svg')";
-      document.querySelector("#btn-play").style.backgroundImage = "url(../css/play.svg)"
+      document.querySelector("#btn-play").style.backgroundImage = "url(../css/icons/play.svg)"
     } else {
       this.moving = true;
       this.interval = setInterval(cb, updateDelay);
         // FIXME : ugly : can't use the "d3-selected" object, need a document.querySelector() object
       //this.playButton.style.background = "url('./pause.svg')";
-      document.querySelector("#btn-play").style.backgroundImage = "url(../css/pause.svg)";
+      document.querySelector("#btn-play").style.backgroundImage = "url(../css/icons/pause.svg)";
     }
   }
 

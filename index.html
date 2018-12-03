@@ -41,7 +41,6 @@
 
     <div class="panels-container">
 
-
         <div class="left-panel-split">
 
             <div class="app-panel" id="mapdiv">
@@ -56,7 +55,7 @@
                     </svg>
                 </div>
                 <!-- This should not -->
-                <div id="map-controls">
+                <div class="one-line-menu" id="map-controls">
                     <button class="btn btn-icon" id="btn-reset"></button>
                     <button class="btn btn-icon" id="btn-play"></button>
                     <svg    xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +68,7 @@
             </div>
 
             <div class="app-panel" id="settingsdiv">
-
+                TODO
             </div>
 
         </div>
@@ -77,8 +76,12 @@
         <div class="splitter"></div>
 
         <div class="right-panel-split">
-            <div class="app-panel sidebardiv ">
-                <p>[SIDEBAE]</p>
+            <div class="app-panel one-line-menu" id="menubar">
+                <p>BREAKING NEWS</p>
+                <button class="btn btn-icon" id="btn-info"></button>
+            </div>
+            <div class="app-panel" id="sidebardiv">
+
             </div>
         </div>
 
@@ -105,17 +108,6 @@
             }
         })
     </script>
-
-    <!-- toggles the right navbar [?]
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#sidebarCollapse').on('click', function () {
-                $('#sidebar').toggleClass('active');
-                $(this).toggleClass('active');
-            });
-        });
-    </script>
-    -->
 
     <!-- Main -->
     <script type='module' src='scripts/app.js'></script>
