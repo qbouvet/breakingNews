@@ -29,7 +29,11 @@ function addDiv(data) {
 
     if (source_container.length === 0){
         add_charts(data)
-        data.forEach((value, mention) => {make_bar_chart(value)})
+
+        data.forEach((value, mention) => {
+            console.log("value: ", value)
+            make_bar_chart(value.map((x,y) => x[0]))
+        })
     } else {
 
         var index_container = 0
@@ -53,7 +57,7 @@ function addDiv(data) {
                 divtest1.appendChild(svgtest0)
                 chart_container.appendChild(divtest1)
 
-                make_bar_chart(value)
+                make_bar_chart(value.map((x,y) => x[0]))
 
                 index_container++
         })
@@ -61,10 +65,21 @@ function addDiv(data) {
 }
 
 function display_source(data){
-    var arr = Array.from(data)
-    console.log(arr[0])
+
+    // var mention_number = Array.from(data.values(), (x, y) => x[0][0])
+    // var mention_timestamp = Array.from(data.values(), (x, y) => x[0][1])
+
+    data.forEach((value, source) => {
+        let mention_number = value.map((x) => x[0])
+        let timestamps = value.map( (x) =>x[1])
+
+        console.log("source: ", source)
+        console.log("sum: ", mention_number.reduce((a,b) => a+b))
+    })
+
     console.log("values: ", data.values())
     console.log("keys: ", data.keys())
+
 
     addDiv(data)
 }

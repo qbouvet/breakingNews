@@ -3,6 +3,7 @@ import {DataLoader} from './DataLoader.js';
 import {make_bar_chart, display_source} from './displaySources.js'
 
 function count_mentions(mentions) {
+	
 	var counts = {}
 	info("counting")
 	mentions.reduce(function (acc, curr) {
@@ -18,26 +19,31 @@ function count_mentions(mentions) {
 	return mapSort1
 }
 
-function make_history(mentions, historyMentions) {
+function make_history(mentions, historyMentions, currentTimestamps) {
+
+	let timestamps = Array.from(currentTimestamps)
+	let current = timestamps[timestamps.length-1]
+
 	mentions.forEach(
 		(value, mention) => {
 			if (mention in historyMentions) {
-				historyMentions[mention].push(value)
+				historyMentions[mention].push([value, current])
 			} else {
-				historyMentions[mention] = [value]
+				historyMentions[mention] = [[value, current]]
 			}
 	})
+
 	return historyMentions
 }
 
 function take_top_history(top_mentions, historyMentions) {
+
 	var top_mentions_map = new Map()
 	top_mentions.forEach(
 		(value, mention) => {
 			if (mention in historyMentions) {
 				top_mentions_map.set(mention, historyMentions[mention])
-			}
-			else {
+			} else {
 				console.log("there is a big problem")
 			}
 	})
@@ -87,7 +93,7 @@ export class MentionHandler {
         // Make sure outline already resolved
         mentions_promise.then((result) => {
 
-          // Update event data and redraw it
+          // Update mentions
           this.currentTimestamps.add(timestamp);
           this.loadedMentions[timestamp] = result;
           this.cumulativeMentions = this.cumulativeMentions.concat(result);
@@ -95,14 +101,15 @@ export class MentionHandler {
           var source_cumulative_frequency = count_mentions(this.cumulativeMentions);
           var source_frequency = count_mentions(result);
 
-		  this.historyMentions = make_history(source_frequency, this.historyMentions)
+		  this.historyMentions = make_history(source_frequency, this.historyMentions, this.currentTimestamps)
 
           var bars_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0,5));
           var bars = new Map(Array.from(source_frequency).slice(0,5));
 
-          var top_history = take_top_history(bars_cumulative, this.historyMentions)
-          
-          display_source(top_history)
+          var top_history_cumulative = take_top_history(bars_cumulative, this.historyMentions)
+          var top_history = take_top_history(bars, this.historyMentions)
+
+          display_source(top_history_cumulative)
 
         });
       }
