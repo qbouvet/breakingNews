@@ -6,64 +6,45 @@ https://atobywankenobi.github.io/data-viz-project/
 
 TODO
 
-	Filter data by source and event type/CAMEO code
-		find suitable data structure
-		add the "selection box" component
-
-	Time Slider
-		dragging back should remove events
-        dragging & *clicking* forward should add *all* events
-        the new scale seems bugged - check scale
-
-	Improvements/visuals/misc
-		add slidebar tooltip to show date where mouse is hovering
-		keep an event counter somewhere (by category, etc)
-
-	Interactive visualization :
-		select-to-zoom on the time series will show the area of attention of the outlet
-
-	Source statistics in right panel
-		After selecting 1-5 outlets, show a time-serie of their number of publications
-
-	Time Slider
-		(?) Allows user to select start time for the animation
-
-	visual improvements
-		"fixed" layout without scroll on the page & see all at once
-			no need for the header bar
-			larger sources placeholder
-		add day/night overlay
-		points should not scale with zoom
-
-
 	misc
-		style slide bar and "clock" div
 		add slidebar tooltip to show date where mouse is hovering
 		keep an event/mention counter somewhere (by category, etc)
-		faster/slower buttons beside play, to speed up timeline
 		add small random offset to events locations so that they don't "stack"
 		verticakl "looped scroll" on the
 
     UX / user interaction / user interface
-        time slider should offer start slider / stop slider / reset button
-        speed selection button
-        !!! DOTS SHOULD SCALE BETTER
+        time slider could offer start slider / stop slider / reset button
 
-    Styling
-        Do a nice time slider
-        Do a nice clock in a corner somewhere
-        add random offset to events location so that they stack less
-        [?] add random time offset to events so that they pop continuously
+    mîm
+        change categories to event code
+        day/night overlay
+
+    Feature :
+        interactive selection on graphs : "band-select" on the time series will show the area of attention of the outlet over selected timeframe
 
 
 IN PROGRESS
 
-	Layout
-        Proportional, 2-panel resizable layout
-            SVG map should maximize into the available space while retaining aspect ratio
-            # SVG map should scale with panel redimensioning
-            # SVG map should not scale with panel redimensioning once zoomed in
-            Settings menu, tabbed, collapsable
+    Gauthier : news outlets graphs in the sidebar
+
+    Tobia   :
+        replace slider with clock
+        add speed-change button
+        Dots styling :
+            [?] add random time offset to events so that they pop continuously
+            [?] have points pop linearily between updates
+            improve dot scaling
+                [?] redraw at each zoom level
+                [?] have 3-6 layer hidden layer for dot size at various zoom levels
+                [?] best solution : find an attribute that prevents scaling, like paths
+
+    Quentin :
+        Page styling :
+            fix collapse buttons
+            add functionality to reset buttons
+            tabbed layout for showing sources stats in settings div (number of mentions in each category)
+
+
 
 DONE
 
@@ -116,5 +97,11 @@ DONE
 		find suitable data structure
 		add the "selection box" component
 
-
 	events tooltips with basic infos
+
+    Layout
+        Proportional, 2-panel resizable layout
+            SVG map should maximize into the available space while retaining aspect ratio
+            # SVG map should scale with panel redimensioning
+            # SVG map should not scale with panel redimensioning once zoomed in
+            Settings menu, tabbed, collapsable
