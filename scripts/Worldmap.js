@@ -1,5 +1,6 @@
 
 import {log, info, warn, err} from './utils.js'
+import {DataLoader} from './DataLoader.js';
 import {eventOnMouseOver, eventOnMouseOut, eventOnMouseClick} from './mouseEvents.js'
 
 /*
@@ -7,12 +8,13 @@ import {eventOnMouseOver, eventOnMouseOut, eventOnMouseClick} from './mouseEvent
  */
 export class Worldmap {
 
-  constructor(svg, outlineJsonPromise) {
+  constructor(svg) {
 
         //  g groups drawn elements so that applying a transformation
         //  to g applies it to all its children
         this.svg = svg;
-        this.g = this.svg.append("g")
+        this.g = this.svg.append("g");
+        this.loader = new DataLoader();
 
         // Zoom definition
         this.currentZoomTransform = "matrix(1 0 0 1 0 0)"    // identity svg transform
@@ -22,7 +24,7 @@ export class Worldmap {
         this.svg.call(this.zoom_handler)
 
         // Define outline and behavior when it resolves
-        this.outlinePromise = outlineJsonPromise;
+        this.outlinePromise = this.loader.loadMapOutline();
         this.outlinePromise.then( (result) => {
 
             if (result==undefined) {
@@ -42,8 +44,15 @@ export class Worldmap {
             this.drawOutline();
         });
 
-        // Define initial overlay data in order to concatenate afterwards
-        this.overlayData = [];
+        // Define events
+        this.currentTimestamps = new Set();
+        this.loadedEvents = {};
+        this.flatEvents = [];
+
+        // Categories selection
+        this.currentCategories = new Set();
+        this.selectionRadiusFunct = (d) => this.currentCategories.has(d["Class"]) ? "1px" : "0px";
+        this.selectionColorFunct = (d) => this.currentCategories.has(d["Class"]) ? "orange" : "gray";
 
         // Define the div for the tooltip
         this.tooltip = d3.select("body")
@@ -52,20 +61,83 @@ export class Worldmap {
             .style("opacity", 0);
 
         info ("Constructed worldmap");
+
+    }
+
+    updateCategory(category, checked) {
+
+      if (checked) {
+        this.currentCategories.add(category);
+      } else {
+        this.currentCategories.delete(category);
+      }
+
+      // Update circles if events are already there
+      if (this.flatEvents.length > 0) {
+
+        this.g.selectAll("circle")
+          .transition()
+            .duration(1000)
+            .delay(100)
+            .attr("fill", this.selectionColorFunct)
+            .attr("r", this.selectionRadiusFunct);
+        }
     }
 
     /*
-       Load new data for the  overlay, data promise is attached to field
+       Load new data for the overlay if necessary
      */
-    updateOverlay(data_promise) {
+    updateEvents(timestamp, isForward) {
+
+      if (isForward) {
+        this.updateEventsForward(timestamp);
+      } else {
+        this.updateEventsBackward(timestamp);
+      }
+    }
+
+    updateEventsForward(timestamp) {
+
+      if (Object.keys(this.loadedEvents).includes(timestamp)) {
+
+        info("Loading from events " + timestamp);
+
+        // Update flatEvents with already loaded data
+        this.flatEvents = this.flatEvents.concat(this.loadedEvents[timestamp]);
+        this.drawOverlay();
+
+      } else {
+
+        info("Loading from file " + timestamp);
+
+        // Load data // FIXME: remove category
+        let data_promise = this.loader.loadEvents(timestamp);
 
         // Make sure outline already resolved
         Promise.all([this.outlinePromise, data_promise]).then((results) => {
 
           // Update event data and redraw it
-          this.overlayData = this.overlayData.concat(results[1]);
+          this.currentTimestamps.add(timestamp);
+          this.loadedEvents[timestamp] = results[1];
+          this.flatEvents = this.flatEvents.concat(results[1]);
           this.drawOverlay();
         });
+      }
+    }
+
+    updateEventsBackward(timestamp) {
+
+      // Remove timestamp from current ones
+      info("Removing from current " + timestamp);
+      this.currentTimestamps.delete(timestamp);
+
+      // Rebuild flatEvents
+      this.flatEvents = [];
+      for (const timestamp in this.currentTimestamps) {
+            this.flatEvents = this.flatEvents.concat(this.loadedEvents[timestamp]);
+      }
+
+      this.drawOverlay();
     }
 
     applyZoom () {
@@ -101,29 +173,38 @@ export class Worldmap {
      */
     drawOverlay() {
 
-        // Enter data
-        let events = this.g
-            .selectAll("circle")
-            .data(this.overlayData);
+      // Enter data
+      let events = this.g
+          .selectAll("circle")
+          .data(this.flatEvents);
 
-        // Enter Selection
-        let circles = events.enter()
-            .append("circle")
-              .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0])
-              .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1])
-              .attr("r", "0px")
-              .attr("fill", "grey");
+      events.exit().remove();
 
-        circles.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
-               .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
-               .on('click', (d) => eventOnMouseClick(d, this));
+      // Enter Selection
+      let circles = events.enter()
+          .append("circle")
+            .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0])
+            .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1])
+            .attr("r", "0px")
+            .attr("fill", "grey");
 
-        // Need to separate transition otherwise Tooltips don't work
-        circles.transition()
-              .duration(500)
-              .delay(200)
-              .attr("fill", "orange")
-              .attr("r", "1px");
+      circles.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
+             .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
+             .on('click', (d) => eventOnMouseClick(d, this));
+
+      // Need to separate transition otherwise Tooltips don't work
+
+      // Full entering transition // TODO: move all durations and consts to a separate place
+      circles
+        .transition()
+          .duration(750)
+          .delay(100)
+          .attr("fill", (d) => this.currentCategories.has(d["Class"]) ? "red" : "gray")
+          .attr("r", (d) => this.currentCategories.has(d["Class"]) ? "2px" : "0px")
+        .transition()
+          .duration(1000)
+          .attr("fill", this.selectionColorFunct)
+          .attr("r", this.selectionRadiusFunct);
     }
 
 }

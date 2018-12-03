@@ -15,6 +15,10 @@
     <script src="https://d3js.org/d3-array.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <!-- chromo scales -->
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <!-- Tooltips-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js"></script>
     <!-- Popper.JS -->
@@ -68,7 +72,13 @@
             </div>
 
             <div class="app-panel" id="settingsdiv">
-                TODO
+                <div id="play-clock">[Click Play To start the visualization]</div>
+                <form action="">
+                  <input id="c1" type="checkbox" name="1"> VERBAL_COOPERATION    </input>
+                  <input id="c2" type="checkbox" name="2"> MATERIAL_COOPERATION    </input>
+                  <input id="c3" type="checkbox" name="3"> VERBAL_CONFLICT    </input>
+                  <input id="c4" type="checkbox" name="4"> MATERIAL_CONFLICT    </input>
+                </form>
             </div>
 
         </div>
@@ -81,12 +91,6 @@
                 <button class="btn btn-icon" id="btn-info"></button>
             </div>
             <div class="app-panel" id="sidebardiv">
-
-            </div>
-        </div>
-
-    </div>
-
 
     <!-- Handles the resizable 2-panel layout -->
     <script type="text/javascript">

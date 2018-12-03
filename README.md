@@ -6,12 +6,6 @@ https://atobywankenobi.github.io/data-viz-project/
 
 TODO
 
-	Interactive visualization : selection on source graphs shows something on the map
-		select-to-zoom on the time series will show the
-
-	Source statistics in right panel
-		After selecting 1-5 outlets, show a time-serie of their number of publications
-
 	Filter data by source and event type/CAMEO code
 		find suitable data structure
 		add the "selection box" component
@@ -25,10 +19,35 @@ TODO
 		add slidebar tooltip to show date where mouse is hovering
 		keep an event counter somewhere (by category, etc)
 
+	Interactive visualization :
+		select-to-zoom on the time series will show the area of attention of the outlet
+
+	Source statistics in right panel
+		After selecting 1-5 outlets, show a time-serie of their number of publications
+
+	Time Slider
+		(?) Allows user to select start time for the animation
+
+	visual improvements
+		"fixed" layout without scroll on the page & see all at once
+			no need for the header bar
+			larger sources placeholder
+		add day/night overlay
+		points should not scale with zoom
+
+
+	misc
+		style slide bar and "clock" div
+		add slidebar tooltip to show date where mouse is hovering
+		keep an event/mention counter somewhere (by category, etc)
+		faster/slower buttons beside play, to speed up timeline
+		add small random offset to events locations so that they don't "stack"
+		verticakl "looped scroll" on the
+
     UX / user interaction / user interface
         time slider should offer start slider / stop slider / reset button
         speed selection button
-        !!! DOTS SHOULD SCALE BETTER 
+        !!! DOTS SHOULD SCALE BETTER
 
     Styling
         Do a nice time slider
@@ -87,5 +106,15 @@ DONE
 	Time slider
 		Play button starts the animation
 		Triggers the load of new data files & matching animation
+
+	events tooltips with basic infos
+
+	Time Slider
+		dragging back should remove events
+
+	Filter data by source and event type/CAMEO code
+		find suitable data structure
+		add the "selection box" component
+
 
 	events tooltips with basic infos

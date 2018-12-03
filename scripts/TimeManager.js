@@ -13,10 +13,26 @@ export class TimeManager {
 
         // Initial date of our dataset
         this.INIT_DATE = new Date(2018, 10, 5, 0, 0);
-        this.END_DATE = new Date(2018, 10, 12, 0, 0);
+        this.END_DATE = new Date(2018, 10, 5, 23, 45);
 
         // Init number of updates
         this.NUM_UPDATES = (this.END_DATE - this.INIT_DATE)/this.msPerUpdate;
+    }
+
+    getSortedUpdateDateList(oldSliderValue, newSliderValue) {
+
+      let updateStep = (newSliderValue > oldSliderValue) ? 1 : -1;
+
+      let dateList = []
+      let currentSliderValue = oldSliderValue;
+
+      while (currentSliderValue != newSliderValue) {
+          currentSliderValue += updateStep;
+          let date = this.getUpdateDate(currentSliderValue);
+          dateList.push(date);
+      }
+
+      return dateList;
     }
 
     getUpdateDate(sliderValue) {

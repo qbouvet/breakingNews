@@ -127,8 +127,6 @@ body {
 #mapdiv {
     flex : 1 1 auto;
     height : 78%;
-        /* debug */
-    border : solid green 3px;
 }
 
 #settingsdiv {
@@ -137,8 +135,6 @@ body {
         /*will be toggled by the collapse-settings button
             visibility : collapse would be better, but unsupported by chrome */
     display : block;
-        /* debug */
-    background-color: purple;
 }
 
 /* ---------------------------------------------------
@@ -165,6 +161,7 @@ body {
 
 #menubar p {
     /* vh = viewport-related units https://stackoverflow.com/questions/16056591/font-scaling-based-on-width-of-container#answer-19818026 */
+    /* TODO : use svg instead ? https://css-tricks.com/fitting-text-to-a-container/ */
         /* remove interline */
     padding: 0;
     margin: 0;
@@ -194,8 +191,6 @@ body {
         /* position & size */
     height : calc( 100% - 50px ) ;
     width : 100%;
-        /* debug */
-    border : solid yellow 3px;
 }
 
 #mainSvg{
@@ -203,8 +198,6 @@ body {
             (parents size needs to be defined, else, oveflow)*/
     height : 100% ;
     width : 100%;
-        /* debug */
-    border : solid purple 2px;
 }
 
 path {
@@ -251,8 +244,6 @@ circle:hover {
 #map-controls { /* typically inherits from one-line-menu */
         /* position & size */
     width : 100%;
-        /* debug */
-    border : solid red 2px;
 }
 
 #btn-play {
