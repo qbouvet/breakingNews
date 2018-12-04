@@ -1,8 +1,108 @@
 
+function add_charts(data) {
+    data.forEach(
+    (value, mention) => {
+        var objTo = document.getElementsByClassName('active')[1]
+
+        var divtest = document.createElement("div");
+        divtest.className = "visualize-source-container"
+
+        var divtest0 = document.createElement("div");
+        divtest0.className = "visualize-source-mention"
+
+        var divtest1 = document.createElement("div");        
+        divtest1.className = "visualize-source-mention-chart"
+
+        var svgtest0 = document.createElement("svg")
+        svgtest0.className = "bar-chart"
+        svgtest0.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+
+        divtest1.appendChild(svgtest0)
+        divtest.appendChild(divtest0)
+        divtest.appendChild(divtest1)
+        objTo.appendChild(divtest)
+    })
+}
+
+function addDiv(data) {
+    var source_container = document.getElementsByClassName('visualize-source-container')
+
+    if (source_container.length === 0){
+        add_charts(data)
+
+        data.forEach((value, mention) => {
+            console.log("value: ", value)
+            make_bar_chart(value.map((x,y) => x[0]))
+        })
+    } else {
+
+        var index_container = 0
+        data.forEach(
+            (value, mention) => {
+                var chart_container = source_container[index_container]
+                $(chart_container).empty()
+
+                var divtest0 = document.createElement("div");
+                divtest0.className = "visualize-source-mention"
+                divtest0.innerHTML = "1"
+
+                var divtest1 = document.createElement("div");
+                divtest1.className = "visualize-source-mention-chart"
+
+                var svgtest0 = document.createElement("svg")
+                svgtest0.className = "bar-chart"
+
+                chart_container.appendChild(divtest0)
+
+                divtest1.appendChild(svgtest0)
+                chart_container.appendChild(divtest1)
+
+                make_bar_chart(value.map((x,y) => x[0]))
+
+                index_container++
+        })
+    }
+}
+
+function display_source(data, timestamps){
+
+    // var mention_number = Array.from(data.values(), (x, y) => x[0][0])
+    // var mention_timestamp = Array.from(data.values(), (x, y) => x[0][1])
+
+    // console.log("data: ", data)
+    data.forEach((value, source) => {
+
+
+        console.log("value: ", value)
+        timestamps.forEach( time => {
+            if (value.has(time)){
+                console.log(value.get(time))
+            } else {
+                value.set(time, 0)
+            }
+        })
+        // let mention_number = value.map((x) => x[0])
+        // let timestamps = value.map( (x) =>x[1])
+
+        // console.log("source: ", source)
+        // console.log("sum: ", mention_number.reduce((a,b) => a+b))
+    })
+
+    console.log("data: ", data)
+
+    // console.log("values: ", data.values())
+    // console.log("keys: ", data.keys())
+
+
+    // addDiv(data)
+}
+
 function make_bar_chart(dataset){
     
     dataset = Array.from(dataset)
-    var svgWidth = document.getElementsByClassName("visualize-source")[0].offsetWidth, svgHeight = 200, barPadding = 0;
+    var svgWidth = document.getElementsByClassName("visualize-source-mention-chart")[0].offsetWidth;
+    var svgHeight = document.getElementsByClassName("visualize-source-mention-chart")[0].offsetHeight;
+    var barPadding = 0;
     var barWidth = (svgWidth / dataset.length);
 
     var svg = d3.selectAll('.bar-chart')
@@ -14,10 +114,10 @@ function make_bar_chart(dataset){
         .enter()
         .append("rect")
         .attr("y", function(d) {
-        return svgHeight - d 
+            return svgHeight - d 
         })
         .attr("height", function(d) { 
-        return d; 
+            return d; 
         })
         .attr("width", barWidth - barPadding)
         .attr("transform", function (d, i) {
@@ -199,5 +299,6 @@ function make_line_chart(){
     });
 }
  export {
-    make_bar_chart, make_line_chart
+    make_bar_chart, make_line_chart,
+    display_source
 }
