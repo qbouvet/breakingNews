@@ -21,11 +21,22 @@ TODO
 
     Feature :
         interactive selection on graphs : "band-select" on the time series will show the area of attention of the outlet over selected timeframe
+    
+    details on the graphs visualization
+        Maximize graph scale on hover
+
+    Styling :
+        Clock at the top center
+        3/4 buttons at bottom center (refresh, playspeed, play, maximize)
+        orange / black / grey bg theme
 
 
 IN PROGRESS
 
-    Gauthier : news outlets graphs in the sidebar
+    Gauthier : graph visualization in the sidebar
+        common scale across all sources
+        name + mention counter stacked, left-aligned
+        [?] (don't do if "maximize graph on hover") on hover : vertical bar spanning across all graphs, gives numerical value at intersection with curve 
 
     Tobia   :
         replace slider with clock
@@ -39,6 +50,8 @@ IN PROGRESS
                 [?] best solution : find an attribute that prevents scaling, like paths
 
     Quentin :
+        heatmap
+        refresh button, information button
         Page styling :
             fix collapse buttons
             add functionality to reset buttons
