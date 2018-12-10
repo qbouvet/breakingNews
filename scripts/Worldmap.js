@@ -1,6 +1,7 @@
 
 import {log, info, warn, err} from './utils.js'
 import {DataLoader} from './DataLoader.js';
+import {D3Handler} from './AnimationStyling.js'
 import {eventOnMouseOver, eventOnMouseOut, eventOnMouseClick} from './mouseEvents.js'
 
 /*
@@ -15,6 +16,7 @@ export class Worldmap {
         this.svg = svg;
         this.g = this.svg.append("g");
         this.loader = new DataLoader();
+        this.D3 = new D3Handler();
 
         // Zoom definition
         this.currentZoomTransform = "matrix(1 0 0 1 0 0)"    // identity svg transform
@@ -51,8 +53,7 @@ export class Worldmap {
 
         // Categories selection
         this.currentCategories = new Set();
-        this.selectionRadiusFunct = (d) => this.currentCategories.has(d["Class"]) ? "1px" : "0px";
-        this.selectionColorFunct = (d) => this.currentCategories.has(d["Class"]) ? "orange" : "gray";
+        this.selected = (d) => this.currentCategories.has(d["Class"]);
 
         // Define the div for the tooltip
         this.tooltip = d3.select("body")
@@ -64,53 +65,38 @@ export class Worldmap {
 
     }
 
+    /*
+      Called when one of the checkboxes is checked or unchecked, updates current selection
+    */
     updateCategory(category, checked) {
 
-      if (checked) {
-        this.currentCategories.add(category);
-      } else {
-        this.currentCategories.delete(category);
-      }
+      // Add or remove from categories
+      checked ? this.currentCategories.add(category) : this.currentCategories.delete(category);
 
       // Update circles if events are already there
-      if (this.flatEvents.length > 0) {
-
-        this.g.selectAll("circle")
-          .transition()
-            .duration(1000)
-            .delay(100)
-            .attr("fill", this.selectionColorFunct)
-            .attr("r", this.selectionRadiusFunct);
-        }
+      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"), this.selected);
     }
 
     /*
-       Load new data for the overlay if necessary
+       Add or remove events to map depending on direction of update
      */
     updateEvents(timestamp, isForward) {
-
-      if (isForward) {
-        this.updateEventsForward(timestamp);
-      } else {
-        this.updateEventsBackward(timestamp);
-      }
+      isForward ? this.updateEventsForward(timestamp) : this.updateEventsBackward(timestamp);
     }
 
     updateEventsForward(timestamp) {
 
       if (Object.keys(this.loadedEvents).includes(timestamp)) {
 
-        info("Loading from events " + timestamp);
-
         // Update flatEvents with already loaded data
+        info("Loading from events " + timestamp);
         this.flatEvents = this.flatEvents.concat(this.loadedEvents[timestamp]);
+        
         this.drawOverlay();
 
       } else {
 
         info("Loading from file " + timestamp);
-
-        // Load data // FIXME: remove category
         let data_promise = this.loader.loadEvents(timestamp);
 
         // Make sure outline already resolved
@@ -120,6 +106,7 @@ export class Worldmap {
           this.currentTimestamps.add(timestamp);
           this.loadedEvents[timestamp] = results[1];
           this.flatEvents = this.flatEvents.concat(results[1]);
+
           this.drawOverlay();
         });
       }
@@ -178,33 +165,22 @@ export class Worldmap {
           .selectAll("circle")
           .data(this.flatEvents);
 
+      // Exit selection
       events.exit().remove();
 
       // Enter Selection
       let circles = events.enter()
-          .append("circle")
-            .attr("cx", (d) => this.projection([d["Long"], d["Lat"]])[0])
-            .attr("cy", (d) => this.projection([d["Long"], d["Lat"]])[1])
-            .attr("r", "0px")
-            .attr("fill", "grey");
+          .append("circle");
+
+      // Place invisible events on map
+      this.D3.invisibleCirclesCorrectLocation(circles, this.projection);
 
       circles.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
              .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
              .on('click', (d) => eventOnMouseClick(d, this));
 
-      // Need to separate transition otherwise Tooltips don't work
-
-      // Full entering transition // TODO: move all durations and consts to a separate place
-      circles
-        .transition()
-          .duration(750)
-          .delay(100)
-          .attr("fill", (d) => this.currentCategories.has(d["Class"]) ? "red" : "gray")
-          .attr("r", (d) => this.currentCategories.has(d["Class"]) ? "2px" : "0px")
-        .transition()
-          .duration(1000)
-          .attr("fill", this.selectionColorFunct)
-          .attr("r", this.selectionRadiusFunct);
+      // Full entering transition
+      this.D3.pulseEntrance(circles, this.selected);
     }
 
 }

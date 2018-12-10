@@ -247,7 +247,8 @@ path {
 
 circle {
         /* keeps width fixed when zooming */
-    vector-effect: non-scaling-stroke;
+    /*vector-effect: non-scaling-stroke;*/
+    fill: none;
 }
 
 /* ---------------------------------------------------
@@ -268,6 +269,7 @@ div.tooltip b {
 
 circle:hover {
   fill: white !important;
+  stroke: white;
 }
 
 
