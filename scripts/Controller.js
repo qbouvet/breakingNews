@@ -49,7 +49,7 @@ export class Controller {
     this.currentTime = 0;
 
     this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speedArray[this.speedIndex]));
-    //this.mentionsReset();
+    this.mentionsReset();
 
     this.CONTROLS.enablePlay(true);
     this.CONTROLS.enableForward(true);
@@ -83,7 +83,7 @@ export class Controller {
 
     // Disable button if MAX_VALUE, or re-enable it FIXME: restart?
     // if (this.currentTime >= 10) 
-    if (this.currentTime >= this.TIME_MANAGER.NUM_UPDATES) {
+    if (this.currentTime >=  10) { //this.TIME_MANAGER.NUM_UPDATES) {
 
       this.playing = false;
       this.endOfDay = true;

@@ -64,6 +64,14 @@ function addDiv(data) {
     }
 }
 
+function clean_sources(reset=false){
+    $('.visualize-source-container').empty()
+    $('.visualize-source-container').show() 
+    if (reset){
+        $('.visualize-source-container').hide() 
+    }
+}
+
 function display_source(data, cumulative_data, timestamps){
 
     // var mention_number = Array.from(data.values(), (x, y) => x[0][0])
@@ -71,8 +79,11 @@ function display_source(data, cumulative_data, timestamps){
 
     console.log("data: ", data)
     console.log("cumumulative_data: ", cumulative_data) 
-    $('.visualize-source-container').css('height', 'calc(100%/' + Array.from(data).length + ')');
-    $('.visualize-source-container').empty()
+    // $('.visualize-source-container').css('height', 'calc(100%/' + Array.from(data).length + ')');
+
+    d3.selectAll(".visualize-source-container").style('height', 'calc(100%/' + Array.from(data).length + ')')
+
+    clean_sources()
 
 
 
@@ -319,5 +330,5 @@ function make_line_chart(){
 }
  export {
     make_bar_chart, make_line_chart,
-    display_source
+    display_source, clean_sources
 }

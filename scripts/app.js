@@ -18,7 +18,7 @@ async function main() {
       (timestamp, isForward, updateStepDuration) => MAP.updateEvents(timestamp, isForward, updateStepDuration),
       (timestamp, isForward) => MENTIONS_HANDLER.updateMentions(timestamp, isForward),
       (updateStepDuration) => MAP.reset(updateStepDuration),
-      undefined); // TODO: mentions reset
+      (x) => MENTIONS_HANDLER.reset());
 
     // Define selection buttons behavior // FIXME: just temp example, we need to decide on data
     let categories = [1, 2, 3, 4];

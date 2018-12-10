@@ -1,6 +1,6 @@
 import {log, info, warn, err} from './utils.js'
 import {DataLoader} from './DataLoader.js';
-import {make_bar_chart, display_source} from './displaySources.js'
+import {make_bar_chart, display_source, clean_sources} from './displaySources.js'
 
 
 function sortMapByKeys(history_value) {
@@ -23,20 +23,26 @@ function sortHistory(history) {
 
 function count_mentions(mentions) {
 
-	var counts = {}
-	info("counting")
-	mentions.reduce(function (acc, curr) {
-		acc[curr['MentionSourceName']] ? acc[curr['MentionSourceName']]++ : acc[curr['MentionSourceName']] = 1;
-		return acc;},
-	counts);
+  if (mentions.length > 0){
+  	var counts = {}
+  	info("counting")
+  	mentions.reduce(function (acc, curr) {
+  		acc[curr['MentionSourceName']] ? acc[curr['MentionSourceName']]++ : acc[curr['MentionSourceName']] = 1;
+  		return acc;},
+  	counts);
 
-	// sorted mentions
-	var mapCounts = new Map(Object.entries(counts))
-	const mapSort1 = new Map([...mapCounts.entries()].sort((a, b) => {
-		return b[1] - a[1] }
-      ));
+  	// sorted mentions
+  	var mapCounts = new Map(Object.entries(counts))
+  	const mapSort1 = new Map([...mapCounts.entries()].sort((a, b) => {
+  		return b[1] - a[1] }
+        ));
 
-	return mapSort1
+  	return mapSort1
+
+  } else {
+    return new Map()
+  }
+
 }
 
 function make_history(mentions, historyMentions, currentTimestamps) {
@@ -108,18 +114,36 @@ function add_timestamps_to_top_history_map(top_history_cumulative, currentTimest
   return top_history_cumulative
 }
 
+function take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps) {
+  let top_history = new Map()
+  top_history_cumulative.forEach((value, source) => {
+    currentTimestamps.forEach( time => {
+      if (top_history.has(source)) {
+        if (value.has(time)) {
+          top_history.get(source).set(time, value.get(time))
+        }
+      } else {
+        if (value.has(time)) {
+          let my_map = new Map()
+          my_map.set(time, value.get(time))
+          top_history.set(source, my_map)
+        }
+      }
+    })
+  })
+  return top_history
+}
+
 export class MentionHandler {
 
     // Initializes path variables
     constructor() {
     	this.loader = new DataLoader();
     	this.loadedMentions = {};
-    	this.counterMentions = {};
     	this.historyMentions = {};
     	this.cumulativeMentions = [];
-    	this.currentTimestamps = new Set();
+    	this.currentTimestamps = [];
       this.k = 5;
-      $('.visualize-source-container').css('height', 'calc(100%/' + this.k + ')');
     }
 
     /*
@@ -136,7 +160,7 @@ export class MentionHandler {
 
     updateMentionsForward(timestamp) {
 
-      if (Object.keys(this.loadedMentions).includes(timestamp)) {
+      if (Object.keys(this.loadedMentions).includes(timestamp) && (timestamp in this.currentTimestamps)) {
 
         info("Loading from events " + timestamp);
 
@@ -153,7 +177,7 @@ export class MentionHandler {
         mentions_promise.then((result) => {
 
           // Update mentions
-          this.currentTimestamps.add(timestamp);
+          this.currentTimestamps.push(timestamp);
           this.loadedMentions[timestamp] = result;
           this.cumulativeMentions = this.cumulativeMentions.concat(result);
 
@@ -162,17 +186,8 @@ export class MentionHandler {
 
           this.historyMentions = make_history(source_frequency, this.historyMentions, this.currentTimestamps)
 
-    		  info("history: ", this.historyMentions)
-
-          // top k results
-    
           var bars_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0,this.k));
-          // // var bars = new Map(Array.from(source_frequency).slice(0,5));
-
-          info("bars_cumulative", bars_cumulative)
-
           var top_history_cumulative = take_top_history(bars_cumulative, this.historyMentions)
-          // // var top_history = take_top_history(bars, this.historyMentions)
 
           top_history_cumulative = add_timestamps_to_top_history_map(top_history_cumulative, this.currentTimestamps)
 
@@ -186,13 +201,50 @@ export class MentionHandler {
 
       // Remove timestamp from current ones
       info("Removing from current " + timestamp);
-      this.currentTimestamps.delete(timestamp);
+      this.currentTimestamps.pop();
+
+      let last_timestamp = this.currentTimestamps[this.currentTimestamps.length-1]
+
+      let result = []
+
+      if (last_timestamp) {
+        result = this.loadedMentions[last_timestamp]
+      }
 
       // Rebuild flatEvents
-      this.flatEvents = [];
-      for (const timestamp in this.currentTimestamps) {
-            this.flatEvents = this.flatEvents.concat(this.loadedMentions[timestamp]);
+      this.cumulativeMentions = [];
+      for (const timestamp of this.currentTimestamps) {
+        this.cumulativeMentions = this.cumulativeMentions.concat(this.loadedMentions[timestamp]);
       }
+
+      if (this.cumulativeMentions.length > 0) {
+
+        var source_cumulative_frequency = count_mentions(this.cumulativeMentions);
+        var source_frequency = count_mentions(result);
+
+        this.historyMentions = make_history(source_frequency, this.historyMentions, this.currentTimestamps)
+
+        var bars_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0,this.k));
+        var top_history_cumulative = take_top_history(bars_cumulative, this.historyMentions)
+
+        top_history_cumulative = add_timestamps_to_top_history_map(top_history_cumulative, this.currentTimestamps)
+
+        top_history_cumulative = take_top_history_up_to_current_timestamp(top_history_cumulative, this.currentTimestamps)
+
+        display_source(top_history_cumulative, bars_cumulative, this.currentTimestamps)
+
+        info(this.loadedMentions)
+
+      } else {
+        clean_sources(true)
+      }
+
+    }
+
+    reset() {
+      this.currentTimestamps = [];
+      this.cumulativeMentions = [];
+      clean_sources(true)
     }
 	
 }
