@@ -9,12 +9,12 @@ import {eventOnMouseOver, eventOnMouseOut, eventOnMouseClick} from './mouseEvent
  */
 export class Worldmap {
 
-  constructor(svg) {
+  constructor() {
 
         //  g groups drawn elements so that applying a transformation
         //  to g applies it to all its children
-        this.svg = svg;
-        this.g = this.svg.append("g");
+        this.svg = d3.select("#mainSvg");;
+        this.g = d3.select("#mapContent");
         this.loader = new DataLoader();
         this.D3 = new D3Handler();
 
@@ -24,6 +24,7 @@ export class Worldmap {
             .scaleExtent([1,15])
             .on("zoom", this.applyZoom.bind(this))
         this.svg.call(this.zoom_handler)
+        this.zoomScalingRatio = 1.0;
 
         // Define outline and behavior when it resolves
         this.outlinePromise = this.loader.loadMapOutline();
@@ -47,7 +48,7 @@ export class Worldmap {
         });
 
         // Define events
-        this.currentTimestamps = new Set();
+        this.currentTimestamps = [];
         this.loadedEvents = {};
         this.flatEvents = [];
 
@@ -65,34 +66,41 @@ export class Worldmap {
 
     }
 
+    reset(updateStepDuration) {
+      this.currentTimestamps = [];
+      this.flatEvents = [];
+
+      this.drawOverlay(updateStepDuration);
+    }
+
     /*
       Called when one of the checkboxes is checked or unchecked, updates current selection
     */
-    updateCategory(category, checked) {
+    updateCategory(category, checked, updateStepDuration) {
 
       // Add or remove from categories
       checked ? this.currentCategories.add(category) : this.currentCategories.delete(category);
 
       // Update circles if events are already there
-      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"), this.selected);
+      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"), this.selected, updateStepDuration);
     }
 
     /*
        Add or remove events to map depending on direction of update
      */
-    updateEvents(timestamp, isForward) {
-      isForward ? this.updateEventsForward(timestamp) : this.updateEventsBackward(timestamp);
+    updateEvents(timestamp, isForward, updateStepDuration) {
+      isForward ? this.updateEventsForward(timestamp, updateStepDuration) : this.updateEventsBackward(timestamp, updateStepDuration);
     }
 
-    updateEventsForward(timestamp) {
+    updateEventsForward(timestamp, updateStepDuration) {
 
       if (Object.keys(this.loadedEvents).includes(timestamp)) {
 
         // Update flatEvents with already loaded data
         info("Loading from events " + timestamp);
         this.flatEvents = this.flatEvents.concat(this.loadedEvents[timestamp]);
-        
-        this.drawOverlay();
+        this.currentTimestamps.push(timestamp);
+        this.drawOverlay(updateStepDuration);
 
       } else {
 
@@ -103,28 +111,28 @@ export class Worldmap {
         Promise.all([this.outlinePromise, data_promise]).then((results) => {
 
           // Update event data and redraw it
-          this.currentTimestamps.add(timestamp);
+          this.currentTimestamps.push(timestamp);
           this.loadedEvents[timestamp] = results[1];
           this.flatEvents = this.flatEvents.concat(results[1]);
 
-          this.drawOverlay();
+          this.drawOverlay(updateStepDuration);
         });
       }
     }
 
-    updateEventsBackward(timestamp) {
+    updateEventsBackward(timestamp, updateStepDuration) {
 
       // Remove timestamp from current ones
       info("Removing from current " + timestamp);
-      this.currentTimestamps.delete(timestamp);
+      this.currentTimestamps.pop();
 
       // Rebuild flatEvents
       this.flatEvents = [];
-      for (const timestamp in this.currentTimestamps) {
-            this.flatEvents = this.flatEvents.concat(this.loadedEvents[timestamp]);
+      for (const t of this.currentTimestamps) {
+        this.flatEvents = this.flatEvents.concat(this.loadedEvents[t]);
       }
 
-      this.drawOverlay();
+      this.drawOverlay(updateStepDuration);
     }
 
     applyZoom () {
@@ -134,6 +142,11 @@ export class Worldmap {
             // do something to disable scaling ??
         }*/
         this.g.attr('transform', transform);
+
+        if (this.zoomScalingRatio != this.currentZoomTransform.k) {
+          this.zoomScalingRatio = this.currentZoomTransform.k;
+          this.D3.scaleCircles(this.g.selectAll("circle"), this.selected, this.zoomScalingRatio);
+        }
     }
 
     /*
@@ -158,7 +171,7 @@ export class Worldmap {
     /*
         Draws the overlay, with or without new data, complete data update sequence
      */
-    drawOverlay() {
+    drawOverlay(updateStepDuration) {
 
       // Enter data
       let events = this.g
@@ -180,7 +193,7 @@ export class Worldmap {
              .on('click', (d) => eventOnMouseClick(d, this));
 
       // Full entering transition
-      this.D3.pulseEntrance(circles, this.selected);
+      this.D3.pulseEntrance(circles, this.selected, updateStepDuration, this.zoomScalingRatio);
     }
 
 }

@@ -11,31 +11,34 @@ export class D3Handler {
       .attr("cx", (d) => projection([d["Long"], d["Lat"]])[0])
       .attr("cy", (d) => projection([d["Long"], d["Lat"]])[1])
       .attr("r", 0)
-      //.attr("fill", "grey");
   }
 
-  updateCategorySelection(circles, selected) {
+  updateCategorySelection(circles, selected, updateStepDuration, scaleRatio) {
 
     circles.transition()
-      .duration(750)
-      //.attr("fill", (d) => selected(d) ? "orange" : "gray")
-      .attr("stroke", (d) => selected(d) ? "orange" : "gray")
-      .attr("stroke-width", (d) => selected(d) ? 2 : 0)
-      .attr("r", (d) => selected(d) ? 1 : 0);
+      .duration(updateStepDuration/2)
+      .attr("fill", (d) => selected(d) ? "#FFA500" : "gray")
+      .attr("r", (d) => selected(d) ? 1/scaleRatio : 0);
   }
 
-  pulseEntrance(circles, selected) {
+  pulseEntrance(circles, selected, updateStepDuration, scaleRatio) {
 
     // Pulse stroke
     let highlightedCircles = circles
       .transition()
-					.duration(1000)
-          .attr("stroke", (d) => selected(d) ? "red" : "gray")
-					.attr('stroke-width', (d) => selected(d) ? 0.5 : 0)
-					.attr("r", 3);
-					//.ease('sine');
+					.duration(updateStepDuration/2)
+          .attr("fill", (d) => selected(d) ? "red" : "gray")
+					.attr("r", (d) => selected(d) ? 2/scaleRatio : 0);
 
-    this.updateCategorySelection(highlightedCircles, selected);
+    this.updateCategorySelection(highlightedCircles, selected, updateStepDuration, scaleRatio);
+  }
+
+  scaleCircles(circles, selected, scaleRatio) {
+
+    circles.transition()
+      .duration(0)
+      .attr("fill", (d) => selected(d) ? "#FFA500" : "gray")
+      .attr("r", (d) => selected(d) ? 1/scaleRatio : 0);
   }
 
 
