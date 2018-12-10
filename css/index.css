@@ -39,6 +39,37 @@ body {
     border-radius : 4px;
 }
 
+.visualize-source-container {
+  /*display: table;*/
+  overflow: hiddene;
+  /*clear: both;*/
+  border: solid black 2px;
+  border-radius: 4px;
+  height: calc(100% / 5);
+  /*height: 200px;*/
+}
+
+.visualize-source-mention {
+  background-color: yellow;
+  width: 30%;
+  height: 100%;
+  float: left;
+}
+.visualize-source-mention-chart {
+  background-color: red;
+  width: 70%;
+  height: 100%;
+  float: right;
+}
+/*.bar-chart{
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+.clear{
+  clear:both;
+}*/
+
     /* generic style for icon-button */
 .btn-icon {
         /* positioning */
@@ -135,33 +166,6 @@ body {
         /*will be toggled by the collapse-settings button
             visibility : collapse would be better, but unsupported by chrome */
     display : block;
-}
-
-.visualize-source-container{
-  height: 200px;
-  overflow: auto;
-  clear: both;
-}
-
-.visualize-source-mention {
-  background-color: black;
-  width: 30%;
-  height: 100%;
-  float: left;
-}
-.visualize-source-mention-chart {
-  background-color: red;
-  width: 70%;
-  height: 100%;
-  float: right;
-}
-.bar-chart{
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-}
-.clear{
-  clear:both;
 }
 
 /*.bar-chart {
