@@ -134,6 +134,24 @@ function take_top_history_up_to_current_timestamp(top_history_cumulative, curren
   return top_history
 }
 
+function prepare_mentions_for_sources_to_visualize(cumulativeMentions, loadedMentions, historyMentions, currentTimestamps, k, timestamp, isBackward=false) {
+  let source_cumulative_frequency = count_mentions(cumulativeMentions);
+  let source_frequency = count_mentions(loadedMentions[timestamp]);
+
+  historyMentions = make_history(source_frequency, historyMentions, currentTimestamps)
+
+  var top_frequency_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0, k));
+  var top_history_cumulative = take_top_history(top_frequency_cumulative, historyMentions)
+
+  top_history_cumulative = add_timestamps_to_top_history_map(top_history_cumulative, currentTimestamps)
+
+  if (isBackward) {
+    top_history_cumulative = take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps)
+  }
+
+  display_source(top_history_cumulative, top_frequency_cumulative, currentTimestamps)
+}
+
 export class MentionHandler {
 
     // Initializes path variables
@@ -181,18 +199,7 @@ export class MentionHandler {
           this.loadedMentions[timestamp] = result;
           this.cumulativeMentions = this.cumulativeMentions.concat(result);
 
-          var source_cumulative_frequency = count_mentions(this.cumulativeMentions);
-          var source_frequency = count_mentions(result);
-
-          this.historyMentions = make_history(source_frequency, this.historyMentions, this.currentTimestamps)
-
-          var bars_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0,this.k));
-          var top_history_cumulative = take_top_history(bars_cumulative, this.historyMentions)
-
-          top_history_cumulative = add_timestamps_to_top_history_map(top_history_cumulative, this.currentTimestamps)
-
-          display_source(top_history_cumulative, bars_cumulative, this.currentTimestamps)
-
+          prepare_mentions_for_sources_to_visualize(this.cumulativeMentions, this.loadedMentions, this.historyMentions, this.currentTimestamps, this.k, timestamp)
         });
       }
     }
@@ -202,43 +209,24 @@ export class MentionHandler {
       // Remove timestamp from current ones
       info("Removing from current " + timestamp);
       this.currentTimestamps.pop();
-
-      let last_timestamp = this.currentTimestamps[this.currentTimestamps.length-1]
-
-      let result = []
-
-      if (last_timestamp) {
-        result = this.loadedMentions[last_timestamp]
-      }
-
-      // Rebuild flatEvents
       this.cumulativeMentions = [];
-      for (const timestamp of this.currentTimestamps) {
-        this.cumulativeMentions = this.cumulativeMentions.concat(this.loadedMentions[timestamp]);
-      }
 
-      if (this.cumulativeMentions.length > 0) {
+      if (this.currentTimestamps.length > 0){ 
 
-        var source_cumulative_frequency = count_mentions(this.cumulativeMentions);
-        var source_frequency = count_mentions(result);
+        let last_timestamp = this.currentTimestamps[this.currentTimestamps.length-1]
+        let result = []
+ 
+        result = this.loadedMentions[last_timestamp]
+            // Rebuild flatEvents
+        for (const timestamp of this.currentTimestamps) {
+          this.cumulativeMentions = this.cumulativeMentions.concat(this.loadedMentions[timestamp]);
+        }
 
-        this.historyMentions = make_history(source_frequency, this.historyMentions, this.currentTimestamps)
-
-        var bars_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0,this.k));
-        var top_history_cumulative = take_top_history(bars_cumulative, this.historyMentions)
-
-        top_history_cumulative = add_timestamps_to_top_history_map(top_history_cumulative, this.currentTimestamps)
-
-        top_history_cumulative = take_top_history_up_to_current_timestamp(top_history_cumulative, this.currentTimestamps)
-
-        display_source(top_history_cumulative, bars_cumulative, this.currentTimestamps)
-
-        info(this.loadedMentions)
+        prepare_mentions_for_sources_to_visualize(this.cumulativeMentions, this.loadedMentions, this.historyMentions, this.currentTimestamps, this.k, timestamp, true)
 
       } else {
         clean_sources(true)
       }
-
     }
 
     reset() {
