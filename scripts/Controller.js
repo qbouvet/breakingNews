@@ -82,7 +82,8 @@ export class Controller {
     this.currentTime = (this.speedArray[this.speedIndex] > 0) ? this.currentTime + 1 : this.currentTime - 1; // FIXME add backward logic
 
     // Disable button if MAX_VALUE, or re-enable it FIXME: restart?
-    if (this.currentTime >= 10) {//this.TIME_MANAGER.NUM_UPDATES) {
+    // if (this.currentTime >= 10) 
+    if (this.currentTime >= this.TIME_MANAGER.NUM_UPDATES) {
 
       this.playing = false;
       this.endOfDay = true;
@@ -99,7 +100,7 @@ export class Controller {
     // Update viz accordingly
     this.CLOCK.update(updateDate);
     this.mapUpdate(this.TIME_MANAGER.dateToTimestamp(updateDate), this.speedArray[this.speedIndex] > 0, this.UPDATE_INTERVAL / Math.abs(this.speedArray[this.speedIndex]));
-    //MENTIONS_HANDLER.updateMentions(TIME_MANAGER.dateToTimestamp(updateDate), isForward);
+    this.mentionsUpdate(this.TIME_MANAGER.dateToTimestamp(updateDate), this.speedArray[this.speedIndex] > 0)
   }
 
   onForwardBackward(forward) {

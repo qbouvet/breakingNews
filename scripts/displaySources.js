@@ -64,36 +64,55 @@ function addDiv(data) {
     }
 }
 
-function display_source(data, timestamps){
+function display_source(data, cumulative_data, timestamps){
 
     // var mention_number = Array.from(data.values(), (x, y) => x[0][0])
     // var mention_timestamp = Array.from(data.values(), (x, y) => x[0][1])
 
-    // console.log("data: ", data)
-    data.forEach((value, source) => {
-
-
-        console.log("value: ", value)
-        timestamps.forEach( time => {
-            if (value.has(time)){
-                console.log(value.get(time))
-            } else {
-                value.set(time, 0)
-            }
-        })
-        // let mention_number = value.map((x) => x[0])
-        // let timestamps = value.map( (x) =>x[1])
-
-        // console.log("source: ", source)
-        // console.log("sum: ", mention_number.reduce((a,b) => a+b))
-    })
-
     console.log("data: ", data)
+    console.log("cumumulative_data: ", cumulative_data) 
+    $('.visualize-source-container').css('height', 'calc(100%/' + Array.from(data).length + ')');
+    $('.visualize-source-container').empty()
+
+
+
+
+    var divParent = d3.select('#sidebardiv')
+                    .selectAll('div')
+                    .data(Array.from(data)).enter()
+                    .append('div')
+                    .attr('class', "visualize-source-container")
+                    // .style('height', height + "px")
+
+    var divMention = d3.selectAll(".visualize-source-container")
+                    .append('div')
+                    .attr('class', "visualize-source-mention")
+                    .text(function (d) {return d[0]})
+
+
+    var divMentionChart = d3.selectAll(".visualize-source-container")
+                    .append('div')
+                    .attr('class', "visualize-source-mention-chart")
+                    .text(function (d) {return d[1]})
+
+
+
+
+    // data.forEach((value, source) => {
+    //     timestamps.forEach( time => {
+    //         if (value.has(time)){
+    //             // console.log(value.get(time))
+    //         } else {
+    //             value.set(time, 0)
+    //         }
+    //     })
+    // })
+
+    // console.log(data)
+
 
     // console.log("values: ", data.values())
     // console.log("keys: ", data.keys())
-
-
     // addDiv(data)
 }
 

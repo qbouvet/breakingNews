@@ -2,6 +2,25 @@ import {log, info, warn, err} from './utils.js'
 import {DataLoader} from './DataLoader.js';
 import {make_bar_chart, display_source} from './displaySources.js'
 
+
+function sortMapByKeys(history_value) {
+
+  const mapSort1 = new Map([...history_value.entries()].sort((a, b) => {
+    return a[0] - b[0] }
+      ));
+
+  return mapSort1;
+}
+
+function sortHistory(history) {
+  history.forEach((value, key) => {
+    value = sortMapByKeys(value)
+    history[key] = value
+  })
+
+  return history
+}
+
 function count_mentions(mentions) {
 
 	var counts = {}
@@ -19,7 +38,6 @@ function count_mentions(mentions) {
 
 	return mapSort1
 }
-
 
 function make_history(mentions, historyMentions, currentTimestamps) {
 
@@ -74,6 +92,22 @@ function take_top_history(top_mentions, historyMentions) {
 	return top_mentions_map
 }
 
+function add_timestamps_to_top_history_map(top_history_cumulative, currentTimestamps) {
+  top_history_cumulative.forEach((value, source) => {
+      currentTimestamps.forEach( time => {
+          if (value.has(time)){
+              // console.log(value.get(time))
+          } else {
+              value.set(time, 0)
+          }
+      })
+  })
+
+ top_history_cumulative = sortHistory(top_history_cumulative)
+
+  return top_history_cumulative
+}
+
 export class MentionHandler {
 
     // Initializes path variables
@@ -84,6 +118,8 @@ export class MentionHandler {
     	this.historyMentions = {};
     	this.cumulativeMentions = [];
     	this.currentTimestamps = new Set();
+      this.k = 5;
+      $('.visualize-source-container').css('height', 'calc(100%/' + this.k + ')');
     }
 
     /*
@@ -124,17 +160,23 @@ export class MentionHandler {
           var source_cumulative_frequency = count_mentions(this.cumulativeMentions);
           var source_frequency = count_mentions(result);
 
-		  this.historyMentions = make_history(source_frequency, this.historyMentions, this.currentTimestamps)
+          this.historyMentions = make_history(source_frequency, this.historyMentions, this.currentTimestamps)
 
-		  info("history: ", this.historyMentions)
+    		  info("history: ", this.historyMentions)
 
-          var bars_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0,5));
+          // top k results
+    
+          var bars_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0,this.k));
           // // var bars = new Map(Array.from(source_frequency).slice(0,5));
+
+          info("bars_cumulative", bars_cumulative)
 
           var top_history_cumulative = take_top_history(bars_cumulative, this.historyMentions)
           // // var top_history = take_top_history(bars, this.historyMentions)
 
-          display_source(top_history_cumulative, this.currentTimestamps)
+          top_history_cumulative = add_timestamps_to_top_history_map(top_history_cumulative, this.currentTimestamps)
+
+          display_source(top_history_cumulative, bars_cumulative, this.currentTimestamps)
 
         });
       }
