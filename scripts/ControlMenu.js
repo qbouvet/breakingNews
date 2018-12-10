@@ -16,7 +16,6 @@ export class ControlMenu {
       this.resetBtn = d3.select('#refresh-btn');
 
       // UI
-      this.placeBar();
       this.updateSpeedText(initSpeed);
 
       // State
@@ -26,19 +25,6 @@ export class ControlMenu {
       this.playEnabled = true;
     }
 
-    placeBar() {
-
-      let parentViewBox = this.parentSvg.attr("viewBox").split(" ");
-
-      this.controlMenu
-        .attr("x", parseInt(parentViewBox[0], 10) + parseInt(parentViewBox[2])/2 - this.controlMenu.attr("width")/2)
-        .attr("y", parseInt(parentViewBox[3], 10));
-
-      this.selectionMenu
-        .attr("x",  parseInt(parentViewBox[0], 10) + parseInt(parentViewBox[2]) - this.selectionMenu.attr("width")/2)
-        .attr("y", parseInt(parentViewBox[3], 10));
-    }
-
     updateSpeedText(speed) {
       this.speedText
         .text(speed + "x")
@@ -46,8 +32,7 @@ export class ControlMenu {
     }
 
     addCollapseBehavior() {
-
-      document.querySelector("#selection-menu").addEventListener("click", () => {
+      document.querySelector("#btn-maximize").addEventListener("click", () => {
           const settingsdiv = document.querySelector("#settingsdiv")
           const display = settingsdiv.style.display
           settingsdiv.style.display = (display === "none") ? "block" : "none";

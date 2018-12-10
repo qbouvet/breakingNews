@@ -73,7 +73,7 @@ body {
     /* generic style for icon-button */
 .btn-icon {
         /* positioning */
-    margin : 3px;
+    margin : 3px 3px 3px 3px;
     width : 40px;
     height : 40px;
         /* Style -> fullsize background-image */
@@ -92,6 +92,8 @@ body {
     flex-direction: row;
     align-items: center;
 }
+
+
 
 /* ---------------------------------------------------
     2-panel layout stuff
@@ -147,8 +149,10 @@ body {
     min-width: 20%;
 }
 
+
+
 /* ---------------------------------------------------
-    LEFT-PANEL-SPLIT CHILDREN
+    LEFT-PANEL-SPLIT'S CHILDREN
     we want them setup so that :
     - settingsdiv get the space it needs
     - mapdiv gets all the rest
@@ -171,6 +175,8 @@ body {
 /*.bar-chart {
   background-color: blue;
 }*/
+
+
 /* ---------------------------------------------------
     SIDEBAR-RELATED STYLING
 ----------------------------------------------------- */
@@ -190,7 +196,7 @@ body {
 
 @font-face {
   font-family: "SomeCoolFont";
-  src: url("../css/fonts/OldNewspaperTypes.ttf");
+  src: url("../css/fonts/Library 3 am.otf");
 }
 
 #menubar p {
@@ -201,7 +207,7 @@ body {
     margin: 0;
     margin-left: 1vw;
         /* font config */
-    font-size : 1.5vw;
+    font-size : 2.5vw;
     font-family: "SomeCoolFont";  /* "must be the last value specified" */
 }
 
@@ -226,6 +232,8 @@ body {
     height : 100%;
     width : 100%;
     background-color: black;
+        /* for children positioning*/
+    position : relative;
 }
 
 #mainSvg{
@@ -250,6 +258,7 @@ circle {
         /* keeps width fixed when zooming */
     /*vector-effect: non-scaling-stroke;*/
 }
+
 
 /* ---------------------------------------------------
     EVENT SELECTION STYLE (tooltip + hover)
@@ -284,6 +293,37 @@ circle:hover {
   cursor: pointer;
 }
 
+#btn-maximize {
+    background-image : url("../css/icons/maximize.png");
+        /* size */
+    height : 30px;
+    width : 30px;
+        /* Position - absolute -> relative to parent */
+    position : absolute;
+    top : calc( 98% - 30px );
+    left : calc( 99% - 30px );
+}
+
+#digital-clock{
+        /* size */
+    width : 180px;
+    height : 65px;
+        /* Position - absolute relative to parent */
+    position : absolute;
+    top : 1%;
+    left : calc( 50% - (180px / 2));
+}
+
+#control-menu{
+        /* size */
+    width : 180px;
+    height : 40px;
+        /* Position - absolute relative to parent */
+    position : absolute;
+    top : calc( 99% - 40px);
+    left : calc( 50% - (180px / 2));
+}
+
 #control-menu-border {
   fill: black;
   stroke: #FFA500;
@@ -298,11 +338,11 @@ circle:hover {
   fill: #FFA500;
 }
 
+
+
 /* ---------------------------------------------------
     Clock
 ----------------------------------------------------- */
-
-
 
 #clock-border {
   fill: black;
