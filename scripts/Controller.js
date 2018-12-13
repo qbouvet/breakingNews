@@ -4,7 +4,6 @@ import {TimeManager} from './TimeManager.js';
 
 export class Controller {
 
-  // TODO: implement reset behavior for mentions
   constructor(mapUpdateCallback, mentionsUpdateCallback, mapResetCallback, mentionsResetCallback) {
 
       // Init callbacks
@@ -13,114 +12,189 @@ export class Controller {
       this.mapReset = mapResetCallback;
       this.mentionsReset = mentionsResetCallback;
 
-      // Init State
-      this.playing = false;
-      this.interval = 0;
-      this.currentTime = 0;
-      this.speedIndex = 5;
-      this.UPDATE_INTERVAL = 2000;
-      this.endOfDay = false;
-
-      // Speed scale
-      this.speedArray = [-4.0, -2.0, -1.0, -0.5, 0.5, 1.0, 2.0, 4.0];
-      this.speedIndexScale = d3.scaleLinear()
-        .domain([0, 7])
-        .range([0, 7])
-        .clamp(true);
-
-      // Time manager
+      // Init components
       this.TIME_MANAGER = new TimeManager();
-
-      // UI parts
       this.CLOCK = new Clock(this.TIME_MANAGER.INIT_DATE);
-      this.CONTROLS = new ControlMenu(this.speedArray[this.speedIndex]);
+      this.CONTROLS = new ControlMenu();
 
       // Init UI behavior
       this.CONTROLS.addPlayPauseBehavior((play) => this.onPlayPause(play));
       this.CONTROLS.addForwardBackwardBehavior((forward) => this.onForwardBackward(forward));
       this.CONTROLS.addCollapseBehavior();
+
+      // Speed components
+      this.UPDATE_INTERVAL = 2000;
+      this.speedScale = d3.scaleLinear()
+        .domain([-2.0, 2.0])
+        .range([-2.0, 2.0])
+        .clamp(true);
+
+      // Init state machine
+      this.interval = 0;
+      this.currentState = 'start';
+      this.nextState('start');
   }
 
-  reset() {
+  nextState(state) {
 
-    this.speedIndex = 5;
-    this.CONTROLS.updateSpeedText(this.speedArray[this.speedIndex]);
+    clearInterval(this.interval);
+    this.currentState = state;
 
-    this.currentTime = 0;
-
-    this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speedArray[this.speedIndex]));
-    this.mentionsReset();
-
-    this.CONTROLS.enablePlay(true);
-    this.CONTROLS.enableForward(true);
-    this.CONTROLS.enableBackward(true);
-    this.CLOCK.update(this.TIME_MANAGER.INIT_DATE);
-
-    this.endOfDay = false;
-  }
-
-  onPlayPause(play) {
-
-    if (this.endOfDay) {
-      this.reset();
-    } else {
-
-      if (this.playing) {
-        this.playing = false;
-        clearInterval(this.interval);
-      } else {
-        this.playing = true;
-        let intervalLength = this.UPDATE_INTERVAL / Math.abs(this.speedArray[this.speedIndex]);
-        this.interval = setInterval((elapsed) => this.step(elapsed), intervalLength);
+    switch (state) {
+      case 'start': {
+        this.startState();
+        break;
       }
+
+      case 'play': {
+        this.playState();
+        break;
+      }
+
+      case 'pause': {
+        this.pauseState();
+        break;
+      }
+
+      case 'end': {
+        this.endState();
+        break;
+      }
+
+      default:
+        console.log("Should never get here");
     }
+  }
+
+  startState() {
+    this.currentTime = 0;
+    this.speed = 1.0;
+
+    this.CONTROLS.updateSpeed(this.speed);
+    this.CONTROLS.setForwardEnabled(true);
+    this.CONTROLS.setBackwardEnabled(false);
+    this.CONTROLS.setPlay();
+    this.CLOCK.update(this.TIME_MANAGER.INIT_DATE);
+  }
+
+  playState() {
+    this.CONTROLS.setBackwardEnabled(!(this.speed === -2));
+    this.CONTROLS.setForwardEnabled(!(this.speed === 2));
+    this.CONTROLS.setPause();
+
+    let intervalLength = this.UPDATE_INTERVAL / Math.abs(this.speed);
+    this.interval = setInterval((elapsed) => this.step(elapsed), intervalLength);
+  }
+
+  pauseState() {
+    this.CONTROLS.setBackwardEnabled(!(this.speed === -2));
+    this.CONTROLS.setForwardEnabled(!(this.speed === 2));
+    this.CONTROLS.setPlay();
+  }
+
+  endState() {
+    this.CONTROLS.setForwardEnabled(false);
+    this.CONTROLS.setBackwardEnabled(false);
+    this.CONTROLS.setReload();
+  }
+
+  onPlayPause() {
+
+    // Take appropriate action
+    switch(this.currentState) {
+
+      case 'start': {
+        this.nextState('play');
+        break;
+      }
+
+      case 'play': {
+        this.nextState('pause');
+        break;
+      }
+
+      case 'pause': {
+        this.nextState('play');
+        break;
+      }
+
+      case 'end': {
+        //this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speed))
+        //this.mentionsReset();
+        this.nextState('start');
+        break;
+      }
+
+      default:
+        console.log("Should never get here");
+    }
+  }
+
+  onForwardBackward(forward) {
+
+    let updateSpeed = (up) => {
+
+      let speedUpdate = (up) ? this.speed + 1 : this.speed - 1;
+
+      // Skip zero
+      if (speedUpdate === 0) {
+        speedUpdate = (up) ? 1 : -1;
+      }
+
+      this.speed = this.speedScale(speedUpdate);
+      this.CONTROLS.updateSpeed(this.speed);
+
+      this.CONTROLS.setBackwardEnabled(!(this.speed === -2));
+      this.CONTROLS.setForwardEnabled(!(this.speed === 2));
+    }
+
+    switch(this.currentState) {
+      case 'start': {
+        if (forward) {
+          updateSpeed(forward);
+        } else if (!forward & this.speed != 1) {
+          updateSpeed(forward);
+          this.CONTROLS.setBackwardEnabled(false);
+        }
+        break;
+      }
+      case 'play': {
+        updateSpeed(forward);
+        this.nextState('play');
+        break;
+      }
+      case 'pause': {
+        updateSpeed(forward);
+        break;
+      }
+
+      default:
+    }
+
   }
 
   step(elapsed) {
 
     // Update current value
-    this.currentTime = (this.speedArray[this.speedIndex] > 0) ? this.currentTime + 1 : this.currentTime - 1; // FIXME add backward logic
+    this.currentTime = (this.speed > 0) ? this.currentTime + 1 : this.currentTime - 1;
 
-    // Disable button if MAX_VALUE, or re-enable it FIXME: restart?
-    // if (this.currentTime >= 10) 
-    if (this.currentTime >=  10) { //this.TIME_MANAGER.NUM_UPDATES) {
+    if (this.currentTime > this.TIME_MANAGER.NUM_UPDATES) {
 
-      this.playing = false;
-      this.endOfDay = true;
-      clearInterval(this.interval);
+      this.nextState('end');
 
-      this.CONTROLS.enablePlay(false);
-      this.CONTROLS.enableForward(false);
-      this.CONTROLS.enableBackward(false);
-    }
+    } else if (this.currentTime < 0) {
 
-    // Get new date
-    let updateDate = this.TIME_MANAGER.getUpdateDate(this.currentTime);
+      this.nextState('start');
 
-    // Update viz accordingly
-    this.CLOCK.update(updateDate);
-    this.mapUpdate(this.TIME_MANAGER.dateToTimestamp(updateDate), this.speedArray[this.speedIndex] > 0, this.UPDATE_INTERVAL / Math.abs(this.speedArray[this.speedIndex]));
-    this.mentionsUpdate(this.TIME_MANAGER.dateToTimestamp(updateDate), this.speedArray[this.speedIndex] > 0)
-  }
+    } else {
 
-  onForwardBackward(forward) {
+      // Get new date
+      let updateDate = this.TIME_MANAGER.getUpdateDate(this.currentTime);
 
-    if (!this.endOfDay) {
-
-      let speedUpdate = (forward) ? this.speedIndex + 1 : this.speedIndex - 1;
-      this.speedIndex = this.speedIndexScale(speedUpdate);
-      this.CONTROLS.updateSpeedText(this.speedArray[this.speedIndex]);
-
-      if (this.playing) {
-        clearInterval(this.interval);
-        let intervalLength = this.UPDATE_INTERVAL / Math.abs(this.speedArray[this.speedIndex]);
-        this.interval = setInterval((elapsed) => this.step(elapsed), intervalLength);
-      }
-
-      // Disable/enable buttons if necessary
-      (this.speedIndex === 0) ? this.CONTROLS.enableBackward(false) : this.CONTROLS.enableBackward(true);
-      (this.speedIndex === (this.speedArray.length - 1)) ? this.CONTROLS.enableForward(false) : this.CONTROLS.enableForward(true);
+      // Update viz accordingly
+      this.CLOCK.update(updateDate);
+      this.mapUpdate(this.TIME_MANAGER.dateToTimestamp(updateDate), this.speed > 0, this.UPDATE_INTERVAL / Math.abs(this.speed));
+      this.mentionsUpdate(this.TIME_MANAGER.dateToTimestamp(updateDate), this.speed > 0)
     }
   }
-
 }
