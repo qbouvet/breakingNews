@@ -3,6 +3,13 @@ export class EventCodes {
 
   constructor() {
 
+    this.classes = {
+      1:{'name':'Verbal Cooperation', 'types':[0, 1, 2, 3, 4]},
+      2:{'name':'Material Cooperation', 'types':[5, 6, 7, 8]},
+      3:{'name':'Verbal Conflict', 'types':[9, 10, 11, 12, 13]},
+      4:{'name':'Material Conflict', 'types':[14, 15, 16, 17, 18, 19]}
+    }
+
     this.codes = {
       10:{'name':'Make statement', 'type':0},
       11:{'name':'Decline comment', 'type':0},

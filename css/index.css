@@ -164,6 +164,16 @@ body {
     height : 78%;
 }
 
+
+
+/*.bar-chart {
+  background-color: blue;
+}*/
+
+/* ---------------------------------------------------
+    Category selection
+----------------------------------------------------- */
+
 #settingsdiv {
     flex : 0 0 22%;
     /*height : 22%;*/
@@ -172,10 +182,22 @@ body {
     display : block;
 }
 
-/*.bar-chart {
-  background-color: blue;
-}*/
+.quadclass-container {
+  width: 25%;
+  height:100%;
+  float: left;
+  border: solid black 1px;
+}
 
+.quadclass-header {
+  width:100%;
+  height:20%;
+  border: solid black 1px;
+}
+
+.event-code{
+  display:block;
+}
 
 /* ---------------------------------------------------
     SIDEBAR-RELATED STYLING
@@ -338,7 +360,6 @@ circle:hover {
 #categories-txt {
   fill: #FFA500;
 }
-
 
 
 /* ---------------------------------------------------

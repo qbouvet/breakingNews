@@ -8,6 +8,7 @@ import {Worldmap} from './Worldmap.js';
 import {TimeManager} from './TimeManager.js';
 import {MentionHandler} from './MentionHandler.js';
 import {Controller} from './Controller.js';
+import {SelectionMenu} from './SelectionMenu.js';
 
 async function main() {
 
@@ -20,7 +21,7 @@ async function main() {
       (updateStepDuration) => MAP.reset(updateStepDuration),
       (x) => MENTIONS_HANDLER.reset());
 
-    // Define selection buttons behavior // FIXME: just temp example, we need to decide on data
+    /* Define selection buttons behavior // FIXME: just temp example, we need to decide on data
     let categories = [1, 2, 3, 4];
 
     for (const c of categories) {
@@ -29,6 +30,7 @@ async function main() {
           MAP.updateCategory(c, checkbox.property("checked"), 1000, 1.0); // FIXME remove hardcoded and put step duration
         });
     }
+    */
 
 }
 

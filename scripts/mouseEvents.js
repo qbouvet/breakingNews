@@ -1,4 +1,4 @@
-import {EventCodes} from './eventCodes.js'
+import {EventCodes} from './EventCodes.js'
 import {make_bar_chart} from './displaySources.js'
 
 function eventOnMouseOver(d, tooltip) {

@@ -3,6 +3,7 @@ import {log, info, warn, err} from './utils.js'
 import {DataLoader} from './DataLoader.js';
 import {D3Handler} from './AnimationStyling.js'
 import {eventOnMouseOver, eventOnMouseOut, eventOnMouseClick} from './mouseEvents.js'
+import {SelectionMenu} from './SelectionMenu.js';
 
 /*
     A worldmap object
@@ -56,8 +57,7 @@ export class Worldmap {
         this.flatEvents = [];
 
         // Categories selection
-        this.currentCategories = new Set();
-        this.selected = (d) => this.currentCategories.has(d["Class"]);
+        this.SELECTION = new SelectionMenu((selectionCheck) => this.updateSelection(selectionCheck));
 
         // Define the div for the tooltip
         this.tooltip = d3.select("body")
@@ -76,16 +76,10 @@ export class Worldmap {
       this.drawOverlay(updateStepDuration);
     }
 
-    /*
-      Called when one of the checkboxes is checked or unchecked, updates current selection
-    */
-    updateCategory(category, checked, updateStepDuration) {
-
-      // Add or remove from categories
-      checked ? this.currentCategories.add(category) : this.currentCategories.delete(category);
+    updateSelection(selectionCheck) {
 
       // Update circles if events are already there
-      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"), this.selected, updateStepDuration);
+      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"), selectionCheck, 100); //FIXME: keep hardcoded?
     }
 
     /*
@@ -188,7 +182,7 @@ export class Worldmap {
              .on('click', (d) => eventOnMouseClick(d, this));
 
       // Full entering transition
-      this.D3.pulseEntrance(circles, this.selected, updateStepDuration);
+      this.D3.pulseEntrance(circles, (d) => this.SELECTION.checkSelected(d), updateStepDuration);
     }
 
 }
