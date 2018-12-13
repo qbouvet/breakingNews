@@ -7,24 +7,32 @@ export class SelectionMenu {
     this.mapUpdate = mapSelectionCallback;
     this.CAMEO = new EventCodes();
 
-    this.master1 = d3.select("#class-1");
-    this.types1 = d3.selectAll(".class-1");
-
     this.selectedTypes = new Set(Object.keys(this.CAMEO.types).map(Number));
-    console.log(this.selectedTypes)
 
-    this.master1.on("change", () => {
-      let checked = this.master1.property("checked");
-      this.types1.property("checked", checked);
-      checked ? this.add(this.CAMEO.classes[1]['types']) : this.remove(this.CAMEO.classes[1]['types']);
-    });
+    this.addCheckboxBehavior();
 
-    this.types1.on("change", (d, i) => {
-      let type = this.CAMEO.classes[1]['types'][i];
-      let checked = d3.select("#type-" + type).property("checked");
-      checked ? this.add([type]) : this.remove([type]);
-    });
+  }
 
+  addCheckboxBehavior() {
+
+    for (let c of Object.keys(this.CAMEO.classes).map(Number)) {
+
+      let masterCheckbox = d3.select("#class-" + c);
+      let childrenCheckboxes = d3.selectAll(".class-" + c);
+
+      masterCheckbox.on("change", () => {
+        let checked = masterCheckbox.property("checked");
+        childrenCheckboxes.property("checked", checked);
+        checked ? this.add(this.CAMEO.classes[c]['types']) : this.remove(this.CAMEO.classes[c]['types']);
+      });
+
+      childrenCheckboxes.on("change", (d, i) => {
+        let type = this.CAMEO.classes[c]['types'][i];
+        let checked = d3.select("#type-" + type).property("checked");
+        checked ? this.add([type]) : this.remove([type]);
+      });
+
+    }
   }
 
   checkSelected(d) {
