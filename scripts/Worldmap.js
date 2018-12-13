@@ -95,10 +95,7 @@ export class Worldmap {
             this.currentTimestamps.push(timestamp);
             if (results == undefined) {
                 this.flatEvents = this.flatEvents.concat(this.eventsBroker.loadedEvents(timestamp));
-                this.currentTimestamps.push(timestamp);
             } else {
-                // this is now in eventsbroker
-                //this.loadedEvents[timestamp] = results[1];
                 this.flatEvents = this.flatEvents.concat(results[1]);
             }
             this.drawOverlay(updateStepDuration);
@@ -112,32 +109,21 @@ export class Worldmap {
                 _process.bind(this)(timestamp, results)
             })
         }
-      /*if (Object.keys(this.loadedEvents).includes(timestamp)) {
-          // Update flatEvents with already loaded data
-        info("Loading from events " + timestamp);
-        _process.bind(this)(timestamp)
-      } else {
-        info("Loading from file " + timestamp);
-        let data_promise = this.loader.loadEvents(timestamp);
-            // Make sure outline already resolved
-        Promise.all([this.outlinePromise, data_promise]).then((results) => {
-            _process.bind(this)(timestamp, results)
-        });
-      }*/
     }
 
     updateEventsBackward(timestamp, updateStepDuration) {
 
       // Remove timestamp from current ones
-      info("Removing from current " + timestamp);
+      info("Removing from currentTiemstamps " + timestamp);
       this.currentTimestamps.pop();
+      info(" currentTimestamps : \n", this.currentTimestamps)
 
       // Rebuild flatEvents
       this.flatEvents = [];
       for (const t of this.currentTimestamps) {
-        this.flatEvents = this.flatEvents.concat(this.eventsBroker.loadedEvents(t));
+         let tmp = this.eventsBroker.loadedEvents(t)
+         this.flatEvents = this.flatEvents.concat(tmp);
       }
-
       this.drawOverlay(updateStepDuration);
     }
 
