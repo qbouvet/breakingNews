@@ -69,6 +69,7 @@ circle:hover {
   cursor: pointer;
 }
 
+
 #btn-maximize {
     background-image : url("../css/icons/maximize.png");
         /* size */
@@ -79,11 +80,7 @@ circle:hover {
     top : calc( 98% - 30px );
     left : calc( 99% - 30px );
 }
-/*
-#backward-btn {
-    background-image : url("../css/icons/backward.svg");
-}
-*/
+
 #digital-clock{
         /* size */
     width : 180px;
