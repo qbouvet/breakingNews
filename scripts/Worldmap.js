@@ -9,7 +9,7 @@ import {eventOnMouseOver, eventOnMouseOut, eventOnMouseClick} from './mouseEvent
  */
 export class Worldmap {
 
-  constructor() {
+    constructor(eventsDataBroker) {
 
         //  g groups drawn elements so that applying a transformation
         //  to g applies it to all its children
@@ -48,8 +48,9 @@ export class Worldmap {
         });
 
         // Define events
+        this.eventsBroker = eventsDataBroker;
         this.currentTimestamps = [];
-        this.loadedEvents = {};
+        //this.loadedEvents = {};
         this.flatEvents = [];
 
         // Categories selection
@@ -93,31 +94,39 @@ export class Worldmap {
     }
 
     updateEventsForward(timestamp, updateStepDuration) {
+        function _process(timestamp, results=undefined) {
+            this.currentTimestamps.push(timestamp);
+            if (results == undefined) {
+                this.flatEvents = this.flatEvents.concat(this.eventsBroker.loadedEvents(timestamp));
+                this.currentTimestamps.push(timestamp);
+            } else {
+                // this is now in eventsbroker
+                //this.loadedEvents[timestamp] = results[1];
+                this.flatEvents = this.flatEvents.concat(results[1]);
+            }
+            this.drawOverlay(updateStepDuration);
+        }
 
-      if (Object.keys(this.loadedEvents).includes(timestamp)) {
-
-        // Update flatEvents with already loaded data
+        if (this.eventsBroker.has(timestamp)) {
+            _process.bind(this)(timestamp)
+        } else {
+            let data_promise = this.eventsBroker.load(timestamp)
+            Promise.all([this.outlinePromise, data_promise]).then((results) => {
+                _process.bind(this)(timestamp, results)
+            })
+        }
+      /*if (Object.keys(this.loadedEvents).includes(timestamp)) {
+          // Update flatEvents with already loaded data
         info("Loading from events " + timestamp);
-        this.flatEvents = this.flatEvents.concat(this.loadedEvents[timestamp]);
-        this.currentTimestamps.push(timestamp);
-        this.drawOverlay(updateStepDuration);
-
+        _process.bind(this)(timestamp)
       } else {
-
         info("Loading from file " + timestamp);
         let data_promise = this.loader.loadEvents(timestamp);
-
-        // Make sure outline already resolved
+            // Make sure outline already resolved
         Promise.all([this.outlinePromise, data_promise]).then((results) => {
-
-          // Update event data and redraw it
-          this.currentTimestamps.push(timestamp);
-          this.loadedEvents[timestamp] = results[1];
-          this.flatEvents = this.flatEvents.concat(results[1]);
-
-          this.drawOverlay(updateStepDuration);
+            _process.bind(this)(timestamp, results)
         });
-      }
+      }*/
     }
 
     updateEventsBackward(timestamp, updateStepDuration) {
@@ -129,7 +138,7 @@ export class Worldmap {
       // Rebuild flatEvents
       this.flatEvents = [];
       for (const t of this.currentTimestamps) {
-        this.flatEvents = this.flatEvents.concat(this.loadedEvents[t]);
+        this.flatEvents = this.flatEvents.concat(this.eventsBroker.loadedEvents(t));
       }
 
       this.drawOverlay(updateStepDuration);

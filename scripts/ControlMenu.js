@@ -48,11 +48,13 @@ export class ControlMenu {
         if (self.playEnabled) {
 
           if (self.playing) {
-            self.playBtn.attr("xlink:href", "../css/icons/play.svg");
+            //self.playBtn.attr("xlink:href", "../css/icons/play.svg");
+            self.playBtn.style("background-image", "url('css/icons/play.svg')")
             self.playing = false;
             callback(true);
           } else {
-            self.playBtn.attr("xlink:href", "../css/icons/pause.svg");
+            //self.playBtn.attr("xlink:href", "../css/icons/pause.svg");
+            self.playBtn.style("background-image", "url('css/icons/pause.svg')")
             self.playing = true;
             callback(false);
           }

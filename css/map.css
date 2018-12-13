@@ -1,0 +1,154 @@
+/* ---------------------------------------------------
+    MAP AND EVENTS STYLE
+----------------------------------------------------- */
+
+#map-canva {
+        /* position & size */
+    height : 100%;
+    width : 100%;
+    /*background-color: black;*/
+    background : black;
+        /* for children positioning*/
+    position : relative;
+}
+
+#mainSvg{
+        /* size, relative to parent (#map-canva)
+            (parents size needs to be defined, else, oveflow)*/
+    height : 100% ;
+    width : 100%;
+}
+
+path {
+    stroke: #333333;
+    fill: #777777;
+    fill-opacity: 0.8;
+    stroke-width: 1.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+        /* keeps width fixed when zooming */
+    vector-effect: non-scaling-stroke;
+}
+
+circle {
+        /* keeps width fixed when zooming */
+    /*vector-effect: non-scaling-stroke;*/
+}
+
+
+/* ---------------------------------------------------
+    EVENT SELECTION STYLE (tooltip + hover)
+----------------------------------------------------- */
+
+div.tooltip {
+  font-family:"avenir next", Arial, sans-serif;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 7px;
+  color: white;
+}
+
+div.tooltip b {
+  color: #FFA51F;
+}
+
+circle:hover {
+  fill: white !important;
+}
+
+
+/* ---------------------------------------------------
+    MAP CONTROLS & TIMESLIDER STYLE
+----------------------------------------------------- */
+
+#refresh-btn:hover,
+#play-btn:hover,
+#forward-btn:hover,
+#backward-btn:hover,
+#selection-menu:hover {
+  cursor: pointer;
+}
+
+#btn-maximize {
+    background-image : url("../css/icons/maximize.png");
+        /* size */
+    height : 30px;
+    width : 30px;
+        /* Position - absolute -> relative to parent */
+    position : absolute;
+    top : calc( 98% - 30px );
+    left : calc( 99% - 30px );
+}
+/*
+#backward-btn {
+    background-image : url("../css/icons/backward.svg");
+}
+*/
+#digital-clock{
+        /* size */
+    width : 180px;
+    height : 65px;
+        /* Position - absolute relative to parent */
+    position : absolute;
+    top : 1%;
+    left : calc( 50% - (180px / 2));
+}
+
+#control-menu{
+        /* size */
+    width : 180px;
+    height : 40px;
+        /* Position - absolute relative to parent */
+    position : absolute;
+    top : calc( 99% - 40px);
+    left : calc( 50% - ((180px - 40px - 4px) / 2));
+    background-color:transparent;
+}
+
+#control-menu-border {
+  fill: black;
+  stroke: #FFA500;
+  stroke-width: 1;
+}
+
+#simulation-speed {
+  fill: #FFA500;
+}
+
+#categories-txt {
+  fill: #FFA500;
+}
+
+
+
+/* ---------------------------------------------------
+    Clock
+----------------------------------------------------- */
+
+#clock-border {
+  fill: black;
+  stroke: #FFA500;
+  stroke-width: 5;
+}
+
+#display-date {
+  fill: #FFA500;
+}
+
+#digital-clock path {
+  fill: #222;
+  stroke: #5f0;
+  stroke-opacity: 0;
+}
+
+#digital-clock circle {
+  fill: #FFA500;
+  stroke: #FFA500;
+  stroke-opacity: 0;
+}
+
+#digital-clock .lit {
+  fill: #FFA500;
+  stroke: #FFA500;
+  stroke-opacity: 1;
+}
