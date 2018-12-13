@@ -13,7 +13,7 @@ export class EventsDataBroker {
             // Dataloader for file access
         this.loader = dataLoader;
             // timestamp => events map
-        this.loadedEvents = new Map();
+        this.loadedEventsMap = new Map();
             // not sure we need it
         this.currentTimestamps = new SortedArray([], true);
         this.flatEvents = [];
@@ -23,18 +23,18 @@ export class EventsDataBroker {
 
         // checks if events for a given timestampe have already been loaded
     has (timestamp) {
-        return this.loadedEvents.has(timestamp)
+        return this.loadedEventsMap.has(timestamp)
     }
 
         // lists all loaded timestamps
     loadedTimestamps () {
-        return this.loadedEvents.keys()
+        return this.loadedEventsMap.keys()
     }
 
         // return loaded events straight away or load then return if not loaded
     loadedEvents (timestamp) {
-        if (this.loadedEvents.has(timestamp)) {
-            return this.loadedEvents.get(timestamp)
+        if (this.loadedEventsMap.has(timestamp)) {
+            return this.loadedEventsMap.get(timestamp)
         } else {
             err("EventDataBroker doesn't have timestamp :", timestamp)
         }
@@ -42,17 +42,17 @@ export class EventsDataBroker {
 
         // loads a timestamp as a promise
     load (timestamp) {
-        if (this.loadedEvents.has(timestamp)) {
+        if (this.loadedEventsMap.has(timestamp)) {
             // return with already loaded data
             return new Promise(function(resolve, reject) {
-                resolve(this.loadedEvents.get(timestamp))
+                resolve(this.loadedEventsMap.get(timestamp))
             })
         } else {
             let p = this.loader.loadEvents(timestamp);
             // cache data
             p.then( (results) => {
                 info("EventDataBroker loaded ", timestamp)
-                this.loadedEvents.set(timestamp, results)
+                this.loadedEventsMap.set(timestamp, results)
                 return results
             })
             // return loading data
@@ -66,8 +66,8 @@ export class EventsDataBroker {
         if (eventId < this.smallestEventID) {
             return [undefined, undefined]
         }
-        for (const k of this.loadedEvents.keys()) {
-            const arr = this.loadedEvents.get(k)
+        for (const k of this.loadedEventsMap.keys()) {
+            const arr = this.loadedEventsMap.get(k)
             for (let i=0; i < arr.length; i++) {
                 if (arr[i]["ID"] == eventId) {
                     return [arr[i]["Lat"], arr[i]["Long"]]
