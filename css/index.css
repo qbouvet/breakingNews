@@ -40,6 +40,13 @@ body {
     background-repeat: no-repeat;
     background-position: 0px 0px;
     background-size : 100% 100%;
+        /*   */
+    border:none;
+}
+
+    /* Fix the 'blue border on click' */
+button:focus{
+    outline:none;
 }
 
 /*  Container that lays-out its children horizontally,

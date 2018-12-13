@@ -61,13 +61,13 @@ export class ControlMenu {
     }
 
     setForwardEnabled(enable) {
-      let icon = (enable) ? "../css/icons/forward.svg" : "../css/icons/forward-disabled.svg";
-      this.forwardBtn.attr("xlink:href", icon);
+      let icon = (enable) ? "url('css/icons/forward.svg')" : "url('css/icons/forward-disabled.svg')";
+      this.forwardBtn.style("background-image", icon);
     }
 
     setBackwardEnabled(enable) {
-      let icon = (enable) ? "../css/icons/backward.svg" : "../css/icons/backward-disabled.svg";
-      this.backwardBtn.attr("xlink:href", icon);
+      let icon = (enable) ? "url('css/icons/backward.svg')" : "css/icons/backward-disabled.svg";
+      this.backwardBtn.style("background-image", icon);
     }
 
     updateSpeed(speed) {
