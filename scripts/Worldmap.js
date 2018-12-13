@@ -19,9 +19,12 @@ export class Worldmap {
         this.D3 = new D3Handler();
 
         // Zoom definition
+        let w = this.svg.style("width").replace("px", "");
+        let h = this.svg.style("height").replace("px", "");
         this.currentZoomTransform = "matrix(1 0 0 1 0 0)"    // identity svg transform
         this.zoom_handler = d3.zoom()
             .scaleExtent([1,15])
+            .translateExtent([[0, 0], [w, h]])
             .on("zoom", this.applyZoom.bind(this))
         this.svg.call(this.zoom_handler)
         this.zoomScalingRatio = 1.0;
@@ -147,15 +150,7 @@ export class Worldmap {
     applyZoom () {
         const transform = d3.event.transform;
         this.currentZoomTransform = transform;
-        /*if (transform.k > 1.2) {
-            // do something to disable scaling ??
-        }*/
         this.g.attr('transform', transform);
-
-        if (this.zoomScalingRatio != this.currentZoomTransform.k) {
-          this.zoomScalingRatio = this.currentZoomTransform.k;
-          this.D3.scaleCircles(this.g.selectAll("circle"), this.selected, this.zoomScalingRatio);
-        }
     }
 
     /*
@@ -202,7 +197,7 @@ export class Worldmap {
              .on('click', (d) => eventOnMouseClick(d, this));
 
       // Full entering transition
-      this.D3.pulseEntrance(circles, this.selected, updateStepDuration, this.zoomScalingRatio);
+      this.D3.pulseEntrance(circles, this.selected, updateStepDuration);
     }
 
 }
