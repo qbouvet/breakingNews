@@ -22,16 +22,42 @@ export class ControlMenu {
       this.backwardBtn.on("click", () => callback(false));
     }
 
+
+    addPlayPauseBehavior(callback) {
+
+        let self = this;
+
+        this.playBtn.on("click", () => {
+
+            if (self.playEnabled) {
+
+                if (self.playing) {
+                    self.setPause()
+                    callback(true);
+                } else {
+                    self.setPlay()
+                    callback(false);
+                }
+            } else {
+                // Reload call
+                callback(undefined);
+            }
+        });
+    }
+
     setPlay() {
-      this.playBtn.attr("xlink:href", "../css/icons/play.svg");
+        this.playBtn.style("background-image", "url('css/icons/play.svg')")
+        this.playing = true;
     }
 
     setPause() {
-      this.playBtn.attr("xlink:href", "../css/icons/pause.svg");
+        this.playBtn.style("background-image", "url('css/icons/pause.svg')")
+        this.playing = false;
     }
 
     setReload() {
-      this.playBtn.attr("xlink:href", "../css/icons/reload.svg");
+        this.playBtn.style("background-image", "url('css/icons/reload.svg')")
+        this.playing = false;   // ?
     }
 
     setForwardEnabled(enable) {

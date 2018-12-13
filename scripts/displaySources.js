@@ -10,7 +10,7 @@ function add_charts(data) {
         var divtest0 = document.createElement("div");
         divtest0.className = "visualize-source-mention"
 
-        var divtest1 = document.createElement("div");        
+        var divtest1 = document.createElement("div");
         divtest1.className = "visualize-source-mention-chart"
 
         var svgtest0 = document.createElement("svg")
@@ -23,6 +23,8 @@ function add_charts(data) {
         objTo.appendChild(divtest)
     })
 }
+
+
 
 function addDiv(data) {
     var source_container = document.getElementsByClassName('visualize-source-container')
@@ -64,29 +66,30 @@ function addDiv(data) {
     }
 }
 
+
+
 function clean_sources(reset=false){
     $('.visualize-source-container').empty()
-    $('.visualize-source-container').show() 
+    $('.visualize-source-container').show()
     if (reset){
-        $('.visualize-source-container').hide() 
+        $('.visualize-source-container').hide()
     }
 }
 
-function display_source(data, cumulative_data, timestamps){
+
+
+function display_source(data, cumulative_data, timestamps, onSourceClick){
 
     // var mention_number = Array.from(data.values(), (x, y) => x[0][0])
     // var mention_timestamp = Array.from(data.values(), (x, y) => x[0][1])
 
     console.log("data: ", data)
-    console.log("cumumulative_data: ", cumulative_data) 
+    console.log("cumumulative_data: ", cumulative_data)
     // $('.visualize-source-container').css('height', 'calc(100%/' + Array.from(data).length + ')');
 
     d3.selectAll(".visualize-source-container").style('height', 'calc(100%/' + Array.from(data).length + ')')
 
     clean_sources()
-
-
-
 
     var divParent = d3.select('#sidebardiv')
                     .selectAll('div')
@@ -106,29 +109,18 @@ function display_source(data, cumulative_data, timestamps){
                     .attr('class', "visualize-source-mention-chart")
                     .text(function (d) {return d[1]})
 
-
-
-
-    // data.forEach((value, source) => {
-    //     timestamps.forEach( time => {
-    //         if (value.has(time)){
-    //             // console.log(value.get(time))
-    //         } else {
-    //             value.set(time, 0)
-    //         }
-    //     })
-    // })
-
-    // console.log(data)
-
-
-    // console.log("values: ", data.values())
-    // console.log("keys: ", data.keys())
-    // addDiv(data)
+    d3.selectAll(".visualize-source-container")
+        .on("click", function () {
+            // 'this' is the 'div' we're operating on
+            const sourceName = this.childNodes[0].childNodes[0].data;
+             (() => {onSourceClick(sourceName)})()
+        })
 }
 
+
+
 function make_bar_chart(dataset){
-    
+
     dataset = Array.from(dataset)
     var svgWidth = document.getElementsByClassName("visualize-source-mention-chart")[0].offsetWidth;
     var svgHeight = document.getElementsByClassName("visualize-source-mention-chart")[0].offsetHeight;
@@ -144,17 +136,19 @@ function make_bar_chart(dataset){
         .enter()
         .append("rect")
         .attr("y", function(d) {
-            return svgHeight - d 
+            return svgHeight - d
         })
-        .attr("height", function(d) { 
-            return d; 
+        .attr("height", function(d) {
+            return d;
         })
         .attr("width", barWidth - barPadding)
         .attr("transform", function (d, i) {
-            var translate = [barWidth * i, 0]; 
+            var translate = [barWidth * i, 0];
             return "translate("+ translate +")";
         });
  }
+
+
 
 function make_line_chart(){
     var svgWidth = document.getElementsByClassName("visualize-source")[0].offsetWidth, svgHeight = 200, barPadding = 5;
@@ -328,7 +322,9 @@ function make_line_chart(){
         }
     });
 }
- export {
+
+
+export {
     make_bar_chart, make_line_chart,
     display_source, clean_sources
 }

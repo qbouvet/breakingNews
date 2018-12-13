@@ -1,0 +1,78 @@
+/* ---------------------------------------------------
+    SIDEBAR-RELATED STYLING
+----------------------------------------------------- */
+
+#menubar { /* typically inherits from one-line-menu */
+        /* left-right align children - NB works with flex */
+    justify-content: space-between;
+    background-color : black;
+}
+
+#btn-info {
+     background-image: url(../css/icons/info.png);
+        /* right-align with 5px gap */
+     position : relative;
+     top : 0px;
+     left : -5px;
+}
+
+@font-face {
+  font-family: "SomeCoolFont";
+  src: url("../css/fonts/Library 3 am.otf");
+}
+
+#menubar p {
+    /* vh = viewport-related units https://stackoverflow.com/questions/16056591/font-scaling-based-on-width-of-container#answer-19818026 */
+    /* TODO : use svg instead ? https://css-tricks.com/fitting-text-to-a-container/ */
+        /* remove interline */
+    padding: 0;
+    margin: 0;
+    margin-left: 1vw;
+        /* font config */
+    font-size : 2.5vw;
+    font-family: "SomeCoolFont";  /* "must be the last value specified" */
+    color:#FFA500;
+
+}
+
+#sidebardiv {
+    background-color : black;
+        /* Position
+    position : absolute;
+    left : 70%;
+    top : 0%;*/
+        /* witdh
+    width : 30%;*/
+    height : 100%;
+}
+
+
+
+
+/* ---------------------------------------------------
+    GRAPHS STYLING
+----------------------------------------------------- */
+
+
+.visualize-source-container {
+  /*display: table;*/
+  overflow: hidden;
+  /*clear: both;*/
+  border: solid black 2px;
+  border-radius: 4px;
+  height: calc(100% / 5);
+  /*height: 200px;*/
+}
+
+.visualize-source-mention {
+  background-color: yellow;
+  width: 30%;
+  height: 100%;
+  float: left;
+}
+.visualize-source-mention-chart {
+  background-color: red;
+  width: 70%;
+  height: 100%;
+  float: right;
+}
