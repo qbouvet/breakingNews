@@ -93,6 +93,10 @@ var SortedArray = (function () {
         },
         filter: function (fct) {
             return this.array.filter(fct)
+        },
+        // name .size() (function) to avoid confusion with .length (property)
+        size: function (fct) {
+            return this.array.length
         }
     });
 

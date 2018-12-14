@@ -20,7 +20,8 @@ export class EventsDataBroker {
             // hack to make getLatLong() faster
         this.smallestEventID = 800011820
             // maximum point offset, 0.01° ~< 1km
-        this.maxPointOffset = 0.02
+            // overlap is worse than a little bit of inacuracy for what we want to show
+        this.maxPointOffset = 0.1
     }
 
         // checks if events for a given timestampe have already been loaded
@@ -71,19 +72,19 @@ export class EventsDataBroker {
 
         //  Returns the lattitude / longitude of an event, if this event is loaded
         // ! exhaustive search
-    getLatLong(eventId) {
+    getEventById(eventId) {
         if (eventId < this.smallestEventID) {
-            return [undefined, undefined]
+            return undefined
         }
-        for (const k of this.loadedEventsMap.keys()) {
-            const arr = this.loadedEventsMap.get(k)
-            for (let i=0; i < arr.length; i++) {
-                if (arr[i]["ID"] == eventId) {
-                    return [arr[i]["Lat"], arr[i]["Long"]]
+        for (const timestamp of this.loadedEventsMap.keys()) {
+            const eventsMapForTimestamp = this.loadedEventsMap.get(timestamp)
+            for (let i=0; i < eventsMapForTimestamp.length; i++) {
+                if (eventsMapForTimestamp[i]["ID"] == eventId) {
+                    return eventsMapForTimestamp[i];
                 }
             }
         }
-        return [undefined, undefined]
+        return undefined
     }
 
 }

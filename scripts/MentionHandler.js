@@ -352,22 +352,23 @@ export class MentionHandler {
          *  that bave been added on the map
          */
     events_for_source (sourceName) {
-        let coveredEvents = new SortedArray([], true)
+        let coveredEventsIds = new SortedArray([], true)
         if (this.sourceTimeEventTree.has(sourceName)) {
             this.sourceTimeEventTree.get(sourceName).forEach( (value, key) => {
                 //err("key:", key, "value:", value)
                 value.forEach( (eventId) => {
-                    coveredEvents.insert(eventId)
+                    coveredEventsIds.insert(eventId)
                 })
             })
         }
-        info("Source : ", sourceName, "covered events : ", coveredEvents)
-        const coveredEventsLocation = coveredEvents.map( (id) => {
-            const tmp = this.eventsBroker.getLatLong(id)
-            return [id, tmp[0], tmp[1]]
-        }).filter( (tupl) => tupl[0]!=undefined && tupl[1]!=undefined)
-        info("Source : ", sourceName, "covered events : ", coveredEventsLocation)
-        return coveredEventsLocation
+        info("Source : ", sourceName, "covered", coveredEventsIds.size(), "events.\nIDs : \n", coveredEventsIds)
+        let tmp = coveredEventsIds.map( (id) => {
+            const event = this.eventsBroker.getEventById(id)
+            return event;
+        })
+        let coveredEvents = tmp.filter( (event) => event!=undefined)
+        info("Out of which", coveredEvents.length, "we were able to locate. \nEvents :\n", coveredEvents)
+        return coveredEvents
     }
 
     showSourceEvents (sourceName) {
