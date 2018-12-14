@@ -113,7 +113,7 @@ function display_source(data, cumulative_data, timestamps, onSourceClick){
         .on("click", function () {
             // 'this' is the 'div' we're operating on
             const sourceName = this.childNodes[0].childNodes[0].data;
-             (() => {onSourceClick(sourceName)})()
+            onSourceClick(sourceName)
         })
 }
 

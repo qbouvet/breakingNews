@@ -54,7 +54,6 @@ export class Worldmap {
         // Define events
         this.eventsBroker = eventsDataBroker;
         this.currentTimestamps = [];
-        //this.loadedEvents = {};
         this.flatEvents = [];
 
         // Categories selection
@@ -66,8 +65,49 @@ export class Worldmap {
             .attr("class", "tooltip")
             .style("opacity", 0);
 
-        info ("Constructed worldmap");
+        // fields used for maskings
+        this.masked = false
+        this.unmaskData = undefined
 
+        info ("Constructed worldmap");
+    }
+
+        /*  Mask :
+         *  Masks the points on the map according to the mask passed as argument,
+         *  E.G. all points in the mask will stay normal, while points not in the
+         *  mask will go grey
+         *  Unmask :
+         *  restore visualization
+         */
+    toggleMask (pointsArray) {
+        if (!this.masked) {
+            info ("worldmap : masking")
+            this.unmaskData = this.flatEvents
+            this.masked = true;
+
+            // Enter data
+            let events = this.g
+                .selectAll("circle")
+                .data(pointsArray);
+
+            // Enter Selection
+            let circles = events.enter().append("circle")
+
+            circles.attr("cx", (elem) => this.projection(elem[0], elem[1])[0])
+                    .attr("cy", (elem) => this.projection(elem[0], elem[1])[1])
+                    .attr("r", 3);
+
+            circles.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
+                .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
+                .on('click', (d) => eventOnMouseClick(d, this));
+
+            // Exit selection
+            events.exit().remove()
+        } else {
+            info ("worldmap : unmasking")
+            this.masked = false;
+            this.drawOverlay(500)
+        }
     }
 
     reset(updateStepDuration) {
@@ -119,7 +159,7 @@ export class Worldmap {
       info(" currentTimestamps : \n", this.currentTimestamps)
 
       // Rebuild flatEvents
-      this.flatEvents = [];
+      this.flatEvents = []
       for (const t of this.currentTimestamps) {
          let tmp = this.eventsBroker.loadedEvents(t)
          this.flatEvents = this.flatEvents.concat(tmp);

@@ -7,6 +7,7 @@ export class D3Handler {
 
   invisibleCirclesCorrectLocation(circles, projection) {
 
+      // NB : if we keep this, when masking points on the map, point will move a bit
     let longp = Math.random();
     let latp = Math.random();
 
@@ -33,10 +34,9 @@ export class D3Handler {
 
     // Pulse stroke
     let highlightedCircles = circles
-      .transition()
-					.duration(updateStepDuration/2)
-          .attr("fill", (d) => selected(d) ? "red" : "gray")
-					.attr("r", (d) => selected(d) ? 2 : 0);
+      .transition().duration(updateStepDuration/2)
+        .attr("fill", (d) => selected(d) ? "red" : "gray")
+		.attr("r", (d) => selected(d) ? 2 : 0);
 
     this.updateCategorySelection(highlightedCircles, selected, updateStepDuration);
   }
