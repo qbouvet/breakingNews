@@ -67,7 +67,6 @@ export class Worldmap {
 
         // fields used for maskings
         this.masked = false
-        this.unmaskData = undefined
 
         info ("Constructed worldmap");
     }
@@ -82,31 +81,21 @@ export class Worldmap {
     toggleMask (pointsArray) {
         if (!this.masked) {
             info ("worldmap : masking")
-            this.unmaskData = this.flatEvents
+            //alert ("showing : "+pointsArray.length+" events")
+                // apply new data and obtain selections
+            const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections( this.g.selectAll("circle"), pointsArray)
+                // update visuals
+            this.D3.easyHeatMap(mergeSel, this.projection, 0.03, 8, 6)
+            exitSel.remove()
             this.masked = true;
-
-            // Enter data
-            let events = this.g
-                .selectAll("circle")
-                .data(pointsArray);
-
-            // Enter Selection
-            let circles = events.enter().append("circle")
-
-            circles.attr("cx", (elem) => this.projection(elem[0], elem[1])[0])
-                    .attr("cy", (elem) => this.projection(elem[0], elem[1])[1])
-                    .attr("r", 3);
-
-            circles.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
-                .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
-                .on('click', (d) => eventOnMouseClick(d, this));
-
-            // Exit selection
-            events.exit().remove()
         } else {
             info ("worldmap : unmasking")
-            this.masked = false;
-            this.drawOverlay(500)
+                // apply new data and obtain selections
+            const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections( this.g.selectAll("circle"), this.flatEvents )
+                // update visuals
+            exitSel.remove()
+            this.D3.applyEventPointStyleStatic(mergeSel, this.projection)
+            this.masked=false
         }
     }
 
@@ -196,28 +185,19 @@ export class Worldmap {
         Draws the overlay, with or without new data, complete data update sequence
      */
     drawOverlay(updateStepDuration) {
-
-      // Enter data
-      let events = this.g
-          .selectAll("circle")
-          .data(this.flatEvents);
-
-      // Exit selection
-      events.exit().remove();
-
-      // Enter Selection
-      let circles = events.enter()
-          .append("circle");
-
-      // Place invisible events on map
-      this.D3.invisibleCirclesCorrectLocation(circles, this.projection);
-
-      circles.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
+      if (this.masked) {
+          this.toggleMask()
+          return
+      }
+        // apply new data and obtain selections
+      const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections( this.g.selectAll("circle"), this.flatEvents )
+        // update visuals
+      exitSel.remove()
+      this.D3.invisibleCirclesCorrectLocation(enterSel, this.projection);
+      enterSel.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
              .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
              .on('click', (d) => eventOnMouseClick(d, this));
-
-      // Full entering transition
-      this.D3.pulseEntrance(circles, (d) => this.SELECTION.checkSelected(d), updateStepDuration);
+      this.D3.pulseEntrance(enterSel, (d) => this.SELECTION.checkSelected(d), updateStepDuration);
     }
 
 }
