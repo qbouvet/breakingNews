@@ -14,9 +14,9 @@ export class EventsDataBroker {
         this.loader = dataLoader;
             // timestamp => events map
         this.loadedEventsMap = new Map();
-            // not sure we need it
-        this.currentTimestamps = new SortedArray([], true);
-        this.flatEvents = [];
+            // Not used yet
+        /*this.currentTimestamps = new SortedArray([], true);
+        this.flatEvents = [];*/
             // hack to make getLatLong() faster
         this.smallestEventID = 800011820
     }

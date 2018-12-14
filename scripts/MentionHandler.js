@@ -225,7 +225,7 @@ function concat_sourceTimeEvent_trees (treeA, treeB) {
 export class MentionHandler {
 
     // Initializes path variables
-    constructor(eventsDataBroker) {
+    constructor(eventsDataBroker, worldmap) {
     	this.loader = new DataLoader();
             // for mentions counting
     	this.loadedMentions = {};          // mention loaded in memory, but possibly after the viz's current time
@@ -237,6 +237,8 @@ export class MentionHandler {
         this.sourceTimeEventTree = new Map();
             // Access to events storage, needed for latLong queries
         this.eventsBroker = eventsDataBroker;
+            // To request redraws / masks
+        this.worldmap = worldmap;
     }
 
 
@@ -341,11 +343,13 @@ export class MentionHandler {
             top_history_cumulative = take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps)
         }
 
-        display_source(top_history_cumulative, top_frequency_cumulative, currentTimestamps, this.events_for_source.bind(this))
+        display_source(top_history_cumulative, top_frequency_cumulative, currentTimestamps, this.showSourceEvents.bind(this))
     }
 
 
-        /* Returns an array of unique eventids  covered by the given source
+        /*  Returns the array    [eventId, lat, long]
+         *  with *only* the events for which we found a Lat/long, i.e those
+         *  that bave been added on the map
          */
     events_for_source (sourceName) {
         let coveredEvents = new SortedArray([], true)
@@ -363,5 +367,11 @@ export class MentionHandler {
             return [id, tmp[0], tmp[1]]
         }).filter( (tupl) => tupl[0]!=undefined && tupl[1]!=undefined)
         info("Source : ", sourceName, "covered events : ", coveredEventsLocation)
+        return coveredEventsLocation
+    }
+
+    showSourceEvents (sourceName) {
+        let events = this.events_for_source(sourceName)
+        this.worldmap.toggleMask(events)
     }
 }

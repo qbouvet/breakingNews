@@ -14,10 +14,10 @@ import {EventsDataBroker} from "./EventsDataBroker.js";
 
 async function main() {
 
-    const eventsBroker = new EventsDataBroker(new DataLoader());
+    const EVENTSBROKER = new EventsDataBroker(new DataLoader());
 
-    const MAP = new Worldmap(eventsBroker);
-    const MENTIONS_HANDLER = new MentionHandler(eventsBroker);
+    const MAP = new Worldmap(EVENTSBROKER);
+    const MENTIONS_HANDLER = new MentionHandler(EVENTSBROKER, MAP);
 
     const CONTROLLER = new Controller(
       (timestamp, isForward, updateStepDuration) => MAP.updateEvents(timestamp, isForward, updateStepDuration),
