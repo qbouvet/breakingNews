@@ -19,6 +19,8 @@ export class EventsDataBroker {
         this.flatEvents = [];*/
             // hack to make getLatLong() faster
         this.smallestEventID = 800011820
+            // maximum point offset, 0.01° ~< 1km
+        this.maxPointOffset = 0.02
     }
 
         // checks if events for a given timestampe have already been loaded
@@ -50,8 +52,15 @@ export class EventsDataBroker {
         } else {
             let p = this.loader.loadEvents(timestamp);
             // cache data
+                // +/-0.01 in lattitude/longitude ~= +/- 1km
+            const randSmallOffset = () => this.maxPointOffset*(Math.random()-0.5)*2
             p.then( (results) => {
                 info("EventDataBroker loaded ", timestamp)
+                results = results.map( (elem) => {
+                    elem["Lat"] = elem["Lat"] + randSmallOffset()
+                    elem["Long"] = elem["Long"] + randSmallOffset()
+                    return elem
+                })
                 this.loadedEventsMap.set(timestamp, results)
                 return results
             })
