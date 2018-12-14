@@ -6,14 +6,13 @@ export class D3Handler {
   }
 
   invisibleCirclesCorrectLocation(circles, projection) {
-
-      // NB : if we keep this, when masking points on the map, point will move a bit
+    /* Now done in EventsDataBroker
     let longp = Math.random();
-    let latp = Math.random();
+    let latp = Math.random(); */
 
     circles
-      .attr("cx", (d) => projection([d["Long"], d["Lat"]])[0] + longp)
-      .attr("cy", (d) => projection([d["Long"], d["Lat"]])[1] + latp)
+      .attr("cx", (d) => projection([d["Long"], d["Lat"]])[0])
+      .attr("cy", (d) => projection([d["Long"], d["Lat"]])[1])
       .attr("r", 0)
   }
 
