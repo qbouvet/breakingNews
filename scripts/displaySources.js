@@ -53,6 +53,9 @@ function display_source(data, cumulative_data, timestamps){
     .attr("width", 16)
     .attr("height", 16);
 
+    console.log(data);
+
+    // FIXME: max value should not be the maximum cumulative value, but the maximum update value ever encountered
 
     // compute the max value of the total data, and pass it for axis scaling
     let max_total_value = Math.ceil(Array.from(cumulative_data.values()).reduce((x, y) => ( x > y ? x : y )))

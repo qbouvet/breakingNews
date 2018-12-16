@@ -6,7 +6,7 @@
   --color-bg: #000000;
   --color-primary: #E75B10;
   --color-accent: #EE801E;
-  --color-darkgray: #333333;
+  --color-darkgray: #222222;
   --color-gray: #888888;
   --color-lightgray: #E3E0DD;
 }
@@ -173,6 +173,8 @@ circle:hover {
   float: left;
   padding-left: 10px;
   padding-right: 10px;
+
+  font-family: 'Jura', sans-serif;
 }
 
 .quadclass-header {
@@ -189,7 +191,7 @@ circle:hover {
 .quadclass-header .checkbox-text {
   display: inline-block;
   margin-left: 10px;
-  font-size: 1vw;
+  font-size: 2vmin;
   transform: translateY(-0.4vh);
 }
 
@@ -258,6 +260,7 @@ circle:hover {
   display: inline-block;
   margin-left: 5px;
   transform: translateY(-0.8vh);
+  font-size: 1.5vmin;
 }
 
 .event-code input {

@@ -180,14 +180,14 @@ export class MentionHandler {
 
       if (Object.keys(this.loadedMentions).includes(timestamp) && (timestamp in this.currentTimestamps)) {
 
-        info("Loading from events " + timestamp);
+        info("Loading from mentions " + timestamp);
 
         // Update flatEvents with already loaded data
         this.cumulativeMentions = this.cumulativeMentions.concat(this.loadedMentions[timestamp]);
         console.log("outside")
       } else {
 
-        info("Loading from file " + timestamp);
+        info("Loading mentions from file " + timestamp);
 
         // Load data
         let mentions_promise = this.loader.loadMentions(timestamp);
