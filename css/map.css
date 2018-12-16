@@ -133,17 +133,17 @@ circle:hover {
 
 #backward-btn {
   height:70%;
-  background-image:url('css/icons/backward.svg');
+  background-image:url('../css/icons/backward.svg');
 }
 
 #play-btn {
   height:70%;
-  background-image:url('css/icons/play.svg');
+  background-image:url('../css/icons/play.svg');
 }
 
 #forward-btn {
   height:70%;
-  background-image:url('css/icons/forward.svg');
+  background-image:url('../css/icons/forward.svg');
 }
 
 #play-btn:hover,
