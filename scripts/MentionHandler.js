@@ -1,6 +1,6 @@
 import {log, info, warn, err} from './utils.js'
 import {DataLoader} from './DataLoader.js';
-import {make_bar_chart, display_source, clean_sources} from './displaySources.js'
+import {display_source, clean_sources} from './displaySources.js'
 
 
 function sortMapByKeys(history_value) {
@@ -184,6 +184,7 @@ export class MentionHandler {
 
         // Update flatEvents with already loaded data
         this.cumulativeMentions = this.cumulativeMentions.concat(this.loadedMentions[timestamp]);
+        console.log("outside")
       } else {
 
         info("Loading from file " + timestamp);
@@ -195,11 +196,12 @@ export class MentionHandler {
         mentions_promise.then((result) => {
 
           // Update mentions
+          console.log("inside")
           this.currentTimestamps.push(timestamp);
           this.loadedMentions[timestamp] = result;
           this.cumulativeMentions = this.cumulativeMentions.concat(result);
-
           prepare_mentions_for_sources_to_visualize(this.cumulativeMentions, this.loadedMentions, this.historyMentions, this.currentTimestamps, this.k, timestamp)
+
         });
       }
     }

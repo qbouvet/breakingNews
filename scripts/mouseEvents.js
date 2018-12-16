@@ -1,5 +1,4 @@
 import {EventCodes} from './eventCodes.js'
-import {make_bar_chart} from './displaySources.js'
 
 function eventOnMouseOver(d, tooltip) {
 
@@ -27,7 +26,6 @@ function eventOnMouseClick(d, that) {
   console.log(that)
   console.log("d: ", d)
   console.log("event id: ", d.ID)
-  make_bar_chart()
 
   // Open event in new tab
   window.open(d['Source']);
