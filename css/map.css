@@ -21,11 +21,10 @@
 
 path {
     stroke: #333333;
-    fill: #777777;
-    fill-opacity: 0.8;
     stroke-width: 1.5px;
     stroke-linecap: round;
     stroke-linejoin: round;
+    fill-opacity: 1;
         /* keeps width fixed when zooming */
     vector-effect: non-scaling-stroke;
 }

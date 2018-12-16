@@ -343,7 +343,10 @@ export class MentionHandler {
             top_history_cumulative = take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps)
         }
 
-        display_source(top_history_cumulative, top_frequency_cumulative, currentTimestamps, this.showSourceEvents.bind(this))
+        display_source(top_history_cumulative,
+                        top_frequency_cumulative,
+                        currentTimestamps,
+                        this.countryColorChart.bind(this))
     }
 
 
@@ -367,12 +370,41 @@ export class MentionHandler {
             return event;
         })
         let coveredEvents = tmp.filter( (event) => event!=undefined)
-        info("Out of which", coveredEvents.length, "we were able to locate. \nEvents :\n", coveredEvents)
+        info("Out of which", coveredEvents.length, "we were able to identify (=find by ID). \nEvents :\n", coveredEvents)
         return coveredEvents
     }
 
-    showSourceEvents (sourceName) {
+    easyHeatmap (sourceName) {
         let events = this.events_for_source(sourceName)
-        this.worldmap.toggleMask(events)
+        this.worldmap.toggleEasyHeatmap(events)
     }
+
+    countEventsByCountry (events) {
+        let count = new Map()
+        events.forEach( (e) =>  {
+            const loc = e["Action_Location"].split(", ")
+            const country = loc[loc.length -1].toLowerCase()
+            if (count.has(country)) {
+                 count.set(country, count.get(country)+1)
+            } else {
+                count.set(country, 1)
+            }
+        });
+        const max = Array.from(count.values()).reduce( (a, b) => Math.max(a,b), 1)
+        count.getOrElse = function (key, defaultVal) {
+            if (this.has(key)) {
+                return this.get(key)
+            } else {
+                return defaultVal
+            }
+        }
+        return [count, max];
+    }
+
+    countryColorChart (sourceName) {
+        const events = this.events_for_source(sourceName)
+        const [count, max] = this.countEventsByCountry(events)
+        this.worldmap.toggleCountryColorChart (count, max)
+    }
+
 }

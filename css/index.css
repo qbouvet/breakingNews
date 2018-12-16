@@ -137,8 +137,8 @@ button:focus{
 ----------------------------------------------------- */
 
 #mapdiv {
-    flex : 1 1 auto;
-    height : 78%;
+    flex : 1 1 75%;
+    height : 70%;
 }
 
 /* ---------------------------------------------------
@@ -146,8 +146,8 @@ button:focus{
 ----------------------------------------------------- */
 
 #settingsdiv {
-    flex : 0 0 22%;
-    /*height : 22%;*/
+    flex : 0 0 25%;
+    height : 25%;
         /*will be toggled by the collapse-settings button
             visibility : collapse would be better, but unsupported by chrome */
     display : block;

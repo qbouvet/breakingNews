@@ -7,7 +7,7 @@ import {DataLoader} from './DataLoader.js';
     /* This class holds the event data in one place and provides function for Others
      * classes to access it
      */
-export class EventsDataBroker {
+class EventsDataBroker {
 
     constructor (dataLoader) {
             // Dataloader for file access
@@ -88,3 +88,26 @@ export class EventsDataBroker {
     }
 
 }
+
+
+    /*  Maps country names from world.json to contry names of the event dataset
+     */
+const cmap = new Map([
+    ["republic of congo", "democratic republic of the congo"],
+    ["republic of serbia", "serbia (general),"],
+    ["united states of america", "united states"]
+])
+cmap.getOrElse = function (key, defaultVal) {
+    if (this.has(key)) {
+        return this.get(key)
+    } else {
+        return defaultVal
+    }
+}
+function matchCountryNames (cname) {
+    const res = cmap.getOrElse (cname, cname)
+    return res
+}
+
+
+export {EventsDataBroker, matchCountryNames}

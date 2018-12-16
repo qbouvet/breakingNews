@@ -9,15 +9,23 @@ export class D3Handler {
   }
 
     /*  Given a D3 DOM selection (e.g. 'this.g.selectAll("circle")')
-     *  and some data, generates the enter, update, enter+update and
-     *  exit selections
+     *  and some data, generates the enter, update, and exit selections
+     *
+     *  I we only want to append one element to our enter selection, we
+     *  can pass it as "appendElem", and a merge selection will be returned
+     *  as well
      */
-  mkSelections (domObjectSelection, data) {
-      const updateSel = domObjectSelection.data(data);
-      const enterSel = updateSel.enter().append("circle")
-      const mergeSel = enterSel.merge(updateSel)    // ENTER + UPDATE
-      const exitSel = updateSel.exit()
-      return [enterSel, updateSel, mergeSel, exitSel]
+    mkSelections (domObjectSelection, data, enterAppend=undefined) {
+        const updateSel = domObjectSelection.data(data);
+        const exitSel = updateSel.exit()
+        if (enterAppend == undefined) {
+            const enterSel = updateSel.enter()
+            return [enterSel, updateSel, exitSel]
+        } else {
+            const enterSel = updateSel.enter().append(enterAppend)
+            const mergeSel = updateSel.merge(enterSel)
+            return [enterSel, updateSel, mergeSel, exitSel]
+        }
   }
 
     /*  Places invisible points (r=0) according to the projection
