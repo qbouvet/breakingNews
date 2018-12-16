@@ -5,7 +5,8 @@ import {eventOnMouseOver, eventOnMouseOut, eventOnMouseClick} from './mouseEvent
 export class D3Handler {
 
   constructor() {
-      this.EventPointOpacity = 0.3;
+      this.EventPointOpacity = 0.5;
+
   }
 
     /*  Given a D3 DOM selection (e.g. 'this.g.selectAll("circle")')
@@ -32,37 +33,37 @@ export class D3Handler {
 
     /*  Apply the point style of events to the selection, non-animated
      */
-  applyEventPointStyleStatic (selection, projection) {
+  applyEventPointStyleStatic (selection, projection, colorMapping) {
       selection
         .attr("cx", (d) => projection([d["Long"], d["Lat"]])[0])
         .attr("cy", (d) => projection([d["Long"], d["Lat"]])[1])
         .attr("fill-opacity", this.EventPointOpacity)
-        .attr("fill", "#FFA500")
+        .attr("fill", (d) => colorMapping(d))
         .attr("stroke-width", 0.05)
-        .attr("stroke", "#FFA500")
+        .attr("stroke", (d) => colorMapping(d))
         .attr("r", 0.5);
   }
 
-  updateCategorySelection(circles, selected, updateStepDuration) {
+  updateCategorySelection(circles, selected, colorMapping, updateStepDuration) {
     circles.transition()
       .duration(updateStepDuration/2)
-      .attr("fill", (d) => selected(d) ? "#FFA500" : "gray")
-      .attr("r", (d) => selected(d) ? this.EventPointOpacity : 0);
+      .attr("fill", (d) => selected(d) ? colorMapping(d) : "gray")
+      .attr("r", (d) => selected(d) ? 0.5 : 0);
 
     circles
       .attr("fill-opacity", this.EventPointOpacity)
       .attr("stroke-width", 0.05)
-      .attr("stroke", "#FFA500");
+      .attr("stroke", (d) => colorMapping(d));
   }
 
-  pulseEntrance(circles, selected, updateStepDuration) {
+  pulseEntrance(circles, selected, colorMapping, updateStepDuration) {
     // Pulse stroke
     let highlightedCircles = circles
       .transition().duration(updateStepDuration/2)
         .attr("fill", (d) => selected(d) ? "red" : "gray")
 		.attr("r", (d) => selected(d) ? 2 : 0);
 
-    this.updateCategorySelection(highlightedCircles, selected, updateStepDuration);
+    this.updateCategorySelection(highlightedCircles, selected, colorMapping, updateStepDuration);
   }
 
     /* Lazy heatmap : stack many large, transparent circles with added offset

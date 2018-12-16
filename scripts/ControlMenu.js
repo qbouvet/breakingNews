@@ -66,7 +66,7 @@ export class ControlMenu {
     }
 
     setBackwardEnabled(enable) {
-      let icon = (enable) ? "url('css/icons/backward.svg')" : "css/icons/backward-disabled.svg";
+      let icon = (enable) ? "url('css/icons/backward.svg')" : "url('css/icons/backward-disabled.svg')";
       this.backwardBtn.style("background-image", icon);
     }
 

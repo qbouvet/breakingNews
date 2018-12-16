@@ -57,7 +57,7 @@ export class Worldmap {
         this.flatEvents = [];
 
         // Categories selection
-        this.SELECTION = new SelectionMenu((selectionCheck) => this.updateSelection(selectionCheck));
+        this.SELECTION = new SelectionMenu((selectionCheck, colorMapping) => this.updateSelection(selectionCheck, colorMapping));
 
         // Define the div for the tooltip
         this.tooltip = d3.select("body")
@@ -94,7 +94,7 @@ export class Worldmap {
             const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections( this.g.selectAll("circle"), this.flatEvents )
                 // update visuals
             exitSel.remove()
-            this.D3.applyEventPointStyleStatic(mergeSel, this.projection)
+            this.D3.applyEventPointStyleStatic(mergeSel, this.projection, (d) => this.SELECTION.colorMapping(d))
             this.masked=false
         }
     }
@@ -106,10 +106,13 @@ export class Worldmap {
       this.drawOverlay(updateStepDuration);
     }
 
-    updateSelection(selectionCheck) {
+    updateSelection(selectionCheck, colorMapping) {
 
       // Update circles if events are already there
-      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"), selectionCheck, 100); //FIXME: keep hardcoded?
+      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"),
+       selectionCheck,
+       colorMapping,
+       100); //FIXME: keep hardcoded?
     }
 
     /*
@@ -197,7 +200,9 @@ export class Worldmap {
       enterSel.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
              .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
              .on('click', (d) => eventOnMouseClick(d, this));
-      this.D3.pulseEntrance(enterSel, (d) => this.SELECTION.checkSelected(d), updateStepDuration);
+      this.D3.pulseEntrance(enterSel, (d) => this.SELECTION.checkSelected(d),
+        (d) => this.SELECTION.colorMapping(d),
+        updateStepDuration);
     }
 
 }
