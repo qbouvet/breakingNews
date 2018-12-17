@@ -131,7 +131,7 @@ function take_top_history_up_to_current_timestamp(top_history_cumulative, curren
       }
     })
   })
-  return top_history
+  return sortHistory(top_history)
 }
 
 function prepare_mentions_for_sources_to_visualize(cumulativeMentions, loadedMentions, historyMentions, currentTimestamps, k, timestamp, isBackward=false) {

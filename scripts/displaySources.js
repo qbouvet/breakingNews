@@ -7,13 +7,33 @@ function clean_sources(reset=false){
     }
 }
 
+function sortMapByKeys(history_value) {
+
+  const mapSort1 = new Map([...history_value.entries()].sort((a, b) => {
+    return a[0] - b[0] }
+      ));
+
+  return mapSort1;
+}
+
+// function sortHistory(history) {
+//   history.forEach((value, key) => {
+//     value = sortMapByKeys(value)
+//     history[key] = value
+//   })
+
+//   return history
+// }
+
 function display_source(data, cumulative_data, timestamps){
 
 
+    let sorted_data = Array.from(data).map((x) => [x[0], sortMapByKeys(x[1])])
     d3.selectAll(".visualize-source-container").style('height', 'calc(100%/' + Array.from(data).length + ')')
 
     //clean container for later redraw all charts
     clean_sources()
+
 
     let array_data = Array.from(data).map(d => {return d[1]})
 
@@ -21,7 +41,7 @@ function display_source(data, cumulative_data, timestamps){
 
     var divParent = d3.select('#sidebardiv')
                     .selectAll('div')
-                    .data(Array.from(data)).enter()
+                    .data(sorted_data).enter()
                     .append('div')
                     .attr('class', "visualize-source-container")
                     // .style('height', height + "px")
@@ -56,45 +76,46 @@ function display_source(data, cumulative_data, timestamps){
 
     // compute the max value of the total data, and pass it for axis scaling
     let max_total_value = Math.ceil(Array.from(cumulative_data.values()).reduce((x, y) => ( x > y ? x : y )))
-    test_line_chart(n, max_total_value, Array.from(array_data[0].keys()))
+    test_line_chart(n, max_total_value, array_data)
 
 }
 
 function xCircle(data) {
-
     let a = Array.from(data.keys())
-    let b = Array.from(data.values())
+    // var c = a.map(function(e, i) {
+    //     return e;
+    // });
 
-    var c = a.map(function(e, i) {
-        return i;
-    });
-
-    return c
+    return a
 }
 
 function yCircle(data) {
 
-    let a = Array.from(data.keys())
+    // let a = Array.from(data.keys())
     let b = Array.from(data.values())
-
-    var c = a.map(function(e, i) {
-        return b[i];
-    });
-    return c
+    return b
 }
 
 function make_tuples(data, xScale, yScale) {
+
+    console.log("dataaaa: ", data)
     // create array of tuples (x, y) to be plotted
-    let a = Array.from(data.keys())
+    let a = Array.from(data.keys()).map(d => d.slice(8,12))
+
+    console.log("keys: ", a)
+
     let b = Array.from(data.values())
 
+    console.log("values: ", b)
+
+    
     var c = a.map(function(e, i) {
-        return [xScale(i), yScale(b[i])];
+        return [xScale(e), yScale(b[i])];
     });
 
     return c
 }
-function test_line_chart(n, max_total_value, datepoints){
+function test_line_chart(n, max_total_value, array_data){
 
     let digits_length = Math.log(max_total_value) * Math.LOG10E + 1 | 0;
     let x_axis_space = digits_length * 6
@@ -105,8 +126,13 @@ function test_line_chart(n, max_total_value, datepoints){
     var width = parentDiv.clientWidth - margin.left - margin.right;
     var height = parentDiv.clientHeight - margin.top - margin.bottom;
 
-    console.log("dateponts: ", datepoints)
+    let datepoints = Array.from(array_data[0].keys()).sort().map(d => d.slice(8,12))
 
+    console.log("datepoints: ", datepoints)
+    // datepoints = datepoints.map(d => d.slice(8,12))
+
+    var x = d3.scalePoint().rangeRound([0, width-x_axis_space])
+    x.domain(datepoints);
     // 5. X scale will use the index of our data
     var xScaleCategorical = d3.scaleOrdinal()
         .domain(datepoints) // input
@@ -120,12 +146,12 @@ function test_line_chart(n, max_total_value, datepoints){
     var yScale = d3.scaleLinear()
         .domain([0, max_total_value]) // input 
         .range([height - margin.bottom, 0]); // output 
-
    //  // 7. d3's line generator
-    // var line = d3.line((d) => {console.log("diao")})
-    //     .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
-    //     .y(function(d, a) { return yScale(d.y); }) // set the y values for the line generator 
-    //     .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+    var line = d3.line()
+        .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+        .y(function(d, i) { return yScale(i); }) // set the y values for the line generator 
+        .curve(d3.curveMonotoneX) // apply smoothing to the line
 
     var svg = d3.selectAll(".visualize-source-mention-chart")
         .append("svg")
@@ -138,7 +164,7 @@ function test_line_chart(n, max_total_value, datepoints){
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + (height - margin.bottom) + ")")
-        .call(d3.axisBottom(xScale).ticks(4));
+        .call(d3.axisBottom(x));
 
     // 4. Call the y axis in a group tag
     svg.append("g")
@@ -148,18 +174,23 @@ function test_line_chart(n, max_total_value, datepoints){
     // 9. Append the path, bind the data, and call the line generator 
     svg.append("path")
         .attr("class", "line") // Assign a class for styling 
-        .attr("d", (d) => {return d3.line()(make_tuples(d[1], xScale, yScale))}) // 11. Calls the line generator 
+        .attr("d", (d) => (d3.line()(make_tuples(d[1], x, yScale)))) // 11. Calls the line generator 
 
 
+    svg.selectAll(".circle")
+      .data(svg.data()).enter().append("circle")
+        .attr("class", "dot")
+        .attr("cx", line.x())
+        .attr("cy", line.y())
+        .attr("r", 3.5);
 
     // trying to put circles 
-
-    // svg.selectAll(".visualize-source-mention-chart").append("circle")
+    // svg.selectAll(".visualize-source-mention-chart").append("circle").enter()
     //     .attr("class", "dot") // Assign a class for styling
-    //     .attr("cx", function(d, i) { return xScale(xCircle(d[1])[i]) })
+    //     .attr("cx", function(d, i) { return x(xCircle(d[1])[i]) })
     //     .attr("cy", function(d, i) { return yScale(yCircle(d[1])[i]) })
     //     .attr("r", 5);
-    // // // 12. Appends a circle for each datapoint 
+    // 12. Appends a circle for each datapoint 
 
 }
 
