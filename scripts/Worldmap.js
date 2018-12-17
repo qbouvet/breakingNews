@@ -1,15 +1,18 @@
 
 import {log, info, warn, err} from './utils.js'
+
 import {DataLoader} from './DataLoader.js';
 import {D3Handler} from './AnimationStyling.js'
 import {eventOnMouseOver, eventOnMouseOut, eventOnMouseClick} from './mouseEvents.js'
+import {SelectionMenu} from './SelectionMenu.js';
+import {EventsDataBroker, matchCountryNames} from "./EventsDataBroker.js";
 
-/*
-    A worldmap object
+
+/*  A worldmap object
  */
 export class Worldmap {
 
-  constructor() {
+    constructor(eventsDataBroker) {
 
         //  g groups drawn elements so that applying a transformation
         //  to g applies it to all its children
@@ -18,15 +21,24 @@ export class Worldmap {
         this.loader = new DataLoader();
         this.D3 = new D3Handler();
 
+        // transforms
+        this.projection = d3.geoLarrivee()//.fitSize([w, h], result);
+        this.path = d3.geoPath().projection(this.projection);
+
         // Zoom definition
+        let w = this.svg.style("width").replace("px", "");
+        let h = this.svg.style("height").replace("px", "");
         this.currentZoomTransform = "matrix(1 0 0 1 0 0)"    // identity svg transform
         this.zoom_handler = d3.zoom()
             .scaleExtent([1,15])
+            .translateExtent([[0, 0], [w, h]])
             .on("zoom", this.applyZoom.bind(this))
         this.svg.call(this.zoom_handler)
         this.zoomScalingRatio = 1.0;
 
         // Define outline and behavior when it resolves
+        this.countriesFillMin = "#888888"
+        this.countriesFillMax= '#FFA500'
         this.outlinePromise = this.loader.loadMapOutline();
         this.outlinePromise.then( (result) => {
 
@@ -39,22 +51,18 @@ export class Worldmap {
             const h = this.svg.style("height").replace("px", "");
             const scale0 = (w - 1) / 2 / Math.PI;
 
-            this.projection = d3.geoLarrivee()//.fitSize([w, h], result);
-            this.path = d3.geoPath().projection(this.projection);
-
             // Store data and draw outline
             this.outlineData = result;
             this.drawOutline();
         });
 
-        // Define events
+        // Events data
+        this.eventsBroker = eventsDataBroker;
         this.currentTimestamps = [];
-        this.loadedEvents = {};
         this.flatEvents = [];
 
         // Categories selection
-        this.currentCategories = new Set();
-        this.selected = (d) => this.currentCategories.has(d["Class"]);
+        this.SELECTION = new SelectionMenu((selectionCheck, colorMapping) => this.updateSelection(selectionCheck, colorMapping));
 
         // Define the div for the tooltip
         this.tooltip = d3.select("body")
@@ -62,8 +70,72 @@ export class Worldmap {
             .attr("class", "tooltip")
             .style("opacity", 0);
 
-        info ("Constructed worldmap");
+        // fields used for maskings
+        this.masked = false;
+        this.countriesColorPalette = (t) => d3.scaleLinear().domain([0,1])
+            .interpolate(d3.interpolateHcl)
+            .range([d3.rgb(this.countriesFillMin), d3.rgb(this.countriesFillMax)]) (t);
 
+        info ("Constructed worldmap");
+    }
+
+        /*  Mask :
+         *  Masks the points on the map according to the mask passed as argument,
+         *  E.G. all points in the mask will stay normal, while points not in the
+         *  mask will go grey
+         *  Unmask :
+         *  restore visualization
+         */
+    toggleEasyHeatmap (pointsArray) {
+        if (!this.masked) {
+            info ("worldmap : masking (easyHeatmap)")
+            //alert ("showing : "+pointsArray.length+" events")
+                // apply new data and obtain selections
+            let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+                this.g.selectAll("circle"), pointsArray, "circle")
+                // update visuals
+            this.D3.easyHeatMap(mergeSel, this.projection, 0.03, 8, 6)
+            exitSel.remove()
+            this.masked = true;
+        } else {
+            info ("worldmap : unmasking (easyHeatmap)")
+                // apply new data and obtain selections
+            let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+                this.g.selectAll("circle"), this.flatEvents, "circle")
+                // update visuals
+            exitSel.remove()
+            this.D3.applyEventPointStyleStatic(mergeSel, this.projection, (d) => this.SELECTION.colorMapping(d))
+            this.masked=false
+        }
+    }
+
+    toggleCountryColorChart (count, max) {
+        if (!this.masked) {
+            info ("worldmap : masking (colorChart)")
+                // hide events on the map
+            // TODO
+                // apply new data to outline and obtain selections
+            const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+                this.g.selectAll("path"), this.outlineData.features, "path")
+            exitSel.remove()
+            function cname (countryFeature) {
+                return matchCountryNames(countryFeature["properties"]["sovereignt"].toLowerCase())
+            }
+            mergeSel
+                .attr("d", this.path)
+                .attr("fill", (features) => {
+                    //if ( ! count.has(cname)) { warn ("colormap : count : country not found : ", cname) }
+                    const frac = count.getOrElse(cname(features), 0) / max;
+                    return this.countriesColorPalette(frac)
+                })
+                .on('mouseover', (features) => eventOnMouseOver(features, this.tooltip, cname(features)+":\n"+count.getOrElse(cname(features), 0)+" events reported" ))
+                .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
+            this.masked = true;
+        } else {
+            info ("worldmap : unmasking (colorChart)")
+            this.drawOutline()
+            this.masked=false
+        }
     }
 
     reset(updateStepDuration) {
@@ -73,127 +145,98 @@ export class Worldmap {
       this.drawOverlay(updateStepDuration);
     }
 
-    /*
-      Called when one of the checkboxes is checked or unchecked, updates current selection
-    */
-    updateCategory(category, checked, updateStepDuration) {
-
-      // Add or remove from categories
-      checked ? this.currentCategories.add(category) : this.currentCategories.delete(category);
+    updateSelection(selectionCheck, colorMapping) {
 
       // Update circles if events are already there
-      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"), this.selected, updateStepDuration);
+      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"),
+       selectionCheck,
+       colorMapping,
+       100); //FIXME: keep hardcoded?
     }
 
-    /*
-       Add or remove events to map depending on direction of update
+    /*  Add or remove events to map depending on direction of update
      */
     updateEvents(timestamp, isForward, updateStepDuration) {
       isForward ? this.updateEventsForward(timestamp, updateStepDuration) : this.updateEventsBackward(timestamp, updateStepDuration);
     }
 
     updateEventsForward(timestamp, updateStepDuration) {
+        function _process(timestamp, results=undefined) {
+            this.currentTimestamps.push(timestamp);
+            if (results == undefined) {
+                this.flatEvents = this.flatEvents.concat(this.eventsBroker.loadedEvents(timestamp));
+            } else {
+                this.flatEvents = this.flatEvents.concat(results[1]);
+            }
+            this.drawOverlay(updateStepDuration);
+        }
 
-      if (Object.keys(this.loadedEvents).includes(timestamp)) {
-
-        // Update flatEvents with already loaded data
-        info("Loading from events " + timestamp);
-        this.flatEvents = this.flatEvents.concat(this.loadedEvents[timestamp]);
-        this.currentTimestamps.push(timestamp);
-        this.drawOverlay(updateStepDuration);
-
-      } else {
-
-        info("Loading from file " + timestamp);
-        let data_promise = this.loader.loadEvents(timestamp);
-
-        // Make sure outline already resolved
-        Promise.all([this.outlinePromise, data_promise]).then((results) => {
-
-          // Update event data and redraw it
-          this.currentTimestamps.push(timestamp);
-          this.loadedEvents[timestamp] = results[1];
-          this.flatEvents = this.flatEvents.concat(results[1]);
-
-          this.drawOverlay(updateStepDuration);
-        });
-      }
+        if (this.eventsBroker.has(timestamp)) {
+            _process.bind(this)(timestamp)
+        } else {
+            let data_promise = this.eventsBroker.load(timestamp)
+            Promise.all([this.outlinePromise, data_promise]).then((results) => {
+                _process.bind(this)(timestamp, results)
+            })
+        }
     }
 
     updateEventsBackward(timestamp, updateStepDuration) {
 
       // Remove timestamp from current ones
-      info("Removing from current " + timestamp);
+      info("Removing from currentTiemstamps " + timestamp);
       this.currentTimestamps.pop();
+      info(" currentTimestamps : \n", this.currentTimestamps)
 
       // Rebuild flatEvents
-      this.flatEvents = [];
+      this.flatEvents = []
       for (const t of this.currentTimestamps) {
-        this.flatEvents = this.flatEvents.concat(this.loadedEvents[t]);
+         let tmp = this.eventsBroker.loadedEvents(t)
+         this.flatEvents = this.flatEvents.concat(tmp);
       }
-
       this.drawOverlay(updateStepDuration);
     }
 
     applyZoom () {
         const transform = d3.event.transform;
         this.currentZoomTransform = transform;
-        /*if (transform.k > 1.2) {
-            // do something to disable scaling ??
-        }*/
         this.g.attr('transform', transform);
-
-        if (this.zoomScalingRatio != this.currentZoomTransform.k) {
-          this.zoomScalingRatio = this.currentZoomTransform.k;
-          this.D3.scaleCircles(this.g.selectAll("circle"), this.selected, this.zoomScalingRatio);
-        }
     }
 
-    /*
-        Draws the countries outline
-     */
+
+        /*  Draws the countries outline
+         *  If a colormap = [Country => int in [0,1] ] is given, this.palette will
+         *  be used for the countried "fill" color
+         */
     drawOutline() {
-
-        const sel = this.g.selectAll("path")
-            .data(this.outlineData.features)
-
-        //Update
-        sel.attr("d", this.path);
-        // Enter
-        sel.enter()
-            .append("path")
-            .attr("d", this.path);
-        // Exit
-        sel.exit()
-            .remove()
+            // apply new data and obtain selections
+        const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+            this.g.selectAll("path"), this.outlineData.features, "path")
+            // update visuals
+            exitSel.remove();
+        mergeSel.attr("d", this.path)
+            .attr("fill", this.countriesFillMin)
     }
 
-    /*
-        Draws the overlay, with or without new data, complete data update sequence
+    /*  Draws the overlay, with or without new data, complete data update sequence
      */
     drawOverlay(updateStepDuration) {
-
-      // Enter data
-      let events = this.g
-          .selectAll("circle")
-          .data(this.flatEvents);
-
-      // Exit selection
-      events.exit().remove();
-
-      // Enter Selection
-      let circles = events.enter()
-          .append("circle");
-
-      // Place invisible events on map
-      this.D3.invisibleCirclesCorrectLocation(circles, this.projection);
-
-      circles.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
+      if (this.masked) {
+          this.toggleCountryColorChart()
+          return
+      }
+        // apply new data and obtain selections
+      let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+          this.g.selectAll("circle"), this.flatEvents, "circle" )
+        // update visuals
+      exitSel.remove()
+      this.D3.invisibleCirclesCorrectLocation(enterSel, this.projection);
+      enterSel.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
              .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
              .on('click', (d) => eventOnMouseClick(d, this));
-
-      // Full entering transition
-      this.D3.pulseEntrance(circles, this.selected, updateStepDuration, this.zoomScalingRatio);
+      this.D3.pulseEntrance(enterSel, (d) => this.SELECTION.checkSelected(d),
+        (d) => this.SELECTION.colorMapping(d),
+        updateStepDuration);
     }
 
 }

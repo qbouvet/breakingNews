@@ -1,115 +1,78 @@
 
 export class ControlMenu {
 
-    constructor(initSpeed) {
+    constructor() {
 
       // D3 selections
-      this.parentSvg = d3.select("#mainSvg");
-
-      this.controlMenu = d3.select('#control-menu');
-      this.selectionMenu = d3.select('#selection-menu');
       this.speedText = d3.select('#simulation-speed');
-
       this.playBtn = d3.select('#play-btn');
       this.forwardBtn = d3.select('#forward-btn');
       this.backwardBtn = d3.select('#backward-btn');
-      this.resetBtn = d3.select('#refresh-btn');
 
       // UI
-      this.placeBar();
-      this.updateSpeedText(initSpeed);
-
-      // State
-      this.playing = false;
-      this.forwardEnabled = true;
-      this.backwardEnabled = true;
-      this.playEnabled = true;
+      this.updateSpeed(0);
     }
 
-    placeBar() {
-
-      let parentViewBox = this.parentSvg.attr("viewBox").split(" ");
-
-      this.controlMenu
-        .attr("x", parseInt(parentViewBox[0], 10) + parseInt(parentViewBox[2])/2 - this.controlMenu.attr("width")/2)
-        .attr("y", parseInt(parentViewBox[3], 10));
-
-      this.selectionMenu
-        .attr("x",  parseInt(parentViewBox[0], 10) + parseInt(parentViewBox[2]) - this.selectionMenu.attr("width")/2)
-        .attr("y", parseInt(parentViewBox[3], 10));
+    addForwardBackwardBehavior(callback) {
+      this.forwardBtn.on("click", () => callback(true));
+      this.backwardBtn.on("click", () => callback(false));
     }
 
-    updateSpeedText(speed) {
+    addPlayPauseBehavior(callback) {
+        this.playBtn.on("click", () => callback());
+    }
+
+    setPlay() {
+        this.playBtn.style("background-image", "url('css/icons/play.svg')")
+    }
+
+    setPause() {
+        this.playBtn.style("background-image", "url('css/icons/pause.svg')")
+    }
+
+    setReload() {
+        this.playBtn.style("background-image", "url('css/icons/reload.svg')")
+    }
+
+    setForwardEnabled(enable) {
+      let icon = (enable) ? "url('css/icons/forward.svg')" : "url('css/icons/forward-disabled.svg')";
+      this.forwardBtn.style("background-image", icon);
+    }
+
+    setBackwardEnabled(enable) {
+      let icon = (enable) ? "url('css/icons/backward.svg')" : "url('css/icons/backward-disabled.svg')";
+      this.backwardBtn.style("background-image", icon);
+    }
+
+    updateSpeed(speed) {
       this.speedText
         .text(speed + "x")
         .attr("font-size", "10");
     }
 
-    addCollapseBehavior() {
+    collapseInfo() {
+      let sidebardiv = document.querySelector("#sidebardiv");
+      let infodiv = document.querySelector("#informationdiv");
+      sidebardiv.style.display = "block";
+      infodiv.style.display = "none";
+    }
 
-      document.querySelector("#selection-menu").addEventListener("click", () => {
+    addInfoBehavior() {
+      document.querySelector("#btn-info").addEventListener("click", () => {
+          console.log("ahiiooooo")
+          let sidebardiv = document.querySelector("#sidebardiv");
+          let infodiv = document.querySelector("#informationdiv");
+          let display = infodiv.style.display;
+          sidebardiv.style.display = (display === "block") ? "block" : "none";
+          infodiv.style.display = (display === "block") ? "none" : "block";
+      });
+    }
+
+    addCollapseBehavior() {
+      document.querySelector("#btn-maximize").addEventListener("click", () => {
           const settingsdiv = document.querySelector("#settingsdiv")
           const display = settingsdiv.style.display
           settingsdiv.style.display = (display === "none") ? "block" : "none";
       });
-    }
-
-    addPlayPauseBehavior(callback) {
-
-      let self = this;
-
-      this.playBtn.on("click", () => {
-
-        if (self.playEnabled) {
-
-          if (self.playing) {
-            self.playBtn.attr("xlink:href", "../css/icons/play.svg");
-            self.playing = false;
-            callback(true);
-          } else {
-            self.playBtn.attr("xlink:href", "../css/icons/pause.svg");
-            self.playing = true;
-            callback(false);
-          }
-        } else {
-          // Reload call
-          callback(undefined);
-        }
-      });
-    }
-
-    enablePlay(enable) {
-      this.playEnabled = enable;
-      let icon = (enable) ? "../css/icons/play.svg" : "../css/icons/reload.svg";
-      this.playBtn.attr("xlink:href", icon);
-    }
-
-    //FIXME: add end of day behavior
-
-    addForwardBackwardBehavior(callback) {
-
-      this.forwardBtn.on("click", () => {
-        if (this.forwardEnabled) {
-          callback(true);
-        }
-      });
-
-      this.backwardBtn.on("click", () => {
-        if (this.backwardEnabled) {
-          callback(false);
-        }
-      });
-    }
-
-    enableForward(enable) {
-      this.forwardEnabled = enable;
-      let icon = (enable) ? "../css/icons/forward.svg" : "../css/icons/forward-disabled.svg";
-      this.forwardBtn.attr("xlink:href", icon);
-    }
-
-    enableBackward(enable) {
-      this.backwardEnabled = enable;
-      let icon = (enable) ? "../css/icons/backward.svg" : "../css/icons/backward-disabled.svg";
-      this.backwardBtn.attr("xlink:href", icon);
     }
 }

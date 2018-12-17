@@ -1,11 +1,12 @@
 
 function clean_sources(reset=false){
     $('.visualize-source-container').empty()
-    $('.visualize-source-container').show() 
+    $('.visualize-source-container').show()
     if (reset){
-        $('.visualize-source-container').hide() 
+        $('.visualize-source-container').hide()
     }
 }
+
 
 function sortMapByKeys(history_value) {
 
@@ -16,17 +17,8 @@ function sortMapByKeys(history_value) {
   return mapSort1;
 }
 
-// function sortHistory(history) {
-//   history.forEach((value, key) => {
-//     value = sortMapByKeys(value)
-//     history[key] = value
-//   })
 
-//   return history
-// }
-
-function display_source(data, cumulative_data, timestamps){
-
+function display_source(data, cumulative_data, timestamps, sourceGraphClickCallback){
 
     let sorted_data = Array.from(data).map((x) => [x[0], sortMapByKeys(x[1])])
     d3.selectAll(".visualize-source-container").style('height', 'calc(100%/' + Array.from(data).length + ')')
@@ -60,12 +52,20 @@ function display_source(data, cumulative_data, timestamps){
                     .attr('class', "visualize-source-mention-num")
                     .text(function (d) {return cumulative_data.get(d[0])})
 
-
     var divMentionChart = d3.selectAll(".visualize-source-container")
                     .append('div')
                     .attr('class', "visualize-source-mention-chart")
                     // .text(function (d) {console.log("d[1]: ", d[1])})
 
+    let getSourceName = (thisElement) => thisElement.childNodes[0].childNodes[0].innerText;
+
+    // "country colorChart on click" behaviour
+    d3.selectAll(".visualize-source-container")
+        .on("click", function () {
+            // 'this' is the 'div' we're operating on
+            const sourceName = getSourceName(this)
+            sourceGraphClickCallback(sourceName)
+    })
 
     d3.selectAll(".visualize-source-mention-text")
     .append("img")
@@ -73,12 +73,16 @@ function display_source(data, cumulative_data, timestamps){
     .attr("width", 16)
     .attr("height", 16);
 
+    console.log(data);
+
+    // FIXME: max value should not be the maximum cumulative value, but the maximum update value ever encountered
 
     // compute the max value of the total data, and pass it for axis scaling
     let max_total_value = Math.ceil(Array.from(cumulative_data.values()).reduce((x, y) => ( x > y ? x : y )))
     test_line_chart(n, max_total_value, array_data)
 
 }
+
 
 function xCircle(data) {
     let a = Array.from(data.keys())
@@ -89,12 +93,14 @@ function xCircle(data) {
     return a
 }
 
+
 function yCircle(data) {
 
     // let a = Array.from(data.keys())
     let b = Array.from(data.values())
     return b
 }
+
 
 function make_tuples(data, xScale, yScale) {
 
@@ -108,13 +114,16 @@ function make_tuples(data, xScale, yScale) {
 
     console.log("values: ", b)
 
-    
+
     var c = a.map(function(e, i) {
         return [xScale(e), yScale(b[i])];
     });
 
     return c
 }
+
+
+
 function test_line_chart(n, max_total_value, array_data){
 
     let digits_length = Math.log(max_total_value) * Math.LOG10E + 1 | 0;
@@ -142,15 +151,15 @@ function test_line_chart(n, max_total_value, array_data){
         .domain([0,n-1]) // input
         .range([0, width - x_axis_space]); // output
 
-   //  // 6. Y scale will use the randomly generate number 
+   //  // 6. Y scale will use the randomly generate number
     var yScale = d3.scaleLinear()
-        .domain([0, max_total_value]) // input 
-        .range([height - margin.bottom, 0]); // output 
+        .domain([0, max_total_value]) // input
+        .range([height - margin.bottom, 0]); // output
    //  // 7. d3's line generator
 
     var line = d3.line()
         .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
-        .y(function(d, i) { return yScale(i); }) // set the y values for the line generator 
+        .y(function(d, i) { return yScale(i); }) // set the y values for the line generator
         .curve(d3.curveMonotoneX) // apply smoothing to the line
 
     var svg = d3.selectAll(".visualize-source-mention-chart")
@@ -169,12 +178,12 @@ function test_line_chart(n, max_total_value, array_data){
     // 4. Call the y axis in a group tag
     svg.append("g")
         .attr("class", "y axis")
-        .call(d3.axisLeft(yScale).ticks(4)); 
+        .call(d3.axisLeft(yScale).ticks(4));
 
-    // 9. Append the path, bind the data, and call the line generator 
+    // 9. Append the path, bind the data, and call the line generator
     svg.append("path")
-        .attr("class", "line") // Assign a class for styling 
-        .attr("d", (d) => (d3.line()(make_tuples(d[1], x, yScale)))) // 11. Calls the line generator 
+        .attr("class", "line") // Assign a class for styling
+        .attr("d", (d) => (d3.line()(make_tuples(d[1], x, yScale)))) // 11. Calls the line generator
 
 
     svg.selectAll(".circle")
@@ -184,13 +193,13 @@ function test_line_chart(n, max_total_value, array_data){
         .attr("cy", line.y())
         .attr("r", 3.5);
 
-    // trying to put circles 
-    // svg.selectAll(".visualize-source-mention-chart").append("circle").enter()
+    // trying to put circles
+    // svg.selectAll(".visualize-source-mention-chart").append("circle")
     //     .attr("class", "dot") // Assign a class for styling
     //     .attr("cx", function(d, i) { return x(xCircle(d[1])[i]) })
     //     .attr("cy", function(d, i) { return yScale(yCircle(d[1])[i]) })
     //     .attr("r", 5);
-    // 12. Appends a circle for each datapoint 
+    // 12. Appends a circle for each datapoint
 
 }
 

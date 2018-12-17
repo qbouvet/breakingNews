@@ -1,37 +1,38 @@
-
 /* ---------------------------------------------------
-    OVERALL PAGE STYLE
+    Variables
 ----------------------------------------------------- */
 
-* {
-    margin: 0px;
-    padding: 0px;
+:root {
+--color-bg: #000000;
+--color-primary: #E75B10;
+--color-accent: #EE801E;
+--color-darkgray: #333333;
+--color-gray: #888888;
+--color-lightgray: #E3E0DD;
 }
 
-    /* FIXME : PROBABLY USELESS
-     */
-.svg-content {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /*preserveAspectRatio=none;*/
+/* ---------------------------------------------------
+  OVERALL PAGE STYLE
+----------------------------------------------------- */
+
+  /* Background color
+   */
+.panels-container {
+  background-color : var(--color-darkgray);
 }
 
-    /*  Background style
-     */
+  /*  Background style
+   */
 body {
-    height : 100%;
-    width : 100%;
-    overflow: auto;
-    background-color: #888888;
+  height : 100%;
+  width : 100%;
+  overflow: auto;
+  background-color : var(--color-darkgray);
 }
 
-    /*  Top level blocks of the visualization :
-     *  map, graph panel, settings
-     */
+  /*  Top level blocks of the visualization :
+   *  map, graph panel, settings
+   */
 .app-panel{
     margin : 2px;
     padding : 2px;
@@ -111,7 +112,7 @@ body {
 .visualize-source-mention-chart svg path {
   fill: none;
 }
-/* 
+/*
   line charts for sources and mentions
 */
 .line {
@@ -136,83 +137,101 @@ body {
 
     /* generic style for icon-button */
 .btn-icon {
-        /* positioning */
-    margin : 3px;
-    width : 40px;
-    height : 40px;
-        /* Style -> fullsize background-image */
-    background-color: transparent;
-    background-repeat: no-repeat;
-    background-position: 0px 0px;
-    background-size : 100% 100%;
+    /* positioning */
+  margin : 3px 3px 3px 3px;
+  width : 40px;
+  height : 40px;
+      /* Style -> fullsize background-image */
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  background-size : 100% 100%;
+      /*   */
+  border:none;
 }
 
-    /* menu where all children are aligned horizontally*/
-.one-line-menu {
-        /* generic height for all such menues */
-    height : 50px;
-        /* children positioning */
-    display : flex;
-    flex-direction: row;
-    align-items: center;
+    /* Fix the 'blue border on click' */
+button:focus{
+  outline:none;
+}
+
+/*  Container that lays-out its children horizontally,
+  left-aligned by default (use container-distribute-horizontally)
+*/
+.container-lay-horizontally {
+      /* generic height for all such menues */
+  height : 50px;
+      /* children positioning */
+  display : flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+/*  Container that horizontally aligns & distributes its content
+    typically used with one-line-menu
+*/
+.container-distribute-horizontally {
+  display: flex;
+  justify-content: space-between;
 }
 
 /* ---------------------------------------------------
-    2-panel layout stuff
+  2-panel layout stuff
 ----------------------------------------------------- */
 
 .panels-container {
-        /* children layout */
-    display: flex;
-    flex-direction: row;
-    overflow: hidden;
-    xtouch-action: none;            /* avoid browser level touch actions */
-        /* positioning      */
-    position : absolute;
-    height : 90;
-    padding: 0;
-    margin: 0;
-    width : 100%;
-    height : 100%;
+      /* children layout */
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  xtouch-action: none;    /* avoid browser level touch actions */
+      /* positioning      */
+  position : absolute;
+  height : 90;
+  padding: 0;
+  margin: 0;
+  width : 100%;
+  height : 100%;
 }
 
 .splitter {
-        /* position & size */
-    flex: 0 0 auto;
-    width: 10px;
-    min-height: 200px;
-        /* Styling */
-    background: url("../css/icons/splitter.png") center center no-repeat #333333;
-    background-size: 40px 40px;
-    border: solid black 1px;
-        /* resize behaviour */
-    cursor: col-resize;
+      /* position & size */
+  flex: 0 0 auto;
+  width: 10px;
+  min-height: 200px;
+      /* Styling */
+  background: url("../css/icons/splitter.png") center center no-repeat var(--color-darkgray);
+  background-size: 10px 40px;
+  background-color : var(--color-bg);
+  border: solid var(--color-bg) 1px;
+      /* resize behaviour */
+  cursor: col-resize;
 }
 
 .left-panel-split {
-        /* position & size */
-    flex: 0 0 auto;
-    min-width: 66%;
-    max-width: 80%;
-    height : 100%;
-        /* misc style */
-    white-space: nowrap;
-    padding: 2px;
-        /* divide space between children */
-    display : flex;
-    flex-direction: column;
+      /* position & size */
+  flex: 0 0 auto;
+  min-width: 66%;
+  max-width: 80%;
+  height : 100%;
+      /* misc style */
+  white-space: nowrap;
+  padding: 2px;
+      /* divide space between children */
+  display : flex;
+  flex-direction: column;
 }
 
 .right-panel-split {
-    flex: 1 1 auto;
-    padding: 2px;
-    width: 100%;
-    min-height: 100%;
-    min-width: 20%;
+  flex: 1 1 auto;
+  padding: 2px;
+  width: 100%;
+  min-height: 100%;
+  min-width: 20%;
 }
 
 /* ---------------------------------------------------
-    LEFT-PANEL-SPLIT CHILDREN
+    LEFT-PANEL-SPLIT'S CHILDREN
     we want them setup so that :
     - settingsdiv get the space it needs
     - mapdiv gets all the rest
@@ -220,41 +239,42 @@ body {
 ----------------------------------------------------- */
 
 #mapdiv {
-    flex : 1 1 auto;
-    height : 78%;
+    flex : 1 1 75%;
+    height : 70%;
 }
 
 #settingsdiv {
-    flex : 0 0 22%;
-    /*height : 22%;*/
-        /*will be toggled by the collapse-settings button
-            visibility : collapse would be better, but unsupported by chrome */
-    display : block;
+  flex : 0 0 25%;
+  /*height : 22%;*/
+      /*will be toggled by the collapse-settings button
+          visibility : collapse would be better, but unsupported by chrome */
+  display : block;
+  background-color: var(--color-bg);
+  color: var(--color-lightgray);
+  height: 25%;
 }
 
-/*.bar-chart {
-  background-color: blue;
-}*/
 /* ---------------------------------------------------
     SIDEBAR-RELATED STYLING
 ----------------------------------------------------- */
 
 #menubar { /* typically inherits from one-line-menu */
-        /* left-right align children - NB works with flex */
-    justify-content: space-between;
+      /* left-right align children - NB works with flex */
+  justify-content: space-between;
 }
 
 #btn-info {
-     background-image: url(../css/icons/info.svg);
-        /* right-align with 5px gap */
-     position : relative;
-     top : 0px;
-     /*left : calc(100% - 45px);*/
+   position : relative;
+   height: 30px;
+   width: 30px;
+
+   top : 0px;
+   background-image: url(../css/icons/info.svg);
 }
 
 @font-face {
   font-family: "SomeCoolFont";
-  src: url("../css/fonts/OldNewspaperTypes.ttf");
+  src: url("../css/fonts/Library 3 am.otf");
 }
 
 #menubar p {
@@ -265,133 +285,11 @@ body {
     margin: 0;
     margin-left: 1vw;
         /* font config */
-    font-size : 1.5vw;
+    font-size : 2.5vw;
     font-family: "SomeCoolFont";  /* "must be the last value specified" */
 }
 
 #sidebardiv {
     background-color: green;
-        /* Position
-    position : absolute;
-    left : 70%;
-    top : 0%;*/
-        /* witdh
-    width : 30%;*/
     height : 100%;
-}
-
-
-/* ---------------------------------------------------
-    MAP AND EVENTS STYLE
------------------------------------------------------ */
-
-#map-canva {
-        /* position & size */
-    height : 100%;
-    width : 100%;
-    background-color: black;
-}
-
-#mainSvg{
-        /* size, relative to parent (#map-canva)
-            (parents size needs to be defined, else, oveflow)*/
-    height : 100% ;
-    width : 100%;
-}
-
-path {
-    stroke: #333333;
-    fill: #777777;
-    fill-opacity: 0.8;
-    stroke-width: 1.5px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-        /* keeps width fixed when zooming */
-    vector-effect: non-scaling-stroke;
-}
-
-circle {
-        /* keeps width fixed when zooming */
-    /*vector-effect: non-scaling-stroke;*/
-}
-
-/* ---------------------------------------------------
-    EVENT SELECTION STYLE (tooltip + hover)
------------------------------------------------------ */
-
-div.tooltip {
-  font-family:"avenir next", Arial, sans-serif;
-  border: 1px solid;
-  border-radius: 6px;
-  padding: 7px;
-  color: white;
-}
-
-div.tooltip b {
-  color: #FFA51F;
-}
-
-circle:hover {
-  fill: white !important;
-}
-
-
-/* ---------------------------------------------------
-    MAP CONTROLS & TIMESLIDER STYLE
------------------------------------------------------ */
-
-#refresh-btn:hover,
-#play-btn:hover,
-#forward-btn:hover,
-#backward-btn:hover,
-#selection-menu:hover {
-  cursor: pointer;
-}
-
-#control-menu-border {
-  fill: black;
-  stroke: #FFA500;
-  stroke-width: 1;
-}
-
-#simulation-speed {
-  fill: #FFA500;
-}
-
-#categories-txt {
-  fill: #FFA500;
-}
-
-/* ---------------------------------------------------
-    Clock
------------------------------------------------------ */
-
-
-
-#clock-border {
-  fill: black;
-  stroke: #FFA500;
-  stroke-width: 5;
-}
-
-#display-date {
-  fill: #FFA500;
-}
-
-#digital-clock path {
-  fill: #222;
-  stroke: #5f0;
-  stroke-opacity: 0;
-}
-
-#digital-clock circle {
-  fill: #FFA500;
-  stroke: #FFA500;
-  stroke-opacity: 0;
-}
-
-#digital-clock .lit {
-  fill: #FFA500;
-  stroke: #FFA500;
-  stroke-opacity: 1;
 }

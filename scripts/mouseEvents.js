@@ -1,20 +1,26 @@
-import {EventCodes} from './eventCodes.js'
+import {EventCodes} from './EventCodes.js'
 
-function eventOnMouseOver(d, tooltip) {
 
+function eventOnMouseOver(d, tooltip, htmlContent=undefined) {
   tooltip.transition()
     .duration(100)
     .style("visibility", "visible")
     .style("opacity", 0.9)
     .style("background", "black");
 
-  tooltip.html(tooltipHTML(d))
-    .style("left", (d3.event.pageX + 15) + "px")
-    .style("top", (d3.event.pageY - 50 ) + "px");
+  if (htmlContent == undefined){
+    tooltip.html(tooltipHTML(d))
+      .style("left", (d3.event.pageX + 15) + "px")
+      .style("top", (d3.event.pageY - 50 ) + "px");
+  } else {
+        tooltip.html(htmlContent)
+          .style("left", (d3.event.pageX + 15) + "px")
+          .style("top", (d3.event.pageY - 50 ) + "px");
+  }
+
 }
 
 function eventOnMouseOut(d, tooltip) {
-
   tooltip.transition()
         .duration(100)
         //.style("opacity", 0)

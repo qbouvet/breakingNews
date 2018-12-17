@@ -1,0 +1,109 @@
+/* ---------------------------------------------------
+    Variables
+----------------------------------------------------- */
+
+:root {
+  --color-bg: #000000;
+  --color-primary: #E75B10;
+  --color-accent: #EE801E;
+  --color-darkgray: #222222;
+  --color-gray: #888888;
+  --color-lightgray: #E3E0DD;
+}
+
+/* ---------------------------------------------------
+    SIDEBAR-RELATED STYLING
+----------------------------------------------------- */
+
+#menubar { /* typically inherits from one-line-menu */
+        /* left-right align children - NB works with flex */
+    justify-content: space-between;
+    background-color : black;
+}
+
+#btn-info {
+     background-image: url(../css/icons/info.png);
+     position : relative;
+     top : 0px;
+     left : -5px;
+}
+
+@font-face {
+  font-family: "SomeCoolFont";
+  src: url("../css/fonts/Library 3 am.otf");
+}
+
+#menubar p {
+    /* vh = viewport-related units https://stackoverflow.com/questions/16056591/font-scaling-based-on-width-of-container#answer-19818026 */
+    /* TODO : use svg instead ? https://css-tricks.com/fitting-text-to-a-container/ */
+        /* remove interline */
+    padding: 0;
+    margin: 0;
+    margin-left: 1vw;
+        /* font config */
+    font-size : 2.5vw;
+    font-family: "SomeCoolFont";  /* "must be the last value specified" */
+    color:#FFA500;
+
+}
+
+#sidebardiv {
+  display: none;
+  height : 94%;
+  background-color : black;
+}
+
+
+/* ---------------------------------------------------
+    Information div
+----------------------------------------------------- */
+#informationdiv {
+  height:94%;
+  display:block;
+  background-color: var(--color-bg);
+
+  font-family: 'Jura', sans-serif;
+  font-size: 1.5vmin;
+  text-align: justify;
+  text-justify: inter-word;
+  color: var(--color-lightgray);
+}
+
+.info-paragraph {
+
+  margin: 1vmin;
+  padding: 1vmin;
+}
+
+.info-section {
+
+}
+
+
+/* ---------------------------------------------------
+    GRAPHS STYLING
+----------------------------------------------------- */
+
+
+.visualize-source-container {
+  /*display: table;*/
+  overflow: hidden;
+  /*clear: both;*/
+  border: solid black 2px;
+  border-radius: 4px;
+  height: calc(100% / 5);
+  /*height: 200px;*/
+}
+
+.visualize-source-mention {
+  background-color: yellow;
+  width: 30%;
+  height: 100%;
+  float: left;
+}
+.visualize-source-mention-chart {
+  background-color: red;
+  width: 70%;
+  height: 100%;
+  float: right;
+}
