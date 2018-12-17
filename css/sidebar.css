@@ -87,43 +87,47 @@
 
 
     /*  Container that holds the sourceGraph text and graph
-     *  previously
+     *  previously .visualize-source-container
      */
-.sourcegraph-container {
 /*.visualize-source-container {*/
-  /*display: table;*/
-  overflow: hidden;
-  background-color : black;
-  /*clear: both;*/
-  border: solid black 2px;
-  border-radius: 4px;
-  /*height: calc(100% / 5);*/
-  height: 200px;
-  position:relative;
+.sourcegraph-container {
+        /* Position & dimension */
+    height: 25%;
+    position:relative;
+        /* spacing */
+    margin-bottom : 100px;
 }
+    /* Bottom delimiter for sourcegraph-container */
+/*.sourcegraph-container:after {
+    content : "";
+    position: absolute;
+    left    : 33%;
+    bottom  : 0;
+    height  : 3px;
+    width   : 33%;
+    border-top : 3px solid var(--color-gray);
+}*/
 
     /*  Title/textbox for a source graph
      */
 .sourcegraph-text {
-  /*display: table;*/
-  overflow: hidden;
-  /*clear: both;*/
-  border: solid black 2px;
-  border-radius: 4px;
-  /*width: 100%;
-  height: 20%;
-  float: top;
-  position: relative;*/
+        /* Position & dimensions */
+    width: 100%;
+    height: 20%;
+        /* font color & content properties */
+    color : var(--color-accent);
+    overflow: hidden;
 }
 
     /*  graph/chart area for a sourcegraph
      *  previously .visualize-source-mention-chart
      */
 .sourcegraph-chart {
-  background-color: red;
-  width: 100%;
-  height: 80%;
-  float: bottom;
+        /* size & position */
+    width: 100%;
+    height: 80%;
+        /* font color & content properties */
+    color : var(--color-gray);
 }
 
 /*

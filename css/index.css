@@ -18,7 +18,7 @@
   /* Background color
    */
 .panels-container {
-  background-color : var(--color-darkgray);
+  background-color : var(--color-gray);
 }
 
   /*  Background style
@@ -34,8 +34,7 @@ body {
    *  map, graph panel, settings
    */
 .app-panel{
-    margin : 2px;
-    padding : 2px;
+    margin : 3px;
     border : solid black 2px;
     border-radius : 4px;
 }

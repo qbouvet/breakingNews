@@ -25,22 +25,15 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
     //clean container for later redraw all charts
     clean_sources()
 
-
     let array_data = Array.from(data).map(d => {return d[1]})
 
     var n = Array.from(array_data[0].keys()).length
-
-
-
-
-
 
     var divParent = d3.select('#sidebardiv')
                     .selectAll('div')
                     .data(sorted_data).enter()
                     .append('div')
                     .attr('class', "sourcegraph-container")
-                    // .style('height', height + "px")
 
     var divMention = d3.selectAll(".sourcegraph-container")
         .append ('div')
@@ -51,29 +44,6 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
         .append('div')
             .attr('class', "sourcegraph-chart")
 
-    /*var divMention = d3.selectAll(".visualize-source-container")
-                    .append('div')
-                    .attr('class', "visualize-source-mention-container")
-
-    var divMentionText = d3.selectAll(".visualize-source-mention-container")
-                    .append('div')
-                    .attr('class', "visualize-source-mention-text")
-                    .text(function (d) {return d[0]})
-
-    var divMentionNum = d3.selectAll(".visualize-source-mention-container")
-                    .append('div')
-                    .attr('class', "visualize-source-mention-num")
-                    .text(function (d) {return cumulative_data.get(d[0])})
-
-    var divMentionChart = d3.selectAll(".visualize-source-container")
-                    .append('div')
-                    .attr('class', "visualize-source-mention-chart")*/
-                    // .text(function (d) {console.log("d[1]: ", d[1])})
-
-
-
-
-
     let getSourceName = (thisElement) => thisElement.childNodes[0].childNodes[0].innerText;
 
     // "country colorChart on click" behaviour
@@ -83,6 +53,21 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
             const sourceName = getSourceName(this)
             sourceGraphClickCallback(sourceName)
     })
+    // "country colorChart on click" behaviour
+    d3.selectAll(".sourcegraph-text")
+        .on("click", function () {
+            // 'this' is the 'div' we're operating on
+            const sourceName = getSourceName(this)
+            sourceGraphClickCallback(sourceName)
+    })
+    // "country colorChart on click" behaviour
+    d3.selectAll(".sourcegraph-chart")
+        .on("click", function () {
+            // 'this' is the 'div' we're operating on
+            const sourceName = getSourceName(this)
+            sourceGraphClickCallback(sourceName)
+    })
+
 
     /*d3.selectAll(".visualize-source-mention-text")
     .append("img")
