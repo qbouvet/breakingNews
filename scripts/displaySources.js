@@ -38,30 +38,16 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
     var divMention = d3.selectAll(".sourcegraph-container")
         .append ('div')
         .attr('class', "sourcegraph-text")
-            .text(function (d) {return d[0]+"  -  "+cumulative_data.get(d[0])+" events reported"})
+            .text(function (d) {return d[0]+" - "+cumulative_data.get(d[0])})
 
     var divMentionChart = d3.selectAll(".sourcegraph-container")
         .append('div')
             .attr('class', "sourcegraph-chart")
 
-    let getSourceName = (thisElement) => thisElement.childNodes[0].childNodes[0].innerText;
+    const getSourceName = (thisElement) => thisElement.children[0].innerHTML.split(" - ")[0];
 
     // "country colorChart on click" behaviour
     d3.selectAll(".sourcegraph-container")
-        .on("click", function () {
-            // 'this' is the 'div' we're operating on
-            const sourceName = getSourceName(this)
-            sourceGraphClickCallback(sourceName)
-    })
-    // "country colorChart on click" behaviour
-    d3.selectAll(".sourcegraph-text")
-        .on("click", function () {
-            // 'this' is the 'div' we're operating on
-            const sourceName = getSourceName(this)
-            sourceGraphClickCallback(sourceName)
-    })
-    // "country colorChart on click" behaviour
-    d3.selectAll(".sourcegraph-chart")
         .on("click", function () {
             // 'this' is the 'div' we're operating on
             const sourceName = getSourceName(this)

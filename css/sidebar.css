@@ -96,6 +96,7 @@
     position:relative;
         /* spacing */
     margin-bottom : 100px;
+    border : solid red 1px;
 }
     /* Bottom delimiter for sourcegraph-container */
 /*.sourcegraph-container:after {
@@ -116,7 +117,10 @@
     height: 20%;
         /* font color & content properties */
     color : var(--color-accent);
+    font-size: 125%;
+    text-align:center;
     overflow: hidden;
+    pointer-events: none;
 }
 
     /*  graph/chart area for a sourcegraph
@@ -128,6 +132,8 @@
     height: 80%;
         /* font color & content properties */
     color : var(--color-gray);
+    pointer-events: none;
+    background-color:lightblue;
 }
 
 /*
