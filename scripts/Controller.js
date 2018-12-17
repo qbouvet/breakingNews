@@ -17,11 +17,6 @@ export class Controller {
       this.CLOCK = new Clock(this.TIME_MANAGER.INIT_DATE);
       this.CONTROLS = new ControlMenu();
 
-      // Init UI behavior
-      this.CONTROLS.addPlayPauseBehavior((play) => this.onPlayPause(play));
-      this.CONTROLS.addForwardBackwardBehavior((forward) => this.onForwardBackward(forward));
-      this.CONTROLS.addCollapseBehavior();
-
       // Speed components
       this.UPDATE_INTERVAL = 2000;
       this.speedScale = d3.scaleLinear()
@@ -33,6 +28,12 @@ export class Controller {
       this.interval = 0;
       this.currentState = 'start';
       this.nextState('start');
+
+      // Init UI behavior
+      this.CONTROLS.addPlayPauseBehavior(() => this.onPlayPause());
+      this.CONTROLS.addForwardBackwardBehavior((forward) => this.onForwardBackward(forward));
+      this.CONTROLS.addCollapseBehavior();
+      this.CONTROLS.addInfoBehavior();
   }
 
   nextState(state) {
@@ -78,6 +79,7 @@ export class Controller {
   }
 
   playState() {
+    this.CONTROLS.collapseInfo();
     this.CONTROLS.setBackwardEnabled(!(this.speed === -2));
     this.CONTROLS.setForwardEnabled(!(this.speed === 2));
     this.CONTROLS.setPause();
@@ -99,6 +101,8 @@ export class Controller {
   }
 
   onPlayPause() {
+
+    console.log(this.currentState)
 
     // Take appropriate action
     switch(this.currentState) {

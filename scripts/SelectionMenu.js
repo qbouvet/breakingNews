@@ -8,6 +8,13 @@ export class SelectionMenu {
     this.CAMEO = new EventCodes();
 
     this.selectedTypes = new Set(Object.keys(this.CAMEO.types).map(Number));
+    
+    this.colors = {
+      1:"#69FFF1",
+      2:"#35FF69",
+      3:"#FFF07C",
+      4:"#FF8360"
+    };
 
     this.addCheckboxBehavior();
 
@@ -39,13 +46,17 @@ export class SelectionMenu {
     return this.selectedTypes.has(this.CAMEO.codes[d['Code']]['type']);
   }
 
+  colorMapping(d) {
+    return this.colors[d['Class']]
+  }
+
   remove(typeList) {
 
     typeList.forEach((d, i) => {
       this.selectedTypes.delete(d);
     });
 
-    this.mapUpdate((d) => this.checkSelected(d));
+    this.mapUpdate((d) => this.checkSelected(d), (d) => this.colorMapping(d));
   }
 
   add(typeList) {
@@ -54,7 +65,7 @@ export class SelectionMenu {
       this.selectedTypes.add(d);
     });
 
-    this.mapUpdate((d) => this.checkSelected(d));
+    this.mapUpdate((d) => this.checkSelected(d), (d) => this.colorMapping(d));
   }
 
 

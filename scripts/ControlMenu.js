@@ -13,51 +13,25 @@ export class ControlMenu {
       this.updateSpeed(0);
     }
 
-    addPlayPauseBehavior(callback) {
-      this.playBtn.on("click", () => callback());
-    }
-
     addForwardBackwardBehavior(callback) {
       this.forwardBtn.on("click", () => callback(true));
       this.backwardBtn.on("click", () => callback(false));
     }
 
-
     addPlayPauseBehavior(callback) {
-
-        let self = this;
-
-        this.playBtn.on("click", () => {
-
-            if (self.playEnabled) {
-
-                if (self.playing) {
-                    self.setPause()
-                    callback(true);
-                } else {
-                    self.setPlay()
-                    callback(false);
-                }
-            } else {
-                // Reload call
-                callback(undefined);
-            }
-        });
+        this.playBtn.on("click", () => callback());
     }
 
     setPlay() {
         this.playBtn.style("background-image", "url('css/icons/play.svg')")
-        this.playing = true;
     }
 
     setPause() {
         this.playBtn.style("background-image", "url('css/icons/pause.svg')")
-        this.playing = false;
     }
 
     setReload() {
         this.playBtn.style("background-image", "url('css/icons/reload.svg')")
-        this.playing = false;   // ?
     }
 
     setForwardEnabled(enable) {
@@ -66,7 +40,7 @@ export class ControlMenu {
     }
 
     setBackwardEnabled(enable) {
-      let icon = (enable) ? "url('css/icons/backward.svg')" : "css/icons/backward-disabled.svg";
+      let icon = (enable) ? "url('css/icons/backward.svg')" : "url('css/icons/backward-disabled.svg')";
       this.backwardBtn.style("background-image", icon);
     }
 
@@ -74,6 +48,24 @@ export class ControlMenu {
       this.speedText
         .text(speed + "x")
         .attr("font-size", "10");
+    }
+
+    collapseInfo() {
+      let sidebardiv = document.querySelector("#sidebardiv");
+      let infodiv = document.querySelector("#informationdiv");
+      sidebardiv.style.display = "block";
+      infodiv.style.display = "none";
+    }
+
+    addInfoBehavior() {
+      document.querySelector("#btn-info").addEventListener("click", () => {
+          console.log("ahiiooooo")
+          let sidebardiv = document.querySelector("#sidebardiv");
+          let infodiv = document.querySelector("#informationdiv");
+          let display = infodiv.style.display;
+          sidebardiv.style.display = (display === "block") ? "block" : "none";
+          infodiv.style.display = (display === "block") ? "none" : "block";
+      });
     }
 
     addCollapseBehavior() {

@@ -37,6 +37,8 @@ export class Worldmap {
         this.zoomScalingRatio = 1.0;
 
         // Define outline and behavior when it resolves
+        this.countriesFillMin = "#888888"
+        this.countriesFillMax= '#FFA500'
         this.outlinePromise = this.loader.loadMapOutline();
         this.outlinePromise.then( (result) => {
 
@@ -60,7 +62,7 @@ export class Worldmap {
         this.flatEvents = [];
 
         // Categories selection
-        this.SELECTION = new SelectionMenu((selectionCheck) => this.updateSelection(selectionCheck));
+        this.SELECTION = new SelectionMenu((selectionCheck, colorMapping) => this.updateSelection(selectionCheck, colorMapping));
 
         // Define the div for the tooltip
         this.tooltip = d3.select("body")
@@ -72,7 +74,7 @@ export class Worldmap {
         this.masked = false;
         this.countriesColorPalette = (t) => d3.scaleLinear().domain([0,1])
             .interpolate(d3.interpolateHcl)
-            .range([d3.rgb("#777777"), d3.rgb('#FFA500')]) (t);
+            .range([d3.rgb(this.countriesFillMin), d3.rgb(this.countriesFillMax)]) (t);
 
         info ("Constructed worldmap");
     }
@@ -102,7 +104,7 @@ export class Worldmap {
                 this.g.selectAll("circle"), this.flatEvents, "circle")
                 // update visuals
             exitSel.remove()
-            this.D3.applyEventPointStyleStatic(mergeSel, this.projection)
+            this.D3.applyEventPointStyleStatic(mergeSel, this.projection, (d) => this.SELECTION.colorMapping(d))
             this.masked=false
         }
     }
@@ -122,16 +124,12 @@ export class Worldmap {
             mergeSel
                 .attr("d", this.path)
                 .attr("fill", (features) => {
-                    /*if ( ! count.has(cname)) {
-                        warn ("colormap : count : country not found : ", cname)
-                    }*/
+                    //if ( ! count.has(cname)) { warn ("colormap : count : country not found : ", cname) }
                     const frac = count.getOrElse(cname(features), 0) / max;
                     return this.countriesColorPalette(frac)
                 })
                 .on('mouseover', (features) => eventOnMouseOver(features, this.tooltip, cname(features)+":\n"+count.getOrElse(cname(features), 0)+" events reported" ))
                 .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
-                // add tooltip
-            // TODO
             this.masked = true;
         } else {
             info ("worldmap : unmasking (colorChart)")
@@ -147,10 +145,13 @@ export class Worldmap {
       this.drawOverlay(updateStepDuration);
     }
 
-    updateSelection(selectionCheck) {
+    updateSelection(selectionCheck, colorMapping) {
 
       // Update circles if events are already there
-      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"), selectionCheck, 100); //FIXME: keep hardcoded?
+      if (this.flatEvents.length > 0) this.D3.updateCategorySelection(this.g.selectAll("circle"),
+       selectionCheck,
+       colorMapping,
+       100); //FIXME: keep hardcoded?
     }
 
     /*  Add or remove events to map depending on direction of update
@@ -214,20 +215,7 @@ export class Worldmap {
             // update visuals
             exitSel.remove();
         mergeSel.attr("d", this.path)
-            .attr("fill", "#777777")
-        /*if (count==undefined) {
-        } else {
-            mergeSel
-                .attr("d", this.path)
-                .attr("fill", (countryFeature) => {
-                    const cname = matchCountryNames(countryFeature["properties"]["sovereignt"].toLowerCase())
-                    /*if ( ! count.has(cname)) {
-                        warn ("colormap : count : country not found : ", cname)
-                    }
-                    const frac = count.getOrElse(cname, 0)
-                    return this.countriesColorPalette(frac)
-                });
-        }*/
+            .attr("fill", this.countriesFillMin)
     }
 
     /*  Draws the overlay, with or without new data, complete data update sequence
@@ -246,7 +234,9 @@ export class Worldmap {
       enterSel.on('mouseover', (d) => eventOnMouseOver(d, this.tooltip))
              .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
              .on('click', (d) => eventOnMouseClick(d, this));
-      this.D3.pulseEntrance(enterSel, (d) => this.SELECTION.checkSelected(d), updateStepDuration);
+      this.D3.pulseEntrance(enterSel, (d) => this.SELECTION.checkSelected(d),
+        (d) => this.SELECTION.colorMapping(d),
+        updateStepDuration);
     }
 
 }

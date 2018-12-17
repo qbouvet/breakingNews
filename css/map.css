@@ -1,13 +1,24 @@
 /* ---------------------------------------------------
-    MAP AND EVENTS STYLE
+    Variables
+----------------------------------------------------- */
+
+:root {
+  --color-bg: #000000;
+  --color-primary: #E75B10;
+  --color-accent: #EE801E;
+  --color-darkgray: #222222;
+  --color-gray: #888888;
+  --color-lightgray: #E3E0DD;
+}
+
+/* ---------------------------------------------------
+    General map svg
 ----------------------------------------------------- */
 
 #map-canva {
-        /* position & size */
     height : 100%;
     width : 100%;
-    /*background-color: black;*/
-    background : black;
+    background : var(--color-bg);
         /* for children positioning*/
     position : relative;
 }
@@ -20,7 +31,8 @@
 }
 
 path {
-    stroke: #333333;
+    stroke: var(--color-darkgray);
+    /* fill done in JS depending on mentions count */
     stroke-width: 1.5px;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -29,14 +41,8 @@ path {
     vector-effect: non-scaling-stroke;
 }
 
-circle {
-        /* keeps width fixed when zooming */
-    /*vector-effect: non-scaling-stroke;*/
-}
-
-
 /* ---------------------------------------------------
-    EVENT SELECTION STYLE (tooltip + hover)
+    Event selection (tooltip + hover)
 ----------------------------------------------------- */
 
 div.tooltip {
@@ -44,106 +50,249 @@ div.tooltip {
   border: 1px solid;
   border-radius: 6px;
   padding: 7px;
-  color: white;
+  color: var(--color-lightgray);
 }
 
 div.tooltip b {
-  color: #FFA51F;
+  color: var(--color-accent);
 }
 
 circle:hover {
-  fill: white !important;
+  fill: var(--color-lightgray) !important;
 }
 
 
 /* ---------------------------------------------------
-    MAP CONTROLS & TIMESLIDER STYLE
+    Digital clock
 ----------------------------------------------------- */
-
-#refresh-btn:hover,
-#play-btn:hover,
-#forward-btn:hover,
-#backward-btn:hover,
-#selection-menu:hover {
-  cursor: pointer;
-}
-
-
-#btn-maximize {
-    background-image : url("../css/icons/maximize.png");
-        /* size */
-    height : 30px;
-    width : 30px;
-        /* Position - absolute -> relative to parent */
-    position : absolute;
-    top : calc( 98% - 30px );
-    left : calc( 99% - 30px );
-}
 
 #digital-clock{
-        /* size */
-    width : 180px;
-    height : 65px;
-        /* Position - absolute relative to parent */
-    position : absolute;
-    top : 1%;
-    left : calc( 50% - (180px / 2));
+  position : absolute;
+  width : 180px;
+  height : 65px;
+  top : 1%;
+  left : calc( 50% - (180px / 2));
 }
-
-#control-menu{
-        /* size */
-    width : 180px;
-    height : 40px;
-        /* Position - absolute relative to parent */
-    position : absolute;
-    top : calc( 99% - 40px);
-    left : calc( 50% - ((180px - 40px - 4px) / 2));
-    background-color:transparent;
-}
-
-#control-menu-border {
-  fill: black;
-  stroke: #FFA500;
-  stroke-width: 1;
-}
-
-#simulation-speed {
-  fill: #FFA500;
-}
-
-#categories-txt {
-  fill: #FFA500;
-}
-
-
-/* ---------------------------------------------------
-    Clock
------------------------------------------------------ */
 
 #clock-border {
-  fill: black;
-  stroke: #FFA500;
-  stroke-width: 5;
+  fill: var(--color-darkgray);
+  stroke: var(--color-primary);
+  stroke-width: 5px;
 }
 
 #display-date {
-  fill: #FFA500;
+  fill: var(--color-accent);
 }
 
 #digital-clock path {
-  fill: #222;
-  stroke: #5f0;
-  stroke-opacity: 0;
+  fill: var(--color-darkgray);
 }
 
 #digital-clock circle {
-  fill: #FFA500;
-  stroke: #FFA500;
-  stroke-opacity: 0;
+  fill: var(--color-accent);
 }
 
 #digital-clock .lit {
-  fill: #FFA500;
-  stroke: #FFA500;
+  fill: var(--color-accent);
+  stroke: var(--color-accent);
   stroke-opacity: 1;
+}
+
+/* ---------------------------------------------------
+    Control menu
+----------------------------------------------------- */
+
+#control-menu{
+  width : 130px;
+  height : 40px;
+  position : absolute;
+  top : calc( 99% - 40px);
+  left : calc( 50% - ((130px) / 2));
+
+  background-color: transparent;
+}
+
+#simulation-speed {
+  height:30%;
+  margin:0px 0px 0px 0px;
+
+  text-align:center;
+  line-height:40%;
+  color: var(--color-primary);
+}
+
+#control-menu-border {
+  position:relative;
+  width: 100%;
+  height:70%;
+
+	background-color: var(--color-darkgray);
+	border-radius:10px;
+	border:2px solid var(--color-primary);
+}
+
+#backward-btn {
+  height:70%;
+  background-image:url('../css/icons/backward.svg');
+}
+
+#play-btn {
+  height:70%;
+  background-image:url('../css/icons/play.svg');
+}
+
+#forward-btn {
+  height:70%;
+  background-image:url('../css/icons/forward.svg');
+}
+
+#play-btn:hover,
+#forward-btn:hover,
+#backward-btn:hover {
+  cursor: pointer;
+}
+
+#btn-maximize {
+  height : 30px;
+  width : 30px;
+
+  position : absolute;
+  top : calc( 98% - 30px );
+  left : calc( 99% - 30px );
+
+  background-image : url("../css/icons/maximize.png");
+}
+
+/* ---------------------------------------------------
+    Selection menu
+----------------------------------------------------- */
+
+.quadclass-container {
+  width: 25%;
+  height:100%;
+  float: left;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  font-family: 'Jura', sans-serif;
+}
+
+.quadclass-header {
+  width:100%;
+  height:18%;
+  margin-top: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: var(--color-darkgray);
+  border-radius:10px;
+  border:2px solid var(--color-primary);
+}
+
+.quadclass-header .checkbox-text {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 2vmin;
+  transform: translateY(-0.4vh);
+}
+
+.class-checkbox {
+  position:relative;
+  display: inline-block;
+
+  top:3px;
+  left:3px;
+  width: 15px;
+  height: 15px;
+  background: var(--color-lightgray);
+
+  border-radius: 100%;
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.5);
+}
+
+.class-checkbox input {
+  visibility: hidden;
+}
+
+.class-checkbox label {
+  position: absolute;
+
+  top: 2px;
+  left: 2px;
+  width: 11px;
+  height: 11px;
+  background: #333;
+
+  transition: all .5s ease;
+  cursor: pointer;
+  z-index: 1;
+
+  border-radius: 100px;
+  box-shadow:inset 0px 1px 3px rgba(0,0,0,0.5);
+}
+
+.event-code-container {
+  margin: 0px;
+  padding: 0px;
+}
+
+.code-list {
+  list-style: none;
+  padding-left: 10px;
+  font-size: 0.8vw;
+}
+
+.event-code {
+  position:relative;
+  display: block;
+
+  margin: 10px;
+
+  top:-3px;
+  width: 8px;
+  height: 8px;
+  background: #E3E0DD;
+
+  border-radius: 100%;
+  box-shadow: 0px 1px 3px rgba(0,0,0,0.5);
+}
+
+.code-list .checkbox-text {
+  display: inline-block;
+  margin-left: 5px;
+  transform: translateY(-0.8vh);
+  font-size: 1.5vmin;
+}
+
+.event-code input {
+  visibility: hidden;
+}
+
+.event-code label {
+  position: absolute;
+
+  top: 1px;
+  left: 1px;
+  width: 6px;
+  height: 6px;
+  background: #333;
+
+  transition: all .5s ease;
+  cursor: pointer;
+  z-index: 1;
+
+  border-radius: 100px;
+  box-shadow:inset 0px 1px 3px rgba(0,0,0,0.5);
+}
+
+input:checked + label.class-1 {
+  background: #69FFF1;
+}
+input:checked + label.class-2 {
+  background: #35FF69;
+}
+input:checked + label.class-3 {
+  background: #FFF07C;
+}
+input:checked + label.class-4 {
+  background: #FF8360;
 }

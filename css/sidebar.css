@@ -1,4 +1,17 @@
 /* ---------------------------------------------------
+    Variables
+----------------------------------------------------- */
+
+:root {
+  --color-bg: #000000;
+  --color-primary: #E75B10;
+  --color-accent: #EE801E;
+  --color-darkgray: #222222;
+  --color-gray: #888888;
+  --color-lightgray: #E3E0DD;
+}
+
+/* ---------------------------------------------------
     SIDEBAR-RELATED STYLING
 ----------------------------------------------------- */
 
@@ -10,7 +23,6 @@
 
 #btn-info {
      background-image: url(../css/icons/info.png);
-        /* right-align with 5px gap */
      position : relative;
      top : 0px;
      left : -5px;
@@ -36,17 +48,36 @@
 }
 
 #sidebardiv {
-    background-color : black;
-        /* Position
-    position : absolute;
-    left : 70%;
-    top : 0%;*/
-        /* witdh
-    width : 30%;*/
-    height : 100%;
+  display: none;
+  height : 94%;
+  background-color : black;
 }
 
 
+/* ---------------------------------------------------
+    Information div
+----------------------------------------------------- */
+#informationdiv {
+  height:94%;
+  display:block;
+  background-color: var(--color-bg);
+
+  font-family: 'Jura', sans-serif;
+  font-size: 1.5vmin;
+  text-align: justify;
+  text-justify: inter-word;
+  color: var(--color-lightgray);
+}
+
+.info-paragraph {
+
+  margin: 1vmin;
+  padding: 1vmin;
+}
+
+.info-section {
+
+}
 
 
 /* ---------------------------------------------------

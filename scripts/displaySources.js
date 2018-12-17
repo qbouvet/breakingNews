@@ -1,73 +1,4 @@
 
-function add_charts(data) {
-    data.forEach(
-    (value, mention) => {
-        var objTo = document.getElementsByClassName('active')[1]
-
-        var divtest = document.createElement("div");
-        divtest.className = "visualize-source-container"
-
-        var divtest0 = document.createElement("div");
-        divtest0.className = "visualize-source-mention"
-
-        var divtest1 = document.createElement("div");
-        divtest1.className = "visualize-source-mention-chart"
-
-        var svgtest0 = document.createElement("svg")
-        svgtest0.className = "bar-chart"
-        svgtest0.setAttribute("xmlns", "http://www.w3.org/2000/svg")
-
-        divtest1.appendChild(svgtest0)
-        divtest.appendChild(divtest0)
-        divtest.appendChild(divtest1)
-        objTo.appendChild(divtest)
-    })
-}
-
-
-
-function addDiv(data) {
-    var source_container = document.getElementsByClassName('visualize-source-container')
-
-    if (source_container.length === 0){
-        add_charts(data)
-
-        data.forEach((value, mention) => {
-            console.log("value: ", value)
-            make_bar_chart(value.map((x,y) => x[0]))
-        })
-    } else {
-
-        var index_container = 0
-        data.forEach(
-            (value, mention) => {
-                var chart_container = source_container[index_container]
-                $(chart_container).empty()
-
-                var divtest0 = document.createElement("div");
-                divtest0.className = "visualize-source-mention"
-                divtest0.innerHTML = "1"
-
-                var divtest1 = document.createElement("div");
-                divtest1.className = "visualize-source-mention-chart"
-
-                var svgtest0 = document.createElement("svg")
-                svgtest0.className = "bar-chart"
-
-                chart_container.appendChild(divtest0)
-
-                divtest1.appendChild(svgtest0)
-                chart_container.appendChild(divtest1)
-
-                make_bar_chart(value.map((x,y) => x[0]))
-
-                index_container++
-        })
-    }
-}
-
-
-
 function clean_sources(reset=false){
     $('.visualize-source-container').empty()
     $('.visualize-source-container').show()
@@ -77,19 +8,16 @@ function clean_sources(reset=false){
 }
 
 
-
-function display_source(data, cumulative_data, timestamps, onSourceClick){
-
-    // var mention_number = Array.from(data.values(), (x, y) => x[0][0])
-    // var mention_timestamp = Array.from(data.values(), (x, y) => x[0][1])
-
-    console.log("data: ", data)
-    console.log("cumumulative_data: ", cumulative_data)
-    // $('.visualize-source-container').css('height', 'calc(100%/' + Array.from(data).length + ')');
+function display_source(data, cumulative_data, timestamps, sourceGraphClickCallback){
 
     d3.selectAll(".visualize-source-container").style('height', 'calc(100%/' + Array.from(data).length + ')')
 
+    //clean container for later redraw all charts
     clean_sources()
+
+    let array_data = Array.from(data).map(d => {return d[1]})
+
+    var n = Array.from(array_data[0].keys()).length
 
     var divParent = d3.select('#sidebardiv')
                     .selectAll('div')
@@ -100,231 +28,157 @@ function display_source(data, cumulative_data, timestamps, onSourceClick){
 
     var divMention = d3.selectAll(".visualize-source-container")
                     .append('div')
-                    .attr('class', "visualize-source-mention")
+                    .attr('class', "visualize-source-mention-container")
+
+    var divMentionText = d3.selectAll(".visualize-source-mention-container")
+                    .append('div')
+                    .attr('class', "visualize-source-mention-text")
                     .text(function (d) {return d[0]})
 
+    var divMentionNum = d3.selectAll(".visualize-source-mention-container")
+                    .append('div')
+                    .attr('class', "visualize-source-mention-num")
+                    .text(function (d) {return cumulative_data.get(d[0])})
 
     var divMentionChart = d3.selectAll(".visualize-source-container")
                     .append('div')
                     .attr('class', "visualize-source-mention-chart")
-                    .text(function (d) {return d[1]})
+                    // .text(function (d) {console.log("d[1]: ", d[1])})
 
+    let getSourceName = (thisElement) => thisElement.childNodes[0].childNodes[0].innerText;
+
+    // "country colorChart on click" behaviour
     d3.selectAll(".visualize-source-container")
         .on("click", function () {
             // 'this' is the 'div' we're operating on
-            const sourceName = this.childNodes[0].childNodes[0].data;
-            onSourceClick(sourceName)
-        })
+            const sourceName = getSourceName(this)
+            sourceGraphClickCallback(sourceName)
+    })
+
+    d3.selectAll(".visualize-source-mention-text")
+    .append("img")
+    .attr("src", function(d) {return "https://www." + d[0] + "/favicon.ico" })
+    .attr("width", 16)
+    .attr("height", 16);
+
+    console.log(data);
+
+    // FIXME: max value should not be the maximum cumulative value, but the maximum update value ever encountered
+
+    // compute the max value of the total data, and pass it for axis scaling
+    let max_total_value = Math.ceil(Array.from(cumulative_data.values()).reduce((x, y) => ( x > y ? x : y )))
+    test_line_chart(n, max_total_value, Array.from(array_data[0].keys()))
+
 }
 
 
+function xCircle(data) {
 
-function make_bar_chart(dataset){
+    let a = Array.from(data.keys())
+    let b = Array.from(data.values())
 
-    dataset = Array.from(dataset)
-    var svgWidth = document.getElementsByClassName("visualize-source-mention-chart")[0].offsetWidth;
-    var svgHeight = document.getElementsByClassName("visualize-source-mention-chart")[0].offsetHeight;
-    var barPadding = 0;
-    var barWidth = (svgWidth / dataset.length);
-
-    var svg = d3.selectAll('.bar-chart')
-        .attr("width", svgWidth)
-        .attr("height", svgHeight);
-
-    var barChart = svg.selectAll("rect")
-        .data(dataset)
-        .enter()
-        .append("rect")
-        .attr("y", function(d) {
-            return svgHeight - d
-        })
-        .attr("height", function(d) {
-            return d;
-        })
-        .attr("width", barWidth - barPadding)
-        .attr("transform", function (d, i) {
-            var translate = [barWidth * i, 0];
-            return "translate("+ translate +")";
-        });
- }
-
-
-
-function make_line_chart(){
-    var svgWidth = document.getElementsByClassName("visualize-source")[0].offsetWidth, svgHeight = 200, barPadding = 5;
-    var barWidth = (svgWidth / dataset.length);
-
-    var svg = d3.selectAll('.bar-chart')
-        .attr("width", svgWidth)
-        .attr("height", svgHeight);
-
-    // var width = document.getElementById('vis')
-    //     .clientWidth;
-    // var height = document.getElementById('vis')
-    //     .clientHeight;
-
-    var margin = {
-        top: 10,
-        bottom: 100,
-        left: 100,
-        right: 120
-    };
-
-    var svg = d3.select('#vis')
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height)
-        .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-    var tooltip = d3.select('body')
-        .append('div')
-        .attr('class', 'tooltip');
-
-    width = width - margin.left - margin.right;
-    height = height - margin.top - margin.bottom;
-
-    var dateParse = d3.timeParse('%Y %b');
-    var tooltipFormat = d3.timeFormat('%B %Y');
-
-    var x_scale = d3.scaleTime()
-        .range([0, width]);
-
-    var y_scale = d3.scaleLinear()
-        .range([height, 0]);
-
-    var band_scale = d3.scaleBand()
-        .range([0, width]);
-
-    var line = d3.line()
-        .x(function(d) {
-            return x_scale(dateParse(d.date));
-        })
-        .y(function(d) {
-            return y_scale(+d.value);
-        })
-        .curve(d3.curveBasis);
-
-    var x_axis = d3.axisBottom()
-        .scale(x_scale);
-
-    var y_axis = d3.axisLeft()
-        .scale(y_scale);
-
-    var data;
-
-    svg.append('g')
-        .attr('class', 'x axis')
-        .attr('transform', 'translate(0, ' + height + ')');
-
-    svg.append('g')
-        .attr('class', 'y axis')
-
-    d3.csv('unemployment_monthly.csv', function(csv_data) {
-        data = csv_data;
-
-        y_scale.domain([0, d3.max(csv_data, function(d) {
-            return +d.value;
-        })]);
-
-        draw("2014");
-
-        function draw(year) {
-
-            year_data = data.filter(function(d) {
-                return dateParse(d.date)
-                    .getFullYear() === +year;
-            });
-
-            x_scale.domain(d3.extent(year_data, function(d) {
-                return dateParse(d.date);
-            }));
-
-            band_scale.domain(year_data.map(function(d) {
-                return dateParse(d.date);
-            }));
-
-            var lines = svg.selectAll('.line')
-                .data([year_data]);
-
-            lines
-                .enter()
-                .append('path')
-                .attr('class', 'line')
-                .attr('fill', 'none')
-                .attr('stroke', 'black')
-                .merge(lines)
-                .transition()
-                .attr('d', line);
-
-            var bars = svg.selectAll('.bar')
-                .data(year_data);
-
-            bars
-                .exit()
-                .remove();
-
-            bars
-                .enter()
-                .append('rect')
-                .attr('class', 'bar')
-                .attr('x', function(d) {
-                    return band_scale(dateParse(d.date));
-                })
-                .attr('width', band_scale.bandwidth())
-                .attr('height', height)
-                .attr('y', 0)
-                .attr('fill', 'black')
-                .attr('opacity', 0)
-                .on('mouseover', mouseOver)
-                .on('mousemove', mouseMove)
-                .on('mouseout', mouseOut);
-
-            d3.select('.x.axis')
-                .call(x_axis);
-
-            d3.select('.y.axis')
-                .transition()
-                .call(y_axis);
-
-            function mouseOver(d) {
-                var date = dateParse(d.date);
-                var displayDate = tooltipFormat(date);
-
-                d3.select(this)
-                    .transition()
-                    .style('opacity', 0.3);
-
-                tooltip
-                    .style('display', null)
-                    .html('<p>Date: ' + displayDate + '<br>Unemployment Rate: ' + d.value + '%</p>');
-            };
-
-            function mouseMove(d) {
-                tooltip
-                    .style('top', (d3.event.pageY - 20) + "px")
-                    .style('left', (d3.event.pageX + 20) + "px");
-            };
-
-            function mouseOut(d) {
-                d3.select(this)
-                    .transition()
-                    .style('opacity', 0)
-
-                tooltip
-                    .style('display', 'none');
-            };
-
-            var slider = d3.select('#year');
-            slider.on('change', function() {
-                draw(this.value);
-            });
-        }
+    var c = a.map(function(e, i) {
+        return i;
     });
+
+    return c
 }
 
 
-export {
-    make_bar_chart, make_line_chart,
+function yCircle(data) {
+
+    let a = Array.from(data.keys())
+    let b = Array.from(data.values())
+
+    var c = a.map(function(e, i) {
+        return b[i];
+    });
+    return c
+}
+
+
+function make_tuples(data, xScale, yScale) {
+    // create array of tuples (x, y) to be plotted
+    let a = Array.from(data.keys())
+    let b = Array.from(data.values())
+
+    var c = a.map(function(e, i) {
+        return [xScale(i), yScale(b[i])];
+    });
+
+    return c
+}
+
+
+function test_line_chart(n, max_total_value, datepoints){
+
+    let digits_length = Math.log(max_total_value) * Math.LOG10E + 1 | 0;
+    let x_axis_space = digits_length * 6
+    // var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
+
+    var parentDiv = $(".visualize-source-mention-chart")[0];
+    var margin = {top: 10, right: 10, bottom: 10, left: 10}
+    var width = parentDiv.clientWidth - margin.left - margin.right;
+    var height = parentDiv.clientHeight - margin.top - margin.bottom;
+
+    console.log("dateponts: ", datepoints)
+
+    // 5. X scale will use the index of our data
+    var xScaleCategorical = d3.scaleOrdinal()
+        .domain(datepoints) // input
+        .range([0, width - x_axis_space]); // output
+
+    var xScale = d3.scaleLinear()
+        .domain([0,n-1]) // input
+        .range([0, width - x_axis_space]); // output
+
+   //  // 6. Y scale will use the randomly generate number
+    var yScale = d3.scaleLinear()
+        .domain([0, max_total_value]) // input
+        .range([height - margin.bottom, 0]); // output
+
+   //  // 7. d3's line generator
+    // var line = d3.line((d) => {console.log("diao")})
+    //     .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+    //     .y(function(d, a) { return yScale(d.y); }) // set the y values for the line generator
+    //     .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+    var svg = d3.selectAll(".visualize-source-mention-chart")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + (margin.left + x_axis_space) + "," + (margin.top) + ")");
+
+   //  // 3. Call the x axis in a group tag
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + (height - margin.bottom) + ")")
+        .call(d3.axisBottom(xScale).ticks(4));
+
+    // 4. Call the y axis in a group tag
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(d3.axisLeft(yScale).ticks(4));
+
+    // 9. Append the path, bind the data, and call the line generator
+    svg.append("path")
+        .attr("class", "line") // Assign a class for styling
+        .attr("d", (d) => {return d3.line()(make_tuples(d[1], xScale, yScale))}) // 11. Calls the line generator
+
+
+
+    // trying to put circles
+
+    // svg.selectAll(".visualize-source-mention-chart").append("circle")
+    //     .attr("class", "dot") // Assign a class for styling
+    //     .attr("cx", function(d, i) { return xScale(xCircle(d[1])[i]) })
+    //     .attr("cy", function(d, i) { return yScale(yCircle(d[1])[i]) })
+    //     .attr("r", 5);
+    // // // 12. Appends a circle for each datapoint
+
+}
+
+ export {
     display_source, clean_sources
 }

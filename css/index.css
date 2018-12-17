@@ -1,132 +1,234 @@
-
 /* ---------------------------------------------------
-    OVERALL PAGE STYLE
+    Variables
 ----------------------------------------------------- */
 
-    /* Background color
-     */
+:root {
+--color-bg: #000000;
+--color-primary: #E75B10;
+--color-accent: #EE801E;
+--color-darkgray: #333333;
+--color-gray: #888888;
+--color-lightgray: #E3E0DD;
+}
+
+/* ---------------------------------------------------
+  OVERALL PAGE STYLE
+----------------------------------------------------- */
+
+  /* Background color
+   */
 .panels-container {
-    background-color : #777777;;
+  background-color : var(--color-darkgray);
 }
 
-    /*  Background style
-     */
+  /*  Background style
+   */
 body {
-    height : 100%;
-    width : 100%;
-    overflow: auto;
-    background-color : rgb(30, 30, 30);
+  height : 100%;
+  width : 100%;
+  overflow: auto;
+  background-color : var(--color-darkgray);
 }
 
-    /*  Top level blocks of the visualization :
-     *  map, graph panel, settings
-     */
+  /*  Top level blocks of the visualization :
+   *  map, graph panel, settings
+   */
 .app-panel{
-    margin : 3px;
-    padding : 0px;
+    margin : 2px;
+    padding : 2px;
     border : solid black 2px;
-    border-radius : 8px;
+    border-radius : 4px;
 }
 
-/*  generic style for icon-button
+/* ----
+ side panel for sources visualization
+---*/
+
+.visualize-source-container {
+  /*display: table;*/
+  overflow: hidden;
+  /*clear: both;*/
+  border: solid black 2px;
+  border-radius: 4px;
+  height: calc(100% / 5);
+  /*height: 200px;*/
+}
+
+.visualize-source-mention-container {
+  /*display: table;*/
+  overflow: hidden;
+  /*clear: both;*/
+  border: solid black 2px;
+  border-radius: 4px;
+
+  width: 30%;
+  height: 100%;
+  float: left;
+  position: relative;
+  /*height: calc(100% / 5);*/
+  /*height: 200px;*/
+}
+
+.visualize-source-mention-text {
+  background-color: yellow;
+  width: 100%;
+  height: 70%;
+  float: top;
+  word-wrap: break-word;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  background-image: white;
+  /*overflow: hidden;*/
+  /*text-overflow: ellipsis;*/
+  /*font-size: 1;*/
+}
+
+.visualize-source-mention-num {
+  background-color: pink;
+  width: 100%;
+  height: 30%;
+  float: bottom;
+
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  /*overflow: hidden;*/
+  /*text-overflow: ellipsis;*/
+  /*font-size: 1;*/
+}
+
+.visualize-source-mention-chart {
+  background-color: red;
+  width: 70%;
+  height: 100%;
+  float: right;
+
+}
+
+
+.visualize-source-mention-chart svg path {
+  fill: none;
+}
+/*
+  line charts for sources and mentions
 */
+.line {
+    fill: none;
+    stroke: #ffab00;
+    stroke-width: 3;
+}
+
+/* Style the dots by assigning a fill and stroke */
+.dot {
+    fill: #ffab00;
+    stroke: #fff;
+}
+/*.bar-chart{
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+.clear{
+  clear:both;
+}*/
+
+    /* generic style for icon-button */
 .btn-icon {
-        /* positioning */
-    margin : 3px 3px 3px 3px;
-    width : 40px;
-    height : 40px;
-        /* Style -> fullsize background-image */
-    background-color: transparent;
-    background-repeat: no-repeat;
-    background-position: 0px 0px;
-    background-size : 100% 100%;
-        /*   */
-    border:none;
+    /* positioning */
+  margin : 3px 3px 3px 3px;
+  width : 40px;
+  height : 40px;
+      /* Style -> fullsize background-image */
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  background-size : 100% 100%;
+      /*   */
+  border:none;
 }
 
     /* Fix the 'blue border on click' */
 button:focus{
-    outline:none;
+  outline:none;
 }
 
 /*  Container that lays-out its children horizontally,
-    left-aligned by default (use container-distribute-horizontally)
+  left-aligned by default (use container-distribute-horizontally)
 */
 .container-lay-horizontally {
-        /* generic height for all such menues */
-    height : 50px;
-        /* children positioning */
-    display : flex;
-    flex-direction: row;
-    align-items: center;
+      /* generic height for all such menues */
+  height : 50px;
+      /* children positioning */
+  display : flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 /*  Container that horizontally aligns & distributes its content
     typically used with one-line-menu
 */
 .container-distribute-horizontally {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
-
-
 /* ---------------------------------------------------
-    2-panel layout stuff
+  2-panel layout stuff
 ----------------------------------------------------- */
 
 .panels-container {
-        /* children layout */
-    display: flex;
-    flex-direction: row;
-    overflow: hidden;
-    xtouch-action: none;    /* avoid browser level touch actions */
-        /* positioning      */
-    position : absolute;
-    height : 90;
-    padding: 0;
-    margin: 0;
-    width : 100%;
-    height : 100%;
+      /* children layout */
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  xtouch-action: none;    /* avoid browser level touch actions */
+      /* positioning      */
+  position : absolute;
+  height : 90;
+  padding: 0;
+  margin: 0;
+  width : 100%;
+  height : 100%;
 }
 
 .splitter {
-        /* position & size */
-    flex: 0 0 auto;
-    width: 10px;
-    min-height: 200px;
-        /* Styling */
-    background: url("../css/icons/splitter.png") center center no-repeat #333333;
-    background-size: 10px 40px;
-    background-color : black;
-    border: solid black 1px;
-        /* resize behaviour */
-    cursor: col-resize;
+      /* position & size */
+  flex: 0 0 auto;
+  width: 10px;
+  min-height: 200px;
+      /* Styling */
+  background: url("../css/icons/splitter.png") center center no-repeat var(--color-darkgray);
+  background-size: 10px 40px;
+  background-color : var(--color-bg);
+  border: solid var(--color-bg) 1px;
+      /* resize behaviour */
+  cursor: col-resize;
 }
 
 .left-panel-split {
-        /* position & size */
-    flex: 0 0 auto;
-    min-width: 66%;
-    max-width: 80%;
-    height : 100%;
-        /* misc style */
-    white-space: nowrap;
-    padding: 2px;
-        /* divide space between children */
-    display : flex;
-    flex-direction: column;
+      /* position & size */
+  flex: 0 0 auto;
+  min-width: 66%;
+  max-width: 80%;
+  height : 100%;
+      /* misc style */
+  white-space: nowrap;
+  padding: 2px;
+      /* divide space between children */
+  display : flex;
+  flex-direction: column;
 }
 
 .right-panel-split {
-    flex: 1 1 auto;
-    padding: 2px;
-    width: 100%;
-    min-height: 100%;
-    min-width: 20%;
+  flex: 1 1 auto;
+  padding: 2px;
+  width: 100%;
+  min-height: 100%;
+  min-width: 20%;
 }
-
-
 
 /* ---------------------------------------------------
     LEFT-PANEL-SPLIT'S CHILDREN
@@ -141,39 +243,15 @@ button:focus{
     height : 70%;
 }
 
-/* ---------------------------------------------------
-    Category selection
------------------------------------------------------ */
-
 #settingsdiv {
-    flex : 0 0 25%;
-    height : 25%;
-        /*will be toggled by the collapse-settings button
-            visibility : collapse would be better, but unsupported by chrome */
-    display : block;
-}
-
-.quadclass-container {
-  width: 25%;
-  height:100%;
-  float: left;
-  border: solid black 1px;
-}
-
-.quadclass-header {
-  width:100%;
-  height:10%;
-  border: solid black 1px;
-}
-
-.code-list label {
-  font-size: 0.8vw;
-}
-
-.event-code {
-  display:block;
-  margin: 0;
-  padding: 0;
+  flex : 0 0 25%;
+  /*height : 22%;*/
+      /*will be toggled by the collapse-settings button
+          visibility : collapse would be better, but unsupported by chrome */
+  display : block;
+  background-color: var(--color-bg);
+  color: var(--color-lightgray);
+  height: 25%;
 }
 
 /* ---------------------------------------------------
@@ -181,16 +259,17 @@ button:focus{
 ----------------------------------------------------- */
 
 #menubar { /* typically inherits from one-line-menu */
-        /* left-right align children - NB works with flex */
-    justify-content: space-between;
+      /* left-right align children - NB works with flex */
+  justify-content: space-between;
 }
 
 #btn-info {
-     background-image: url(../css/icons/info.svg);
-        /* right-align with 5px gap */
-     position : relative;
-     top : 0px;
-     /*left : calc(100% - 45px);*/
+   position : relative;
+   height: 30px;
+   width: 30px;
+
+   top : 0px;
+   background-image: url(../css/icons/info.svg);
 }
 
 @font-face {
@@ -212,11 +291,5 @@ button:focus{
 
 #sidebardiv {
     background-color: green;
-        /* Position
-    position : absolute;
-    left : 70%;
-    top : 0%;*/
-        /* witdh
-    width : 30%;*/
     height : 100%;
 }

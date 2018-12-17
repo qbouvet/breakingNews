@@ -2,8 +2,7 @@ import {log, info, warn, err} from './utils.js'
 import {SortedArray} from './utils.js'
 
 import {DataLoader} from './DataLoader.js';
-import {make_bar_chart, display_source, clean_sources} from './displaySources.js'
-
+import {display_source, clean_sources} from './displaySources.js'
 
 
 
@@ -35,25 +34,23 @@ function sortHistory(history) {
      *  returns a map [SourceName -> [nbMentions, Map[MentionTime => SortedArray(EVENTIDS)]] ]
      *  sorted by decreasing nbMentions
      */
-function count_mentions(mentions) {
-    if (mentions.length > 0){
-    	var counts = {}
-    	info("counting")
-    	mentions.reduce(function (acc, curr) {
-    		acc[curr['MentionSourceName']] ? acc[curr['MentionSourceName']]++ : acc[curr['MentionSourceName']] = 1;
-    		return acc;},
-    	counts);
+    function count_mentions(mentions) {
+        if (mentions.length > 0){
+            var counts = {}
+            info("counting")
+            mentions.reduce(function (acc, curr) {
+                acc[curr['MentionSourceName']] ? acc[curr['MentionSourceName']]++ : acc[curr['MentionSourceName']] = 1;
+                return acc;
+            },counts);
 
-    	// sorted mentions
-    	var mapCounts = new Map(Object.entries(counts))
-    	const mapSort1 = new Map([...mapCounts.entries()].sort((a, b) => {
-    		return b[1] - a[1] }
-          ));
-
-    	return mapSort1
-
+            // sorted mentions
+            var mapCounts = new Map(Object.entries(counts))
+            const mapSort1 = new Map([...mapCounts.entries()].sort((a, b) => {
+            return b[1] - a[1] }
+        ));
+        return mapSort1
     } else {
-      return new Map()
+         return new Map()
     }
 }
 
@@ -64,22 +61,22 @@ function count_mentions(mentions) {
      */
 function make_history(mentions, historyMentions, currentTimestamps) {
 
-	let timestamps = Array.from(currentTimestamps)
-	const current = timestamps[timestamps.length-1]
+     let timestamps = Array.from(currentTimestamps)
+     const current = timestamps[timestamps.length-1]
 
-	//console.log("history mentions: ", historyMentions)
-	//console.log("current: ", current)
+     //console.log("history mentions: ", historyMentions)
+     //console.log("current: ", current)
 
-	mentions.forEach( // mention is made of [key => value] == [sourceName => Map[MentionTime => SortedArray[EventIds]]]
-		(value, key) => {
-			if (key in historyMentions) {
-				historyMentions[key].set(current, value)
-			} else {
-				historyMentions[key] = new Map([[current, value]])
-			}
-	})
+     mentions.forEach( // mention is made of [key => value] == [sourceName => Map[MentionTime => SortedArray[EventIds]]]
+     	(value, key) => {
+     		if (key in historyMentions) {
+     			historyMentions[key].set(current, value)
+     		} else {
+     			historyMentions[key] = new Map([[current, value]])
+     		}
+     })
 
-	return historyMentions
+     return historyMentions
 }
 
 
@@ -89,18 +86,18 @@ function make_history(mentions, historyMentions, currentTimestamps) {
      */
 function take_top_history(top_mentions, historyMentions) {
 
-	var top_mentions_map = new Map()
+    var top_mentions_map = new Map()
 
-	top_mentions.forEach(
-		(value, mention) => {
-			if (mention in historyMentions) {
-				top_mentions_map.set(mention, historyMentions[mention])
-			} else {
-				console.log("there is a big problem")
-			}
-	})
+    top_mentions.forEach(
+        (value, mention) => {
+            if (mention in historyMentions) {
+                top_mentions_map.set(mention, historyMentions[mention])
+            } else {
+                console.log("there is a big problem")
+            }
+    })
 
-	return top_mentions_map
+    return top_mentions_map
 }
 
 
@@ -109,19 +106,18 @@ function take_top_history(top_mentions, historyMentions) {
      *  and return a sorted resulting [ sourceName => List( (timestamp, nbMentions) ) ]
      */
 function add_timestamps_to_top_history_map(top_history_cumulative, currentTimestamps) {
-    top_history_cumulative.forEach((value, source) => {
-        currentTimestamps.forEach( time => {
-            if (value.has(time)){
-                // console.log(value.get(time))
-            } else {
-                value.set(time, 0)
-            }
-        })
-    })
-    top_history_cumulative = sortHistory(top_history_cumulative)
-    return top_history_cumulative
-}
-
+         top_history_cumulative.forEach((value, source) => {
+             currentTimestamps.forEach( time => {
+                 if (value.has(time)){
+                     // console.log(value.get(time))
+                 } else {
+                     value.set(time, 0)
+                 }
+             })
+         })
+         top_history_cumulative = sortHistory(top_history_cumulative)
+         return top_history_cumulative
+     }
 
 
 function take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps) {
@@ -143,7 +139,6 @@ function take_top_history_up_to_current_timestamp(top_history_cumulative, curren
   })
   return top_history
 }
-
 
 
 
@@ -241,10 +236,9 @@ export class MentionHandler {
         this.worldmap = worldmap;
     }
 
-
     /*
     	Update mentions
-     */
+    */
     updateMentions(timestamp, isForward) {
         if (isForward) {
             if ( !( (Object.keys(this.loadedMentions).includes(timestamp) && (timestamp in this.currentTimestamps)) )) {
@@ -262,7 +256,6 @@ export class MentionHandler {
             this.updateMentionsBackward(timestamp);
         }
     }
-
 
     updateMentionsForward (timestamp, fileLoadResult=undefined) {
             // that mean we loaded a data file with a promise -> we need to update mentions
@@ -290,7 +283,6 @@ export class MentionHandler {
         // else didn't load new file => nothing to do, data structure is built already
     }
 
-
     updateMentionsBackward(timestamp) {
 
       // Remove timestamp from current ones
@@ -316,13 +308,11 @@ export class MentionHandler {
       }
     }
 
-
     reset() {
       this.currentTimestamps = [];
       this.cumulativeMentions = [];
       clean_sources(true)
     }
-
 
     prepare_mentions_for_sources_to_visualize(cumulativeMentions, loadedMentions, historyMentions, currentTimestamps, k, timestamp, isBackward=false) {
             // prepare [sourceName => nbMentions]
@@ -406,5 +396,4 @@ export class MentionHandler {
         const [count, max] = this.countEventsByCountry(events)
         this.worldmap.toggleCountryColorChart (count, max)
     }
-
 }
