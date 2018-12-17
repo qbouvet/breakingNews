@@ -1,12 +1,14 @@
 
 import {log, info, warn, err} from './utils.js'
+
 import {DataLoader} from './DataLoader.js';
 import {D3Handler} from './AnimationStyling.js'
 import {eventOnMouseOver, eventOnMouseOut, eventOnMouseClick} from './mouseEvents.js'
 import {SelectionMenu} from './SelectionMenu.js';
+import {EventsDataBroker, matchCountryNames} from "./EventsDataBroker.js";
 
-/*
-    A worldmap object
+
+/*  A worldmap object
  */
 export class Worldmap {
 
@@ -18,6 +20,10 @@ export class Worldmap {
         this.g = d3.select("#mapContent");
         this.loader = new DataLoader();
         this.D3 = new D3Handler();
+
+        // transforms
+        this.projection = d3.geoLarrivee()//.fitSize([w, h], result);
+        this.path = d3.geoPath().projection(this.projection);
 
         // Zoom definition
         let w = this.svg.style("width").replace("px", "");
@@ -31,6 +37,8 @@ export class Worldmap {
         this.zoomScalingRatio = 1.0;
 
         // Define outline and behavior when it resolves
+        this.countriesFillMin = "#888888"
+        this.countriesFillMax= '#FFA500'
         this.outlinePromise = this.loader.loadMapOutline();
         this.outlinePromise.then( (result) => {
 
@@ -43,15 +51,12 @@ export class Worldmap {
             const h = this.svg.style("height").replace("px", "");
             const scale0 = (w - 1) / 2 / Math.PI;
 
-            this.projection = d3.geoLarrivee()//.fitSize([w, h], result);
-            this.path = d3.geoPath().projection(this.projection);
-
             // Store data and draw outline
             this.outlineData = result;
             this.drawOutline();
         });
 
-        // Define events
+        // Events data
         this.eventsBroker = eventsDataBroker;
         this.currentTimestamps = [];
         this.flatEvents = [];
@@ -66,7 +71,10 @@ export class Worldmap {
             .style("opacity", 0);
 
         // fields used for maskings
-        this.masked = false
+        this.masked = false;
+        this.countriesColorPalette = (t) => d3.scaleLinear().domain([0,1])
+            .interpolate(d3.interpolateHcl)
+            .range([d3.rgb(this.countriesFillMin), d3.rgb(this.countriesFillMax)]) (t);
 
         info ("Constructed worldmap");
     }
@@ -78,23 +86,54 @@ export class Worldmap {
          *  Unmask :
          *  restore visualization
          */
-    toggleMask (pointsArray) {
+    toggleEasyHeatmap (pointsArray) {
         if (!this.masked) {
-            info ("worldmap : masking")
+            info ("worldmap : masking (easyHeatmap)")
             //alert ("showing : "+pointsArray.length+" events")
                 // apply new data and obtain selections
-            const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections( this.g.selectAll("circle"), pointsArray)
+            let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+                this.g.selectAll("circle"), pointsArray, "circle")
                 // update visuals
             this.D3.easyHeatMap(mergeSel, this.projection, 0.03, 8, 6)
             exitSel.remove()
             this.masked = true;
         } else {
-            info ("worldmap : unmasking")
+            info ("worldmap : unmasking (easyHeatmap)")
                 // apply new data and obtain selections
-            const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections( this.g.selectAll("circle"), this.flatEvents )
+            let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+                this.g.selectAll("circle"), this.flatEvents, "circle")
                 // update visuals
             exitSel.remove()
             this.D3.applyEventPointStyleStatic(mergeSel, this.projection, (d) => this.SELECTION.colorMapping(d))
+            this.masked=false
+        }
+    }
+
+    toggleCountryColorChart (count, max) {
+        if (!this.masked) {
+            info ("worldmap : masking (colorChart)")
+                // hide events on the map
+            // TODO
+                // apply new data to outline and obtain selections
+            const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+                this.g.selectAll("path"), this.outlineData.features, "path")
+            exitSel.remove()
+            function cname (countryFeature) {
+                return matchCountryNames(countryFeature["properties"]["sovereignt"].toLowerCase())
+            }
+            mergeSel
+                .attr("d", this.path)
+                .attr("fill", (features) => {
+                    //if ( ! count.has(cname)) { warn ("colormap : count : country not found : ", cname) }
+                    const frac = count.getOrElse(cname(features), 0) / max;
+                    return this.countriesColorPalette(frac)
+                })
+                .on('mouseover', (features) => eventOnMouseOver(features, this.tooltip, cname(features)+":\n"+count.getOrElse(cname(features), 0)+" events reported" ))
+                .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
+            this.masked = true;
+        } else {
+            info ("worldmap : unmasking (colorChart)")
+            this.drawOutline()
             this.masked=false
         }
     }
@@ -115,8 +154,7 @@ export class Worldmap {
        100); //FIXME: keep hardcoded?
     }
 
-    /*
-       Add or remove events to map depending on direction of update
+    /*  Add or remove events to map depending on direction of update
      */
     updateEvents(timestamp, isForward, updateStepDuration) {
       isForward ? this.updateEventsForward(timestamp, updateStepDuration) : this.updateEventsBackward(timestamp, updateStepDuration);
@@ -165,35 +203,31 @@ export class Worldmap {
         this.g.attr('transform', transform);
     }
 
-    /*
-        Draws the countries outline
-     */
+
+        /*  Draws the countries outline
+         *  If a colormap = [Country => int in [0,1] ] is given, this.palette will
+         *  be used for the countried "fill" color
+         */
     drawOutline() {
-
-        const sel = this.g.selectAll("path")
-            .data(this.outlineData.features)
-
-        //Update
-        sel.attr("d", this.path);
-        // Enter
-        sel.enter()
-            .append("path")
-            .attr("d", this.path);
-        // Exit
-        sel.exit()
-            .remove()
+            // apply new data and obtain selections
+        const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+            this.g.selectAll("path"), this.outlineData.features, "path")
+            // update visuals
+            exitSel.remove();
+        mergeSel.attr("d", this.path)
+            .attr("fill", this.countriesFillMin)
     }
 
-    /*
-        Draws the overlay, with or without new data, complete data update sequence
+    /*  Draws the overlay, with or without new data, complete data update sequence
      */
     drawOverlay(updateStepDuration) {
       if (this.masked) {
-          this.toggleMask()
+          this.toggleCountryColorChart()
           return
       }
         // apply new data and obtain selections
-      const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections( this.g.selectAll("circle"), this.flatEvents )
+      let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+          this.g.selectAll("circle"), this.flatEvents, "circle" )
         // update visuals
       exitSel.remove()
       this.D3.invisibleCirclesCorrectLocation(enterSel, this.projection);

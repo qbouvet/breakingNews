@@ -32,11 +32,11 @@
 
 path {
     stroke: var(--color-darkgray);
-    fill: var(--color-gray);
-    fill-opacity: 0.8;
+    /* fill done in JS depending on mentions count */
     stroke-width: 1.5px;
     stroke-linecap: round;
     stroke-linejoin: round;
+    fill-opacity: 1;
         /* keeps width fixed when zooming */
     vector-effect: non-scaling-stroke;
 }

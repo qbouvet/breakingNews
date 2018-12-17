@@ -7,8 +7,8 @@ function clean_sources(reset=false){
     }
 }
 
-function display_source(data, cumulative_data, timestamps){
 
+function display_source(data, cumulative_data, timestamps, sourceGraphClickCallback){
 
     d3.selectAll(".visualize-source-container").style('height', 'calc(100%/' + Array.from(data).length + ')')
 
@@ -40,12 +40,20 @@ function display_source(data, cumulative_data, timestamps){
                     .attr('class', "visualize-source-mention-num")
                     .text(function (d) {return cumulative_data.get(d[0])})
 
-
     var divMentionChart = d3.selectAll(".visualize-source-container")
                     .append('div')
                     .attr('class', "visualize-source-mention-chart")
                     // .text(function (d) {console.log("d[1]: ", d[1])})
 
+    let getSourceName = (thisElement) => thisElement.childNodes[0].childNodes[0].innerText;
+
+    // "country colorChart on click" behaviour
+    d3.selectAll(".visualize-source-container")
+        .on("click", function () {
+            // 'this' is the 'div' we're operating on
+            const sourceName = getSourceName(this)
+            sourceGraphClickCallback(sourceName)
+    })
 
     d3.selectAll(".visualize-source-mention-text")
     .append("img")
@@ -63,6 +71,7 @@ function display_source(data, cumulative_data, timestamps){
 
 }
 
+
 function xCircle(data) {
 
     let a = Array.from(data.keys())
@@ -75,6 +84,7 @@ function xCircle(data) {
     return c
 }
 
+
 function yCircle(data) {
 
     let a = Array.from(data.keys())
@@ -85,6 +95,7 @@ function yCircle(data) {
     });
     return c
 }
+
 
 function make_tuples(data, xScale, yScale) {
     // create array of tuples (x, y) to be plotted
@@ -97,6 +108,8 @@ function make_tuples(data, xScale, yScale) {
 
     return c
 }
+
+
 function test_line_chart(n, max_total_value, datepoints){
 
     let digits_length = Math.log(max_total_value) * Math.LOG10E + 1 | 0;

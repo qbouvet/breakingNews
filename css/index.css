@@ -239,8 +239,8 @@ button:focus{
 ----------------------------------------------------- */
 
 #mapdiv {
-  flex : 1 1 auto;
-  height : 70%;
+    flex : 1 1 75%;
+    height : 70%;
 }
 
 #settingsdiv {
