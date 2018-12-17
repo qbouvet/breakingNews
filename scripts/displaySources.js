@@ -21,7 +21,6 @@ function sortMapByKeys(history_value) {
 function display_source(data, cumulative_data, timestamps, sourceGraphClickCallback){
 
     let sorted_data = Array.from(data).map((x) => [x[0], sortMapByKeys(x[1])])
-    d3.selectAll(".visualize-source-container").style('height', 'calc(100%/' + Array.from(data).length + ')')
 
     //clean container for later redraw all charts
     clean_sources()
@@ -31,6 +30,11 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
 
     var n = Array.from(array_data[0].keys()).length
 
+
+
+
+
+
     var divParent = d3.select('#sidebardiv')
                     .selectAll('div')
                     .data(sorted_data).enter()
@@ -39,6 +43,15 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
                     // .style('height', height + "px")
 
     var divMention = d3.selectAll(".visualize-source-container")
+        .append ('div')
+            .attr('class', "visualize-source-mention")
+            .text(function (d) {return d[0]+"  -  "+cumulative_data.get(d[0])+" events reported"})
+
+    var divMentionChart = d3.selectAll(".visualize-source-container")
+        .append('div')
+            .attr('class', "visualize-source-mention-chart")
+
+    /*var divMention = d3.selectAll(".visualize-source-container")
                     .append('div')
                     .attr('class', "visualize-source-mention-container")
 
@@ -54,8 +67,12 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
 
     var divMentionChart = d3.selectAll(".visualize-source-container")
                     .append('div')
-                    .attr('class', "visualize-source-mention-chart")
+                    .attr('class', "visualize-source-mention-chart")*/
                     // .text(function (d) {console.log("d[1]: ", d[1])})
+
+
+
+
 
     let getSourceName = (thisElement) => thisElement.childNodes[0].childNodes[0].innerText;
 
