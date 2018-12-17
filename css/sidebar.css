@@ -89,8 +89,8 @@
     /*  Container that holds the sourceGraph text and graph
      *  previously
      */
-/*.sourcegraph-container {*/
-.visualize-source-container {
+.sourcegraph-container {
+/*.visualize-source-container {*/
   /*display: table;*/
   overflow: hidden;
   background-color : black;
@@ -99,6 +99,7 @@
   border-radius: 4px;
   /*height: calc(100% / 5);*/
   height: 200px;
+  position:relative;
 }
 
     /*  Title/textbox for a source graph
@@ -109,18 +110,16 @@
   /*clear: both;*/
   border: solid black 2px;
   border-radius: 4px;
-
-  width: 100%;
+  /*width: 100%;
   height: 20%;
   float: top;
-  position: relative;
+  position: relative;*/
 }
 
     /*  graph/chart area for a sourcegraph
      *  previously .visualize-source-mention-chart
      */
-/*.sourcegraph-graph {*/
-.visualize-source-mention-chart{
+.sourcegraph-chart {
   background-color: red;
   width: 100%;
   height: 80%;

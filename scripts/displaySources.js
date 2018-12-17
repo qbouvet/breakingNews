@@ -1,9 +1,9 @@
 
 function clean_sources(reset=false){
-    $('.visualize-source-container').empty()
-    $('.visualize-source-container').show()
+    $('.sourcegraph-container').empty()
+    $('.sourcegraph-container').show()
     if (reset){
-        $('.visualize-source-container').hide()
+        $('.sourcegraph-container').hide()
     }
 }
 
@@ -39,17 +39,17 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
                     .selectAll('div')
                     .data(sorted_data).enter()
                     .append('div')
-                    .attr('class', "visualize-source-container")
+                    .attr('class', "sourcegraph-container")
                     // .style('height', height + "px")
 
-    var divMention = d3.selectAll(".visualize-source-container")
+    var divMention = d3.selectAll(".sourcegraph-container")
         .append ('div')
-            .attr('class', "visualize-source-mention")
+        .attr('class', "sourcegraph-text")
             .text(function (d) {return d[0]+"  -  "+cumulative_data.get(d[0])+" events reported"})
 
-    var divMentionChart = d3.selectAll(".visualize-source-container")
+    var divMentionChart = d3.selectAll(".sourcegraph-container")
         .append('div')
-            .attr('class', "visualize-source-mention-chart")
+            .attr('class', "sourcegraph-chart")
 
     /*var divMention = d3.selectAll(".visualize-source-container")
                     .append('div')
@@ -77,18 +77,18 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
     let getSourceName = (thisElement) => thisElement.childNodes[0].childNodes[0].innerText;
 
     // "country colorChart on click" behaviour
-    d3.selectAll(".visualize-source-container")
+    d3.selectAll(".sourcegraph-container")
         .on("click", function () {
             // 'this' is the 'div' we're operating on
             const sourceName = getSourceName(this)
             sourceGraphClickCallback(sourceName)
     })
 
-    d3.selectAll(".visualize-source-mention-text")
+    /*d3.selectAll(".visualize-source-mention-text")
     .append("img")
     .attr("src", function(d) {return "https://www." + d[0] + "/favicon.ico" })
     .attr("width", 16)
-    .attr("height", 16);
+    .attr("height", 16);*/
 
     console.log(data);
 
@@ -147,7 +147,7 @@ function test_line_chart(n, max_total_value, array_data){
     let x_axis_space = digits_length * 6
     // var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
 
-    var parentDiv = $(".visualize-source-mention-chart")[0];
+    var parentDiv = $(".sourcegraph-chart")[0];
     var margin = {top: 10, right: 10, bottom: 10, left: 10}
     var width = parentDiv.clientWidth - margin.left - margin.right;
     var height = parentDiv.clientHeight - margin.top - margin.bottom;
@@ -179,7 +179,7 @@ function test_line_chart(n, max_total_value, array_data){
         .y(function(d, i) { return yScale(i); }) // set the y values for the line generator
         .curve(d3.curveMonotoneX) // apply smoothing to the line
 
-    var svg = d3.selectAll(".visualize-source-mention-chart")
+    var svg = d3.selectAll(".sourcegraph-chart")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
