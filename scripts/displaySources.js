@@ -55,9 +55,12 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
     )
     */
 
-    let selection = d3.selectAll('#sidebardiv').selectAll("div.sourcegraph-container").data(divData)
+    let [enterSel, updateSel, exitSel] = d3h.mkSelections(
+        d3.selectAll('#sidebardiv').selectAll("div.sourcegraph-container"),
+        divData
+    )
 
-    selection
+    updateSel
         .on("click", (d) => function (d) {
             // 'this' is the 'div' we're operating on
             const sourceName = d[0]
@@ -68,7 +71,7 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
         .append('div')
             .attr('class', "sourcegraph-chart")
 
-    selection.enter()
+    enterSel
         .append('div')
             .attr('class', "sourcegraph-container")
             .on("click", (d) => function (d) {
@@ -82,7 +85,7 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
         .append('div')
             .attr('class', "sourcegraph-chart")
 
-    selection.exit().remove()
+    exitSel.remove()
 
     return
 
