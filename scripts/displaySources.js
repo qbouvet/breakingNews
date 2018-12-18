@@ -25,15 +25,6 @@ function sortMapByKeys(history_value) {
   return mapSort1;
 }
 
-function make_scale(max, height, bottom) {
-
-    var yScale = d3.scaleLinear()
-        .domain([0, max]) // input
-        .range([height - bottom, 0]);
-
-    return yScale
-}
-
     /*  Display the top k sources as graphs in the sidebar-
      *      data : for the top k sources :
      *          [sourceName, Map(timestamp => mentionsCount)]
@@ -97,25 +88,16 @@ function display_source(timeseriesData, perSourceCumulativeCount, timestamps, so
         return [entry[0], [...entry[1].entries()]]
     })
 
-    let max_scale = Array.from(timeseriesData.values()).map(d => Array.from(d.values())).map(d => Math.max(...d))
-
-    let array_scales = []
-    for (var i = 0; i < 5; i++){
-        array_scales.push(make_scale(max_scale[i], height, margin.bottom))
-    }
-
-    console.log("max_scale: ", max_scale)
-    console.log("array_scales: ", array_scales)
-
-
     // Sort Map(timestamp => count) by increasing order of timestamps for display in graph
     let sorted_data = Array.from(timeseriesData).map((x) => [x[0], sortMapByKeys(x[1])])
     let datepoints = Array.from(sorted_data[0][1].keys()).sort().map(d => d.slice(8,12))
 
     let chart_data_prepared_to_plot = chartdata.map(d => d[1].map(a => [a[0].slice(8,12), a[1]]))
 
+    let max_current_timeSeries = chart_data_prepared_to_plot.map(x => x.map(d => d[1]).reduce((x, y) => ( x > y ? x : y ))).reduce((x,y) => (x>y ? x:y))
+
     for (var i = 0; i < 5; i++){
-        drawSingleChart(chart_data_prepared_to_plot[i], height, width, margin, datepoints, i)    
+        drawSingleChart(chart_data_prepared_to_plot[i], height, width, margin, datepoints, max_current_timeSeries, i)    
     }
     // drawChart(timeseriesData, perSourceCumulativeCount)
 //===========================================================================================================
@@ -129,9 +111,9 @@ function display_source(timeseriesData, perSourceCumulativeCount, timestamps, so
 }
 
 
-function drawSingleChart(aa, height, width, margin, datepoints, index){
+function drawSingleChart(aa, height, width, margin, datepoints, max_total_value, index){
 
-    let max_total_value = aa.map(d => d[1]).reduce((x, y) => ( x > y ? x : y ))
+    // let max_total_value = aa.map(d => d[1]).reduce((x, y) => ( x > y ? x : y ))
     let digits_length = Math.log(max_total_value) * Math.LOG10E + 1 | 0;
     let x_axis_space = digits_length * 6
 
@@ -144,8 +126,8 @@ function drawSingleChart(aa, height, width, margin, datepoints, index){
 
    //  // 7. d3's line generator
     var line = d3.line()
-        .x(function(d) { console.log("X: ", d[0]); return xScale(d[0]); }) // set the x values for the line generator
-        .y(function(d) { console.log("Y: ", d[1]); return yScale(d[1]); }) // set the y values for the line generator
+        .x(function(d) { return xScale(d[0]); }) // set the x values for the line generator
+        .y(function(d) { return yScale(d[1]); }) // set the y values for the line generator
         .curve(d3.curveMonotoneX) // apply smoothing to the line
 
     var svg = d3.select("#sourcegraph-id"+index)
@@ -181,8 +163,8 @@ function drawSingleChart(aa, height, width, margin, datepoints, index){
     .data(aa).enter()
     .append("circle")
     .attr("class", "dot")
-    .attr("cx", (d) => {console.log("cx: ", d[0]); return xScale(d[0])})
-    .attr("cy", (d) => {console.log("cy: ", d[1]); return yScale(d[1])})
+    .attr("cx", (d) => {return xScale(d[0])})
+    .attr("cy", (d) => {return yScale(d[1])})
     .attr("r", 3.5);
 }
 
