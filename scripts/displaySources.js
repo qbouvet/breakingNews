@@ -49,60 +49,40 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
     let divData = [...cumulative_data.entries()]
     const getSourceName = (thisElement) => thisElement.children[0].innerHTML.split(" - ")[0];
 
-    /*let selection = d3.selectAll('#sidebardiv').selectAll('div').data(divData)
-    selection
-        .text( (d) => d[0]+" - "+d[1])
-    selection.enter()
-        .append('div')
-            .text( (d) => d[0]+" - "+d[1])
-    selection.exit().remove()
-    return
-    */
-
     /*let [enterSel, updateSel, exitSel] = d3h.mkSelections(
         d3.select('#sidebardiv').select('div'),
         divData
     )
-        updateSel
+    */
+
+    let selection = d3.selectAll('#sidebardiv').selectAll("div.sourcegraph-container").data(divData)
+
+    selection
+        .on("click", (d) => function (d) {
+            // 'this' is the 'div' we're operating on
+            const sourceName = d[0]
+            sourceGraphClickCallback(sourceName)
+        })
+        .select(".sourcegraph-text")
+            .text( (d) => d[0]+" - "+d[1])
+        .append('div')
+            .attr('class', "sourcegraph-chart")
+
+    selection.enter()
+        .append('div')
+            .attr('class', "sourcegraph-container")
             .on("click", (d) => function (d) {
                 // 'this' is the 'div' we're operating on
                 const sourceName = d[0]
                 sourceGraphClickCallback(sourceName)
             })
-            .select(".sourcegraph-text")
-                .text( (d) => d[0]+" - "+d[1])
-        enterSel
-            .append("div")
-                .attr('class', "sourcegraph-container")
-                .on("click", (d) => function (d) {
-                    // 'this' is the 'div' we're operating on
-                    const sourceName = d[0]
-                    sourceGraphClickCallback(sourceName)
-                })
-            .append('div')
-                .attr('class', "sourcegraph-text")
-                .text( (d) => d[0]+" - "+d[1])
-            .append('div')
-                .attr('class', "sourcegraph-chart")
-        exitSel.remove()
-    */
-
-    let selection = d3.selectAll('#sidebardiv').selectAll("div.sourcegraph-container").data(divData)
-
-    selection.select(".sourcegraph-text")
-        .text( (d) => d[0]+" - "+d[1])
-
-    let tmp = selection.enter()
         .append('div')
-            .attr('class', "sourcegraph-container")
-
-    tmp.append('div')
             .attr('class', "sourcegraph-text")
             .text( (d) => d[0]+" - "+d[1])
+        .append('div')
+            .attr('class', "sourcegraph-chart")
 
     selection.exit().remove()
-
-
 
     return
 
