@@ -1,4 +1,6 @@
 
+import {log, info, warn, err} from './utils.js'
+
 import {D3Handler} from './AnimationStyling.js'
 
 
@@ -34,13 +36,13 @@ function sortMapByKeys(history_value) {
      *      sourceGraphClickCallback :
      *          callback function to be used when clicking on a source graph
      */
-function display_source(data, cumulative_data, timestamps, sourceGraphClickCallback){
+function display_source(timeseriesData, perSourceCumulativeCount, timestamps, sourceGraphClickCallback){
 
         // Sort Map(timestamp => count) by increasing order of timestamps for display in graph
-    let sorted_data = Array.from(data).map((x) => [x[0], sortMapByKeys(x[1])])
+    let sorted_data = Array.from(timeseriesData).map((x) => [x[0], sortMapByKeys(x[1])])
 
         // divs data
-    let divData = [...cumulative_data.entries()]
+    let divData = [...perSourceCumulativeCount.entries()]
     const getSourceName = (thisElement) => thisElement.children[0].innerHTML.split(" - ")[0];
 
         // Compute selections and update data
@@ -67,11 +69,22 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
         // exit selection
     exitSel.remove()
 
+    /*const chartdivs = d3.selectAll(".sourcegraph-chart")._groups[0]
+    chartdivs.forEach( (div) => {
+        // div.__data__
+        drawChart(div, timeseriesData, div.__data__[0])
+    })*/
+
     // FIXME: max value should not be the maximum cumulative value, but the maximum update value ever encountered
 
     // compute the max value of the total data, and pass it for axis scaling
     let max_total_value = Math.ceil(Array.from(cumulative_data.values()).reduce((x, y) => ( x > y ? x : y )))
     test_line_chart(n, max_total_value, array_data)
+}
+
+
+drawChart(chartdiv, timeseriesData, sourceName) {
+
 }
 
 
