@@ -419,14 +419,14 @@ export class MentionHandler {
 
     prepare_v2 (timestamp, k) {
 
-        const debug = this.getTopSourcesAndEvents(timestamp, k)     // Map( sourceName => Map( timestamp => [eventsID] )
-        const debug2 = this.getCumulatedMentions(timestamp, k)      // Map( sourceName => overallCount )
-        const debug3 = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
-        const debug4 = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
+        const sourcesEvents = this.getTopSourcesAndEvents(timestamp, k)     // Map( sourceName => Map( timestamp => [eventsID] )
+        const cumulatedMentions = this.getCumulatedMentions(timestamp, k)      // Map( sourceName => overallCount )
+        const liveTimestamps = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
+        const timeseries = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
 
-        display_source(this.getTopSourcesTimeSeries(),          // Map( sourceName => Map(timestamp => count) )
-                        this.getCumulatedMentions(),            // Map( sourceName => overallCount )
-                        this.getElapsedTimestamps(),            // list of timestamps to display
+        display_source(timeseries,          // Map( sourceName => Map(timestamp => count) )
+                        cumulatedMentions,            // Map( sourceName => overallCount )
+                        liveTimestamps,            // list of timestamps to display
                         this.countryColorChart.bind(this))      // country colormap callback function
     }
 
@@ -542,22 +542,22 @@ export class MentionHandler {
             top_history_cumulative = take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps)
         }
 
-        const debug = this.getTopSourcesAndEvents(timestamp, k)     // Map( sourceName => Map( timestamp => [eventsID] )
-        const debug2 = this.getCumulatedMentions(timestamp, k)      // Map( sourceName => overallCount )
-        const debug3 = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
-        const debug4 = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
+        const sourcesEvents = this.getTopSourcesAndEvents(timestamp, k)     // Map( sourceName => Map( timestamp => [eventsID] )
+        const cumulatedMentions = this.getCumulatedMentions(timestamp, k)      // Map( sourceName => overallCount )
+        const liveTimestamps = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
+        const timeseries = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
 
-        display_source(this.getTopSourcesTimeSeries(),          // Map( sourceName => Map(timestamp => count) )
-                        this.getCumulatedMentions(),            // Map( sourceName => overallCount )
-                        this.getElapsedTimestamps(),            // list of timestamps to display
+        display_source(timeseries,          // Map( sourceName => Map(timestamp => count) )
+                        cumulatedMentions,            // Map( sourceName => overallCount )
+                        liveTimestamps,            // list of timestamps to display
                         this.countryColorChart.bind(this))      // country colormap callback function
 
         return
 
-        display_source(top_history_cumulative,              // Map( sourceName => Map(timestamp => count) )
+        /*display_source(top_history_cumulative,              // Map( sourceName => Map(timestamp => count) )
                         top_frequency_cumulative,           // Map( sourceName => overallCount )
                         currentTimestamps,                  // list of timestamps to display
-                        this.countryColorChart.bind(this))  // country colormap callback function
+                        this.countryColorChart.bind(this))  // country colormap callback function*/
     }
 
 
