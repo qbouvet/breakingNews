@@ -40,24 +40,69 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
     let sorted_data = Array.from(data).map((x) => [x[0], sortMapByKeys(x[1])])
 
         //clean container for later redraw all charts
-    clean_sources()
+    //clean_sources()
 
         // [Map(timestamp => count)]
     let array_data = Array.from(data).map(d => {return d[1]})
 
         // divs data
     let divData = [...cumulative_data.entries()]
-    let [enterSel, updateSel, exitSel] = d3h.mkSelections(
-        d3.select('#sidebardiv').selectAll('div'),
-        divData
-        )
+    const getSourceName = (thisElement) => thisElement.children[0].innerHTML.split(" - ")[0];
 
-    enterSel
-        .append("div")
-            .attr('class', "sourcegraph-container")
+    /*let selection = d3.selectAll('#sidebardiv').selectAll('div').data(divData)
+    selection
+        .text( (d) => d[0]+" - "+d[1])
+    selection.enter()
         .append('div')
+            .text( (d) => d[0]+" - "+d[1])
+    selection.exit().remove()
+    return
+    */
+
+    /*let [enterSel, updateSel, exitSel] = d3h.mkSelections(
+        d3.select('#sidebardiv').select('div'),
+        divData
+    )
+        updateSel
+            .on("click", (d) => function (d) {
+                // 'this' is the 'div' we're operating on
+                const sourceName = d[0]
+                sourceGraphClickCallback(sourceName)
+            })
+            .select(".sourcegraph-text")
+                .text( (d) => d[0]+" - "+d[1])
+        enterSel
+            .append("div")
+                .attr('class', "sourcegraph-container")
+                .on("click", (d) => function (d) {
+                    // 'this' is the 'div' we're operating on
+                    const sourceName = d[0]
+                    sourceGraphClickCallback(sourceName)
+                })
+            .append('div')
+                .attr('class', "sourcegraph-text")
+                .text( (d) => d[0]+" - "+d[1])
+            .append('div')
+                .attr('class', "sourcegraph-chart")
+        exitSel.remove()
+    */
+
+    let selection = d3.selectAll('#sidebardiv').selectAll("div.sourcegraph-container").data(divData)
+
+    selection.select(".sourcegraph-text")
+        .text( (d) => d[0]+" - "+d[1])
+
+    let tmp = selection.enter()
+        .append('div')
+            .attr('class', "sourcegraph-container")
+
+    tmp.append('div')
             .attr('class', "sourcegraph-text")
-            .text( (d) => d[0])
+            .text( (d) => d[0]+" - "+d[1])
+
+    selection.exit().remove()
+
+
 
     return
 
@@ -78,8 +123,6 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
     var divMentionChart = d3.selectAll(".sourcegraph-container")
         .append('div')
             .attr('class', "sourcegraph-chart")
-
-    const getSourceName = (thisElement) => thisElement.children[0].innerHTML.split(" - ")[0];
 
     // "country colorChart on click" behaviour
     d3.selectAll(".sourcegraph-container")
