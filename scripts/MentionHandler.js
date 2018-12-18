@@ -157,11 +157,11 @@ function take_top_history_up_to_current_timestamp(top_history_cumulative, curren
             SOURCE->MENTIONTIME->EVENTID  TRACKING (for heatmap)
 *******************************************************************************/
 
-
-/*  Counts the number of mentions per source,
- *  returns a Map(SourceName -> Map(MentionTime => SortedArray[EVENTIDS]) )
- *  sorted by decreasing number of mentions
- */
+    // SHOULD BE BUG-FREE
+    /*  Counts the number of mentions per source,
+     *  returns a Map(SourceName -> Map(MentionTime => SortedArray[EVENTIDS]) )
+     *  sorted by decreasing number of mentions
+     */
 function gen_sourceTimeEvent_tree (mentions) {
         // TODO : NON-UNIQUE sorted array
     const sortedArrayFactory = function (array) {return new SortedArray(array, true)}
@@ -194,6 +194,7 @@ function gen_sourceTimeEvent_tree (mentions) {
 }
 
 
+    // SHOULD BE BUG-FREE
     /*  Returns a Map(SourceName -> Map(timestamp => SortedArray[EVENTIDS]) )
      *  which is the concatenation of the two arguments (of the same type as ^ )
      *  !!! in-place modification of treeA (?)
@@ -228,6 +229,7 @@ function concat_sourceTimeEvent_trees (treeA, treeB) {
 }
 
 
+    // HAS BEEN RELATIVELY DEBUGGED
     /*  Cumulative mentions :
      *      Map(SourceName -> Map(timestamp => cumulatedCount )
      *  contains for each source, the number of cumulated mentions as of 'timestamp'
@@ -335,9 +337,9 @@ export class MentionHandler {
      */
     getElapsedTimestamps (time=undefined) {
         if (time == undefined) {
-            return this.loadedTimestamps.filter ( (t) => t<=this.currentTime)
+            return [...this.loadedTimestamps.keys()].filter ( (t) => t<=this.currentTime)
         } else {
-            return this.loadedTimestamps.filter ( (t) => t<=time)
+            return [...this.loadedTimestamps.keys()].filter ( (t) => t<=time)
         }
     }
 
@@ -349,8 +351,9 @@ export class MentionHandler {
                         this.countryColorChart.bind(this))  // country colormap callback function
     }
 
+        // HAS BEEN RELATIVELY DEBUGGED
         /*  Returns the k most "prolific at time timestamp" new sources and their events :
-         *      Map( sourceName => Map( timestamps => eventsIDs )
+         *      [sourceName , Map( timestamps => eventsIDs )]
          */
     getTopSourcesAndEvents (timestamp, k) {
             // sort cumulativeMentions according to cumulative amount of mentions at time 'timestamp'
@@ -377,8 +380,49 @@ export class MentionHandler {
             const tmp3 = new MapOrElse(filteredSourceTimeEventTree)    // recreate a map from the array of entries
             return [sourceName, tmp3]
         })
-        return new MapOrElse(res)
+        return res
     }
+
+        // SHOULD BE RELATIVELY BUG-FREE
+        /*  Returns (by querying this.sourceCumulatedMentions) :
+         *      [ Source => OverallCount ]
+         *  As is at time 'timestamp', for the k top sources (optional)
+         */
+    getCumulatedMentions (timestamp, k=undefined) {
+        const tmp = [...this.sourceCumulatedMentions.entries()].map( (entry) => {
+            return [entry[0], entry[1].getOrElse(timestamp, 0)]
+        })
+        if (k==undefined) {
+            // !! Not sorted (intended to be re-wrapped in a Map)
+            return tmp
+        } else {
+            // sort and slice
+            return tmp
+                .sort((a, b) => b[1]-a[1] ) // decreasing order
+                .slice(0, k)
+        }
+    }
+
+        /*  Returns the 0-padded time serie for the top k sources :
+         *      Map(SourceName => Map(Timestamp => count))
+         *  0-padded = if there we no mentions as time t, a tuple (t => 0) is
+         *  added to the map
+         *  Accepts a pre-computed 'topSourcesAndEvents' map to avoid redondant
+         *  computations :
+         *      Map( sourceName => Map(timestamp => sortedArray[EventsID]))
+         */
+    getTopSourcesTimeSeries (timestamp, k, topSourcesAndEvents=undefined) {
+        if (topSourcesAndEvents==undefined) {
+            topSourcesAndEvents = this.getTopSourcesAndEvents(timestamp, k)
+        }
+        return topSourcesAndEvents.map( (entry) => {
+            return [entry[0], new MapOrElse(
+                this.getElapsedTimestamps().map( (t) => [t, entry[1].getOrElse(parseInt(t),new SortedArray([])).size()] )
+            )]
+        })
+    }
+
+    // todo : the rest of accessor methods needed for display_source
 
 
 
@@ -474,6 +518,9 @@ export class MentionHandler {
                                                 isBackward=false) {
 
         const debug = this.getTopSourcesAndEvents(timestamp, k)
+        const debug2 = this.getCumulatedMentions(timestamp, k)
+        const debug3 = this.getElapsedTimestamps(timestamp)
+        const debug4 = this.getTopSourcesTimeSeries(timestamp, k)
 
             // prepare [sourceName => nbMentions]
         let source_cumulative_frequency = count_mentions(cumulativeMentions);
