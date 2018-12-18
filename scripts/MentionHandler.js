@@ -156,12 +156,6 @@ export class MentionHandler {
 
             // visulization parameter : number of displayed source graphs
         this.k = 5;
-
-            // for mentions counting
-    	this.loadedMentions = {};          // mention loaded in memory, but possibly after the viz's current time
-    	this.historyMentions = {};         //
-    	this.cumulativeMentions = [];      // All mentions that happened before the viz's current time and that have been processed
-    	this.currentTimestamps = [];       // all timestamps before/equal to the viz's current time
     }
 
     /*  Update data structures to a new currentTime
@@ -299,8 +293,8 @@ export class MentionHandler {
 
 
 /*=================================================================================================================
-    Display stuff
-    =============*/
+    Viz stuff
+    =========*/
 
         /*  Queries the EventsDataBroker for events reported by the source
          *  Returns :

@@ -39,83 +39,33 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
         // Sort Map(timestamp => count) by increasing order of timestamps for display in graph
     let sorted_data = Array.from(data).map((x) => [x[0], sortMapByKeys(x[1])])
 
-        //clean container for later redraw all charts
-    //clean_sources()
-
-        // [Map(timestamp => count)]
-    let array_data = Array.from(data).map(d => {return d[1]})
-
         // divs data
     let divData = [...cumulative_data.entries()]
     const getSourceName = (thisElement) => thisElement.children[0].innerHTML.split(" - ")[0];
 
-    /*let [enterSel, updateSel, exitSel] = d3h.mkSelections(
-        d3.select('#sidebardiv').select('div'),
-        divData
-    )
-    */
-
+        // Compute selections and update data
     let [enterSel, updateSel, exitSel] = d3h.mkSelections(
         d3.selectAll('#sidebardiv').selectAll("div.sourcegraph-container"),
         divData
     )
-
-    updateSel
-        .on("click", (d) => function (d) {
-            // 'this' is the 'div' we're operating on
-            const sourceName = d[0]
-            sourceGraphClickCallback(sourceName)
-        })
-        .select(".sourcegraph-text")
+        // update selection
+    updateSel.on("click", (d) => sourceGraphClickCallback(d[0]) )
+    updateSel.select(".sourcegraph-text")
             .text( (d) => d[0]+" - "+d[1])
-        .append('div')
-            .attr('class', "sourcegraph-chart")
-
-    enterSel
+    updateSel.select(".sourcegraph-chart")
+            .text( "updated") // just for proof of concept
+        // enter selection has 2 children -> 2 sub-selections
+    const enterTopLevel = enterSel
         .append('div')
             .attr('class', "sourcegraph-container")
-            .on("click", (d) => function (d) {
-                // 'this' is the 'div' we're operating on
-                const sourceName = d[0]
-                sourceGraphClickCallback(sourceName)
-            })
-        .append('div')
+            .on("click", (d) => sourceGraphClickCallback(d[0]) )
+    enterTopLevel.append('div')
             .attr('class', "sourcegraph-text")
             .text( (d) => d[0]+" - "+d[1])
-        .append('div')
+    enterTopLevel.append('div')
             .attr('class', "sourcegraph-chart")
-
+        // exit selection
     exitSel.remove()
-
-    return
-
-        //number of sources to display
-    var n = Array.from(array_data[0].keys()).length
-
-    var divParent = d3.select('#sidebardiv')
-                    .selectAll('div')
-                    .data(sorted_data).enter()
-                    .append('div')
-                    .attr('class', "sourcegraph-container")
-
-    var divMention = d3.selectAll(".sourcegraph-container")
-        .append ('div')
-        .attr('class', "sourcegraph-text")
-            .text(function (d) {return d[0]+" - "+cumulative_data.get(d[0])})
-
-    var divMentionChart = d3.selectAll(".sourcegraph-container")
-        .append('div')
-            .attr('class', "sourcegraph-chart")
-
-    // "country colorChart on click" behaviour
-    d3.selectAll(".sourcegraph-container")
-        .on("click", function () {
-            // 'this' is the 'div' we're operating on
-            const sourceName = getSourceName(this)
-            sourceGraphClickCallback(sourceName)
-    })
-
-    console.log(data);
 
     // FIXME: max value should not be the maximum cumulative value, but the maximum update value ever encountered
 

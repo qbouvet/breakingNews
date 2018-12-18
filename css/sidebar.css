@@ -95,7 +95,7 @@
     height: 25%;
     position:relative;
         /* spacing */
-    margin-bottom : 100px;
+    margin-bottom : 35px;
     border : solid red 1px;
 }
     /* Bottom delimiter for sourcegraph-container */
