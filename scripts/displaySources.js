@@ -1,4 +1,10 @@
 
+import {D3Handler} from './AnimationStyling.js'
+
+
+const d3h = new D3Handler()
+
+
 function clean_sources(reset=false){
     $('.sourcegraph-container').empty()
     $('.sourcegraph-container').show()
@@ -39,10 +45,24 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
         // [Map(timestamp => count)]
     let array_data = Array.from(data).map(d => {return d[1]})
 
+        // divs data
+    let divData = [...cumulative_data.entries()]
+    let [enterSel, updateSel, exitSel] = d3h.mkSelections(
+        d3.select('#sidebardiv').selectAll('div'),
+        divData
+        )
+
+    enterSel
+        .append("div")
+            .attr('class', "sourcegraph-container")
+        .append('div')
+            .attr('class', "sourcegraph-text")
+            .text( (d) => d[0])
+
+    return
+
         //number of sources to display
     var n = Array.from(array_data[0].keys()).length
-
-    //const [enterSel, updateSel, exitSel] =
 
     var divParent = d3.select('#sidebardiv')
                     .selectAll('div')
