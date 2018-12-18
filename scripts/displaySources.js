@@ -75,15 +75,90 @@ function display_source(timeseriesData, perSourceCumulativeCount, timestamps, so
         drawChart(div, timeseriesData, div.__data__[0])
     })*/
 
+    let chartdata = [...timeseriesData.entries()].map( (entry) => {
+        return [entry[0], [...entry[1].entries()]]
+    })
+
+    let digits_length = Math.log(max_total_value) * Math.LOG10E + 1 | 0;
+    let x_axis_space = digits_length * 6
+    // var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
+
+    var parentDiv = $(".sourcegraph-chart")[0];
+    var margin = {top: 10, right: 10, bottom: 10, left: 10}
+    var width = parentDiv.clientWidth - margin.left - margin.right;
+    var height = parentDiv.clientHeight - margin.top - margin.bottom;
+
+    let datepoints = Array.from(array_data[0].keys()).sort().map(d => d.slice(8,12))
+
+//===========================================================================================================
+//===========================================================================================================
+
+    console.log("datepoints: ", datepoints)
+    // datepoints = datepoints.map(d => d.slice(8,12))
+
+    // 5. X scale will use the index of our data
+    var x = d3.scalePoint().rangeRound([0, width-x_axis_space])
+    x.domain(datepoints);
+    var xScaleCategorical = d3.scaleOrdinal()
+        .domain(datepoints) // input
+        .range([0, width - x_axis_space]); // output
+    var xScale = d3.scaleLinear()
+        .domain([0,n-1]) // input
+        .range([0, width - x_axis_space]); // output
+
+   //  // 6. Y scale will use the randomly generate number
+   function makeYAxis(timeseriesDataForSource) {
+       const max = 
+       yScale = d3.scaleLinear()
+           .domain([0, max_total_value]) // input
+           .range([height - margin.bottom, 0]); // output
+   }
+    var yScale = d3.scaleLinear()
+        .domain([0, max_total_value]) // input
+        .range([height - margin.bottom, 0]); // output
+
+   //  // 7. d3's line generator
+    var line = d3.line()
+        .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+        .y(function(d, i) { return yScale(i); }) // set the y values for the line generator
+        .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+    var svg = d3.selectAll(".sourcegraph-chart")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + (margin.left + x_axis_space) + "," + (margin.top) + ")");
+
+   //  // 3. Call the x axis in a group tag
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + (height - margin.bottom) + ")")
+        .call(d3.axisBottom(x));
+
+    // 4. Call the y axis in a group tag
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(d3.axisLeft(yScale).ticks(4));
+
+    // 9. Append the path, bind the data, and call the line generator
+    svg.append("path")
+        .attr("class", "line") // Assign a class for styling
+        .attr("d", (d) => (d3.line()(make_tuples(d[1], x, yScale)))) // 11. Calls the line generator
+
+
+//===========================================================================================================
+//===========================================================================================================
+
     // FIXME: max value should not be the maximum cumulative value, but the maximum update value ever encountered
 
     // compute the max value of the total data, and pass it for axis scaling
-    let max_total_value = Math.ceil(Array.from(cumulative_data.values()).reduce((x, y) => ( x > y ? x : y )))
-    test_line_chart(n, max_total_value, array_data)
+    /*let max_total_value = Math.ceil(Array.from(cumulative_data.values()).reduce((x, y) => ( x > y ? x : y )))
+    test_line_chart(n, max_total_value, array_data)*/
 }
 
 
-drawChart(chartdiv, timeseriesData, sourceName) {
+function drawChart(chartdiv, timeseriesData, sourceName) {
 
 }
 
