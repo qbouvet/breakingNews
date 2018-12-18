@@ -24,6 +24,20 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+
+/*  Map with getOrElse
+ */
+class MapOrElse extends Map {
+    getOrElse (key, defaultValue){
+        if(super.has(key)){
+            return super.get(key)
+        }else{
+            return defaultValue
+        }
+    }
+}
+
+
 /*  Modified from :
  *      https://github.com/javascript/sorted-array
  *  - "add-if-not-present" behaviour with the unique=true constructor parameter.
@@ -85,6 +99,12 @@ var SortedArray = (function () {
             if (index >= 0) this.array.splice(index, 1);
             return this;
         },
+        get: function (index) {
+            return this.array[index]
+        },
+        contains: function(element) {
+            return this.search(element) >= 0
+        },
         forEach: function (fct) {
             return this.array.forEach(fct)
         },
@@ -126,5 +146,6 @@ export {
     whenDocumentLoaded,
     log, info, warn, err,
     SortedArray,
+    MapOrElse, 
     sleep
 }

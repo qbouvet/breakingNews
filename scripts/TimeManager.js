@@ -1,5 +1,6 @@
 
 import {log, info, warn, err} from './utils.js'
+import {SortedArray} from './utils.js'
 
 
 /*
@@ -17,6 +18,13 @@ export class TimeManager {
 
         // Init number of updates
         this.NUM_UPDATES = (this.END_DATE - this.INIT_DATE)/this.msPerUpdate;
+
+        this.allTimestamps = new SortedArray([], true);
+        for (let i=0; i<this.NUM_UPDATES; i++){
+            const clk = this.getUpdateDate(i)
+            const tsp = this.dateToTimestamp(clk)
+            this.allTimestamps.insert(tsp)
+        }
     }
 
     getUpdateDate(clockValue) {
@@ -36,4 +44,40 @@ export class TimeManager {
             pad(date.getDate(), 2) + pad(date.getHours(), 2) +
             pad(date.getMinutes(), 2) + "00";
     }
+
+    nextTimestamp (timestamp) {
+        if (this.allTimestamps.contains(timestamp)){
+            const index = this.allTimestamps.search(timestamp)
+            if (index < 0) {
+                err ("TimeManager : timestamp not found : ", timestamp)
+                return
+            } else if (index == this.allTimestamps.size()) {
+                warn ("TimeManager : timestamp has no next (is last) : ", timestamp)
+                return
+            }
+            return this.allTimestamps.get(index+1);
+        } else {
+            err ("TimeManager : not a valid timestamp : ", timestamp)
+            return
+        }
+    }
+
+    prevTimestamp (timestamp) {
+        if (this.allTimestamps.contains(timestamp)){
+            const index = this.allTimestamps.search(timestamp)
+            if (index < 0) {
+                err ("TimeManager : timestamp not found : ", timestamp)
+                return
+            } else if (index == 0) {
+                warn ("TimeManager : timestamp has no previous (is first) : ", timestamp)
+                return
+            }
+            return this.allTimestamps.get(index-1);
+        } else {
+            err ("TimeManager : not a valid timestamp : ", timestamp)
+            return
+        }
+    }
+
+
 }

@@ -18,7 +18,7 @@
   /* Background color
    */
 .panels-container {
-  background-color : var(--color-darkgray);
+  background-color : var(--color-gray);
 }
 
   /*  Background style
@@ -34,106 +34,10 @@ body {
    *  map, graph panel, settings
    */
 .app-panel{
-    margin : 2px;
-    padding : 2px;
+    margin : 3px;
     border : solid black 2px;
     border-radius : 4px;
 }
-
-/* ----
- side panel for sources visualization
----*/
-
-.visualize-source-container {
-  /*display: table;*/
-  overflow: hidden;
-  /*clear: both;*/
-  border: solid black 2px;
-  border-radius: 4px;
-  height: calc(100% / 5);
-  /*height: 200px;*/
-}
-
-.visualize-source-mention-container {
-  /*display: table;*/
-  overflow: hidden;
-  /*clear: both;*/
-  border: solid black 2px;
-  border-radius: 4px;
-
-  width: 30%;
-  height: 100%;
-  float: left;
-  position: relative;
-  /*height: calc(100% / 5);*/
-  /*height: 200px;*/
-}
-
-.visualize-source-mention-text {
-  background-color: yellow;
-  width: 100%;
-  height: 70%;
-  float: top;
-  word-wrap: break-word;
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 5px;
-  background-image: white;
-  /*overflow: hidden;*/
-  /*text-overflow: ellipsis;*/
-  /*font-size: 1;*/
-}
-
-.visualize-source-mention-num {
-  background-color: pink;
-  width: 100%;
-  height: 30%;
-  float: bottom;
-
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 5px;
-  /*overflow: hidden;*/
-  /*text-overflow: ellipsis;*/
-  /*font-size: 1;*/
-}
-
-.visualize-source-mention-chart {
-  background-color: red;
-  width: 70%;
-  height: 100%;
-  float: right;
-
-}
-
-
-.visualize-source-mention-chart svg path {
-  fill: none;
-}
-/*
-  line charts for sources and mentions
-*/
-.line {
-    fill: none;
-    stroke: #ffab00;
-    stroke-width: 3;
-}
-
-/* Style the dots by assigning a fill and stroke */
-.dot {
-    fill: #ffab00;
-    stroke: #fff;
-}
-/*.bar-chart{
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-}
-.clear{
-  clear:both;
-}*/
 
     /* generic style for icon-button */
 .btn-icon {
@@ -199,6 +103,7 @@ button:focus{
   flex: 0 0 auto;
   width: 10px;
   min-height: 200px;
+  height : 100%;
       /* Styling */
   background: url("../css/icons/splitter.png") center center no-repeat var(--color-darkgray);
   background-size: 10px 40px;

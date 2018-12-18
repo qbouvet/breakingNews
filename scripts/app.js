@@ -3,6 +3,7 @@ import {log, info, warn, err} from './utils.js';
 import {whenDocumentLoaded} from './utils.js';
 import {sleep} from './utils.js';
 import {SortedArray} from './utils.js'
+import {MapOrElse} from './utils.js'
 
 import {DataLoader} from './DataLoader.js';
 import {Worldmap} from './Worldmap.js';
@@ -21,7 +22,7 @@ async function main() {
 
     const CONTROLLER = new Controller(
       (timestamp, isForward, updateStepDuration) => MAP.updateEvents(timestamp, isForward, updateStepDuration),
-      (timestamp, isForward) => MENTIONS_HANDLER.updateMentions(timestamp, isForward),
+      (timestamp, isForward) => MENTIONS_HANDLER.update(timestamp, isForward),
       (updateStepDuration) => MAP.reset(updateStepDuration),
       (x) => MENTIONS_HANDLER.reset());
 
