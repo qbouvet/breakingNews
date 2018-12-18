@@ -331,7 +331,7 @@ export class MentionHandler {
         }
     }
 
-    // UNTESTED
+    // SHOULD BE BUG FREE
     /*  Returns in an array all elapsed timestamps from time 0 to currentTime
      *  Be default, will use this.currentTime, but can also accept it as argument
      */
@@ -341,14 +341,6 @@ export class MentionHandler {
         } else {
             return [...this.loadedTimestamps.keys()].filter ( (t) => t<=time)
         }
-    }
-
-
-    prepare_v2 () {
-        display_source(top_history_cumulative,              // Map( sourceName => Map(timestamp => count) )
-                        top_frequency_cumulative,           // Map( sourceName => overallCount )
-                        currentTimestamps,                  // list of timestamps to display
-                        this.countryColorChart.bind(this))  // country colormap callback function
     }
 
         // HAS BEEN RELATIVELY DEBUGGED
@@ -380,7 +372,7 @@ export class MentionHandler {
             const tmp3 = new MapOrElse(filteredSourceTimeEventTree)    // recreate a map from the array of entries
             return [sourceName, tmp3]
         })
-        return res
+        return new MapOrElse(res)
     }
 
         // SHOULD BE RELATIVELY BUG-FREE
@@ -394,15 +386,17 @@ export class MentionHandler {
         })
         if (k==undefined) {
             // !! Not sorted (intended to be re-wrapped in a Map)
-            return tmp
+            return new MapOrElse(tmp)
         } else {
             // sort and slice
-            return tmp
+            return new MapOrElse (tmp
                 .sort((a, b) => b[1]-a[1] ) // decreasing order
                 .slice(0, k)
+            )
         }
     }
 
+        // SHOULD BE RELATIVEL BUG-FREE
         /*  Returns the 0-padded time serie for the top k sources :
          *      Map(SourceName => Map(Timestamp => count))
          *  0-padded = if there we no mentions as time t, a tuple (t => 0) is
@@ -415,14 +409,26 @@ export class MentionHandler {
         if (topSourcesAndEvents==undefined) {
             topSourcesAndEvents = this.getTopSourcesAndEvents(timestamp, k)
         }
-        return topSourcesAndEvents.map( (entry) => {
+        return new MapOrElse([...topSourcesAndEvents.entries()].map( (entry) => {
             return [entry[0], new MapOrElse(
                 this.getElapsedTimestamps().map( (t) => [t, entry[1].getOrElse(parseInt(t),new SortedArray([])).size()] )
             )]
-        })
+        }))
     }
 
-    // todo : the rest of accessor methods needed for display_source
+
+    prepare_v2 (timestamp, k) {
+
+        const debug = this.getTopSourcesAndEvents(timestamp, k)     // Map( sourceName => Map( timestamp => [eventsID] )
+        const debug2 = this.getCumulatedMentions(timestamp, k)      // Map( sourceName => overallCount )
+        const debug3 = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
+        const debug4 = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
+
+        display_source(this.getTopSourcesTimeSeries(),          // Map( sourceName => Map(timestamp => count) )
+                        this.getCumulatedMentions(),            // Map( sourceName => overallCount )
+                        this.getElapsedTimestamps(),            // list of timestamps to display
+                        this.countryColorChart.bind(this))      // country colormap callback function
+    }
 
 
 
@@ -517,10 +523,6 @@ export class MentionHandler {
                                                 timestamp,
                                                 isBackward=false) {
 
-        const debug = this.getTopSourcesAndEvents(timestamp, k)
-        const debug2 = this.getCumulatedMentions(timestamp, k)
-        const debug3 = this.getElapsedTimestamps(timestamp)
-        const debug4 = this.getTopSourcesTimeSeries(timestamp, k)
 
             // prepare [sourceName => nbMentions]
         let source_cumulative_frequency = count_mentions(cumulativeMentions);
@@ -539,6 +541,18 @@ export class MentionHandler {
         if (isBackward) {
             top_history_cumulative = take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps)
         }
+
+        const debug = this.getTopSourcesAndEvents(timestamp, k)     // Map( sourceName => Map( timestamp => [eventsID] )
+        const debug2 = this.getCumulatedMentions(timestamp, k)      // Map( sourceName => overallCount )
+        const debug3 = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
+        const debug4 = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
+
+        display_source(this.getTopSourcesTimeSeries(),          // Map( sourceName => Map(timestamp => count) )
+                        this.getCumulatedMentions(),            // Map( sourceName => overallCount )
+                        this.getElapsedTimestamps(),            // list of timestamps to display
+                        this.countryColorChart.bind(this))      // country colormap callback function
+
+        return
 
         display_source(top_history_cumulative,              // Map( sourceName => Map(timestamp => count) )
                         top_frequency_cumulative,           // Map( sourceName => overallCount )
