@@ -199,12 +199,14 @@ function gen_sourceTimeEvent_tree (mentions) {
      *  !!! in-place modification of treeA (?)
      */
 function concat_sourceTimeEvent_trees (treeA, treeB) {
-    if (treeA.size <= 0 && treeB.size <= 0) {
-        return new Map()
-    } else if (treeB.size <= 0 ){
-        return treeA
-    } else {
-        return treeB
+    if (treeA.size <= 0 || treeB.size <= 0) {
+        if (treeA.size <= 0 && treeB.size <= 0) {
+            return new Map()
+        } else if (treeB.size <= 0 ){
+            return treeA
+        } else {
+            return treeB
+        }
     }
     //warn("merging :\ntreeA:", treeA, "\ntreeB:", treeB)
     treeB.forEach( (timeEventMap, sourceName) => {
@@ -221,6 +223,7 @@ function concat_sourceTimeEvent_trees (treeA, treeB) {
             treeA.set(sourceName, treeB.get(sourceName))
         }
     });
+    return treeA
     //warn("merging : result (treeA):\n", treeA)
 }
 
@@ -233,6 +236,7 @@ function concat_sourceTimeEvent_trees (treeA, treeB) {
      *  contains new mentions
      */
 function updateCumulativeMentions (cumulativeMentions, newMentions, timestamp) {
+        // add the content of newMentions to cumulativeMentions
     newMentions.forEach ( (value, key) => { // key=sourceName, Map(timestamp => SortedArray[EVENTIDS])
         if (cumulativeMentions.has(key)) {
             const cumulativeMentionsForSource = cumulativeMentions.get(key)
@@ -248,15 +252,14 @@ function updateCumulativeMentions (cumulativeMentions, newMentions, timestamp) {
             cumulativeMentions.set(key, newMap)
         }
     });
+        // Update all elements of cumulativeMentions that didn't have any new mentions this period
+    cumulativeMentions.forEach( (value, key) => {
+        if (!value.has(timestamp)) {
+            value.set(timestamp, value.get(timeMgr.prevTimestamp(timestamp)))
+        }
+    });
     return cumulativeMentions;
 }
-
-function sortMapByValues(map) {
-    return new Map([...history_value.entries()].sort((a, b) => {
-        return a[0] - b[0] }
-    ));
-}
-
 
 
 
@@ -394,7 +397,7 @@ export class MentionHandler {
                 let mentions_promise = this.loader.loadMentions(timestamp);
                 mentions_promise.then( (result) => {
                     this.updateMentionsForward(timestamp, result)
-                    this.updateSourceTimeEventTree(timestamp, result)
+                    //this.updateSourceTimeEventTree(timestamp, result)
                 });
             } else {
                 this.updateMentionsForward(timestamp, undefined)
@@ -470,7 +473,7 @@ export class MentionHandler {
                                                 timestamp,
                                                 isBackward=false) {
 
-        this.getTopSourcesAndEvents(timestamp, k)
+        const debug = this.getTopSourcesAndEvents(timestamp, k)
 
             // prepare [sourceName => nbMentions]
         let source_cumulative_frequency = count_mentions(cumulativeMentions);
