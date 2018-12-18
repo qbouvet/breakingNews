@@ -18,16 +18,31 @@ function sortMapByKeys(history_value) {
 }
 
 
+    /*  Display the top k sources as graphs in the sidebar-
+     *      data : for the top k sources :
+     *          [sourceName, Map(timestamp => mentionsCount)]
+     *      cumulative_data : for the top k sources :
+     *          [sourceName, totalMentions]
+     *      timestamps :
+     *          list of all elapsed timestamps
+     *      sourceGraphClickCallback :
+     *          callback function to be used when clicking on a source graph
+     */
 function display_source(data, cumulative_data, timestamps, sourceGraphClickCallback){
 
+        // Sort Map(timestamp => count) by increasing order of timestamps for display in graph
     let sorted_data = Array.from(data).map((x) => [x[0], sortMapByKeys(x[1])])
 
-    //clean container for later redraw all charts
+        //clean container for later redraw all charts
     clean_sources()
 
+        // [Map(timestamp => count)]
     let array_data = Array.from(data).map(d => {return d[1]})
 
+        //number of sources to display
     var n = Array.from(array_data[0].keys()).length
+
+    //const [enterSel, updateSel, exitSel] =
 
     var divParent = d3.select('#sidebardiv')
                     .selectAll('div')
@@ -54,13 +69,6 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
             sourceGraphClickCallback(sourceName)
     })
 
-
-    /*d3.selectAll(".visualize-source-mention-text")
-    .append("img")
-    .attr("src", function(d) {return "https://www." + d[0] + "/favicon.ico" })
-    .attr("width", 16)
-    .attr("height", 16);*/
-
     console.log(data);
 
     // FIXME: max value should not be the maximum cumulative value, but the maximum update value ever encountered
@@ -68,7 +76,6 @@ function display_source(data, cumulative_data, timestamps, sourceGraphClickCallb
     // compute the max value of the total data, and pass it for axis scaling
     let max_total_value = Math.ceil(Array.from(cumulative_data.values()).reduce((x, y) => ( x > y ? x : y )))
     test_line_chart(n, max_total_value, array_data)
-
 }
 
 

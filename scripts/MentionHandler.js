@@ -28,26 +28,27 @@ function sortHistory(history) {
   return history
 }
 
-
+    // THIS SEEMS BROKEN ?
+    // (run is in debugger, mapSort1 is always undefined)
     /*  Counts the number of mentions per source,
      *  ---returns a map [SourceName -> mentionCount] sorted by mentioncount---
      *  returns a map [SourceName -> [nbMentions, Map[MentionTime => SortedArray(EVENTIDS)]] ]
      *  sorted by decreasing nbMentions
      */
-    function count_mentions(mentions) {
-        if (mentions.length > 0){
-            var counts = {}
-            info("counting")
-            mentions.reduce(function (acc, curr) {
-                acc[curr['MentionSourceName']] ? acc[curr['MentionSourceName']]++ : acc[curr['MentionSourceName']] = 1;
-                return acc;
-            },counts);
+function count_mentions(mentions) {
+    if (mentions.length > 0){
+        var counts = {}
+        info("counting")
+        mentions.reduce(function (acc, curr) {
+            acc[curr['MentionSourceName']] ? acc[curr['MentionSourceName']]++ : acc[curr['MentionSourceName']] = 1;
+            return acc;
+        },counts);
 
-            // sorted mentions
-            var mapCounts = new Map(Object.entries(counts))
-            const mapSort1 = new Map([...mapCounts.entries()].sort((a, b) => {
-            return b[1] - a[1] }
-        ));
+        // sorted mentions
+        var mapCounts = new Map(Object.entries(counts))
+        const mapSort1 = new Map([...mapCounts.entries()].sort((a, b) => {
+            return b[1] - a[1]
+        }));
         return mapSort1
     } else {
          return new Map()
@@ -55,9 +56,8 @@ function sortHistory(history) {
 }
 
     /*  Extends the "historic" mention map with the given number of mentions at the given timestamp.
-     *  Historic mentions map :
-     *      ---[sourceName -> list( (timestamp, nbMentionsAtTimestamp) )]---
-     *      [SourceName -> [nbMentions, Map[MentionTime => SortedArray(EVENTIDS)]] ]
+     *  Historic mentions map is :
+     *      Map( sourceName => Map(timestamp, mentionsCount))
      */
 function make_history(mentions, historyMentions, currentTimestamps) {
 
@@ -80,14 +80,12 @@ function make_history(mentions, historyMentions, currentTimestamps) {
 }
 
 
-    /*  Given the top mentions for the current timestamp (in 'top_mentions'),
-     *  retrives their historical values serie from historyMentions. i.e. :
-     *      [ sourceName => List( (timestamp, nbMentions) ) ]
+    /*  Returns a map of the top 5 sources :
+     *      Map( sourceName => Map(timestamp, mentionsCount) )
+     *  Filter historyMentions by only keeping sources in top_mentions.
      */
 function take_top_history(top_mentions, historyMentions) {
-
     var top_mentions_map = new Map()
-
     top_mentions.forEach(
         (value, mention) => {
             if (mention in historyMentions) {
@@ -101,9 +99,9 @@ function take_top_history(top_mentions, historyMentions) {
 }
 
 
-    /*  For each source in 'top_history_cumulative', adds a (timestamp, 0)
-     *  value to the historical values if the source had reported no event at that timestamp
-     *  and return a sorted resulting [ sourceName => List( (timestamp, nbMentions) ) ]
+    /*  Adds (timestamp, 0) for each missing timestamp in 'top_history_cumulative'
+     *  Returns :
+     *      Map( sourceName => Map(timestamp => count) )
      */
 function add_timestamps_to_top_history_map(top_history_cumulative, currentTimestamps) {
          top_history_cumulative.forEach((value, source) => {
@@ -120,6 +118,12 @@ function add_timestamps_to_top_history_map(top_history_cumulative, currentTimest
      }
 
 
+    /* (?) Trims out of top_history_cumulative entries whose timestamp is
+     * (?) after the current time
+     *     Used only then going backwards
+     *     returns (probably) :
+     * (?)     Map( sourceName => Map(timestamp => count) )
+     */
 function take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps) {
   let top_history = new Map()
   top_history_cumulative.forEach((value, source) => {
@@ -152,34 +156,38 @@ function take_top_history_up_to_current_timestamp(top_history_cumulative, curren
 
 
 /*  Counts the number of mentions per source,
- *  returns a map [SourceName -> [nbMentions, Map[MentionTime => SortedArray(EVENTIDS)]] ]
+ *  returns a Map(SourceName -> Map(MentionTime => SortedArray[EVENTIDS]) )
  *  sorted by decreasing number of mentions
  */
 function gen_sourceTimeEvent_tree (mentions) {
+        // TODO : NON-UNIQUE sorted array
     const sortedArrayFactory = function (array) {return new SortedArray(array, true)}
-    let counts = new Map()
+    let mentionsCountPerSource = new Map()
     if (mentions.length > 0) {
-        mentions.reduce(function (acc, curr) {
-            if (acc.has(curr['MentionSourceName'])) {
-                const sourceMap = acc.get(curr['MentionSourceName'])
-                if (sourceMap.has(curr["MentionTimeDate"])) {
-                    sourceMap.get(curr["MentionTimeDate"]).insert(curr["GLOBALEVENTID"]);
+        mentions.reduce(function (acc, currMention) {
+            if (acc.has(currMention['MentionSourceName'])) {
+                    // Map(timestamp => SortedArray(eventsID) )
+                const sourceToMentionsMap = acc.get(currMention['MentionSourceName'])
+                if (sourceToMentionsMap.has(currMention["MentionTimeDate"])) {
+                    sourceToMentionsMap.get(currMention["MentionTimeDate"]).insert(currMention["GLOBALEVENTID"]);
                 } else {
-                    sourceMap.set( curr["MentionTimeDate"], new SortedArray([curr["GLOBALEVENTID"]]) )
+                    sourceToMentionsMap.set( currMention["MentionTimeDate"], new SortedArray([currMention["GLOBALEVENTID"]]) )
                 }
             } else {
-                acc.set(curr['MentionSourceName'],
-                        new Map([[ curr["MentionTimeDate"], new SortedArray([curr["GLOBALEVENTID"]]) ]]) );
+                acc.set(currMention['MentionSourceName'],
+                        new Map([[ currMention["MentionTimeDate"], new SortedArray([currMention["GLOBALEVENTID"]]) ]]) );
             }
             return acc;
-        }, counts);
+        }, mentionsCountPerSource);
         // fixme : for performance, this could be removed if needed
-        counts = new Map([...counts.entries()].sort((entryA, entryB) => {
-            return entryB[1][0] - entryA[1][0] // NB : decreasing order
-        }));
+        mentionsCountPerSource = new Map([...mentionsCountPerSource.entries()]
+            .sort((entryA, entryB) => {
+                return entryB[1][0] - entryA[1][0] // NB : decreasing order
+            })
+        );
     }
     //warn("Generated sourceTimeEvent tree :\n", counts)
-    return counts
+    return mentionsCountPerSource
 }
 
 
@@ -236,8 +244,7 @@ export class MentionHandler {
         this.worldmap = worldmap;
     }
 
-    /*
-    	Update mentions
+    /*  Update mentions
     */
     updateMentions(timestamp, isForward) {
         if (isForward) {
