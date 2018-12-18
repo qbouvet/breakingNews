@@ -3,6 +3,7 @@ import {log, info, warn, err} from './utils.js';
 import {whenDocumentLoaded} from './utils.js';
 import {sleep} from './utils.js';
 import {SortedArray} from './utils.js'
+import {MapOrElse} from './utils.js'
 
 import {DataLoader} from './DataLoader.js';
 import {Worldmap} from './Worldmap.js';

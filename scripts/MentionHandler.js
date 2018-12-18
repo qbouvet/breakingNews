@@ -1,8 +1,10 @@
 import {log, info, warn, err} from './utils.js'
 import {SortedArray} from './utils.js'
+import {MapOrElse} from './utils.js'
 
 import {DataLoader} from './DataLoader.js';
 import {display_source, clean_sources} from './displaySources.js'
+import {TimeManager} from './TimeManager.js';
 
 
 
@@ -11,6 +13,7 @@ import {display_source, clean_sources} from './displaySources.js'
                     Mentions counter (for graphs)
 *******************************************************************************/
 
+const timeMgr = new TimeManager()
 
 function sortMapByKeys(history_value) {
   const mapSort1 = new Map([...history_value.entries()].sort((a, b) => {
@@ -191,7 +194,7 @@ function gen_sourceTimeEvent_tree (mentions) {
 }
 
 
-    /*  Returns a [SourceName -> [nbMentions, Map[MentionTime => SortedArray(EVENTIDS)]] ]
+    /*  Returns a Map(SourceName -> Map(timestamp => SortedArray[EVENTIDS]) )
      *  which is the concatenation of the two arguments (of the same type as ^ )
      *  !!! in-place modification of treeA (?)
      */
@@ -222,6 +225,37 @@ function concat_sourceTimeEvent_trees (treeA, treeB) {
 }
 
 
+    /*  Cumulative mentions :
+     *      Map(SourceName -> Map(timestamp => cumulatedCount )
+     *  contains for each source, the number of cumulated mentions as of 'timestamp'
+     *  newMentions :
+     *      Map(SourceName -> Map(timestamp => SortedArray[EVENTIDS]) )
+     *  contains new mentions
+     */
+function updateCumulativeMentions (cumulativeMentions, newMentions, timestamp) {
+    newMentions.forEach ( (value, key) => { // key=sourceName, Map(timestamp => SortedArray[EVENTIDS])
+        if (cumulativeMentions.has(key)) {
+            const cumulativeMentionsForSource = cumulativeMentions.get(key)
+            const prevTimestamp = timeMgr.prevTimestamp(timestamp)
+            const previousCount = prevTimestamp==undefined ? 0 : cumulativeMentionsForSource.getOrElse(prevTimestamp, 0)
+            const debug = [...value.entries()] // get first value
+            const currentCount = previousCount + [...value.entries()][0][1].size()   //complicated way to read the first value
+            cumulativeMentions.get(key).set(timestamp, currentCount)
+        } else {
+            const newMap = new MapOrElse();
+            const currentCount = value.get(parseInt(timestamp)).size()
+            newMap.set(timestamp, currentCount)
+            cumulativeMentions.set(key, newMap)
+        }
+    });
+    return cumulativeMentions;
+}
+
+function sortMapByValues(map) {
+    return new Map([...history_value.entries()].sort((a, b) => {
+        return a[0] - b[0] }
+    ));
+}
 
 
 
@@ -240,9 +274,13 @@ export class MentionHandler {
             // data access
         this.loader = new DataLoader();
 
-            // core data structure :
-        this.sourceTimeEventTree = new Map();   // Map( SourceName => Map(timestamp => eventsId))
-        this.loadedTimestamps = new Map();      // Map( timestamp => mentions )
+            // core data structures :
+        this.sourceTimeEventTree = new MapOrElse();     // Map( SourceName => Map(timestamp => eventsId))
+                                                        // used to retrieve a source's eventsID at a given timestamp
+        this.sourceCumulatedMentions = new MapOrElse(); // Map( sourceName => Map(timestamp => cumulatedMentionsCount)
+                                                        // used to find the most prolific source at each timestamp
+        this.loadedTimestamps = new Map();              // Map( timestamp => mentions )
+                                                        // Keep track of which files were loaded
         this.currentTime = undefined
 
             // Access to events storage, needed for latLong queries
@@ -271,6 +309,7 @@ export class MentionHandler {
                 .then( (result) => {    // update data structures
                     const new_sourceTimeEvent = gen_sourceTimeEvent_tree (result)
                     this.sourceTimeEventTree = concat_sourceTimeEvent_trees(this.sourceTimeEventTree, new_sourceTimeEvent)
+                    this.sourceCumulatedMentions = updateCumulativeMentions (this.sourceCumulatedMentions, new_sourceTimeEvent, timestamp)
                     this.currentTime = timestamp
                     this.loadedTimestamps.set(timestamp, result)
                 })
@@ -299,6 +338,51 @@ export class MentionHandler {
         }
     }
 
+
+    prepare_v2 () {
+        display_source(top_history_cumulative,              // Map( sourceName => Map(timestamp => count) )
+                        top_frequency_cumulative,           // Map( sourceName => overallCount )
+                        currentTimestamps,                  // list of timestamps to display
+                        this.countryColorChart.bind(this))  // country colormap callback function
+    }
+
+        /*  Returns the k most "prolific at time timestamp" new sources and their events :
+         *      Map( sourceName => Map( timestamps => eventsIDs )
+         */
+    getTopSourcesAndEvents (timestamp, k) {
+            // sort cumulativeMentions according to cumulative amount of mentions at time 'timestamp'
+            // use it to get our top sources
+        const tmp = [...this.sourceCumulatedMentions.entries()].sort((a, b) => {
+            return b[1].get(timestamp) -a[1].get(timestamp) // decreasing order
+        });
+        const topSourcesCumulatedMentions = (k > tmp.length) ?
+            tmp : tmp.slice(0, k)
+            // topsources : Map(SourceName => cumulatedCount)
+        const topSources = topSourcesCumulatedMentions.map( (elem) => elem[0] );
+            // For each sourceName in the top sources
+        const res = topSources.map( (sourceName) => {
+                // for each [timestamp, SortedArray[EventIds]] in timeEventTree[sourceName], drop it if timestamp > timestamp
+            const filteredSourceTimeEventTree = [...this.sourceTimeEventTree.get(sourceName).entries()].filter( (elem) => {
+                return elem[0] <= parseInt(timestamp)
+            })
+            /*const filteredSourceTimeEventTree = [...this.sourceTimeEventTree.get(sourceName).entries()].map( (elem) => {
+                    // for each [sourceName => Map(timestamp, [eventIDs]) ]
+                const eventsMentionnedBeforeTimestamp = [...elem[1].entries()].filter( (entry) => entry[1] <= timestamp )
+                const tmpres = new MapOrElse(eventsMentionnedBeforeTimestamp)
+                [elem[0], tmpres]
+            })*/
+            const tmp3 = new MapOrElse(filteredSourceTimeEventTree)    // recreate a map from the array of entries
+            return [sourceName, tmp3]
+        })
+        return new MapOrElse(res)
+    }
+
+
+
+
+/*=================================================================================================================
+    Update mentions
+    =============*/
 
     /*  Update mentions
     */
@@ -378,13 +462,6 @@ export class MentionHandler {
       clean_sources(true)
     }
 
-    prepare_v2 () {
-        display_source(top_history_cumulative,              // Map( sourceName => Map(timestamp => count) )
-                        top_frequency_cumulative,           // Map( sourceName => overallCount )
-                        currentTimestamps,                  // list of timestamps to display
-                        this.countryColorChart.bind(this))  // country colormap callback function
-    }
-
     prepare_mentions_for_sources_to_visualize(  cumulativeMentions,
                                                 loadedMentions,
                                                 historyMentions,
@@ -392,6 +469,9 @@ export class MentionHandler {
                                                 k,
                                                 timestamp,
                                                 isBackward=false) {
+
+        this.getTopSourcesAndEvents(timestamp, k)
+
             // prepare [sourceName => nbMentions]
         let source_cumulative_frequency = count_mentions(cumulativeMentions);
         let source_frequency = count_mentions(loadedMentions[timestamp]);
