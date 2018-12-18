@@ -319,15 +319,17 @@ export class MentionHandler {
                     this.loadedTimestamps.set(timestamp, result)
                 })
                 .then( (result) => {
-                    err ("here, we should call redraw")
+                    this.draw_graphs(timestamp, this.k)
                 });
             } else {
                 info("Mention file already loaded (forward) for timestamp : " + timestamp);
                 this.currentTime = timestamp;
+                this.draw_graphs(timestamp, this.k)
             }
         } else {
             info("Mention file already loaded (backward) for timestamp : " + timestamp);
             this.currentTime = timestamp;
+            this.draw_graphs(timestamp, this.k)
         }
     }
 
@@ -417,7 +419,7 @@ export class MentionHandler {
     }
 
 
-    prepare_v2 (timestamp, k) {
+    draw_graphs (timestamp, k) {
 
         const sourcesEvents = this.getTopSourcesAndEvents(timestamp, k)     // Map( sourceName => Map( timestamp => [eventsID] )
         const cumulatedMentions = this.getCumulatedMentions(timestamp, k)      // Map( sourceName => overallCount )
@@ -523,6 +525,8 @@ export class MentionHandler {
                                                 timestamp,
                                                 isBackward=false) {
 
+        this.draw_graphs(timestamp, k)
+        return
 
             // prepare [sourceName => nbMentions]
         let source_cumulative_frequency = count_mentions(cumulativeMentions);

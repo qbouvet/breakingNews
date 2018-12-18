@@ -22,7 +22,7 @@ async function main() {
 
     const CONTROLLER = new Controller(
       (timestamp, isForward, updateStepDuration) => MAP.updateEvents(timestamp, isForward, updateStepDuration),
-      (timestamp, isForward) => MENTIONS_HANDLER.updateMentions(timestamp, isForward),
+      (timestamp, isForward) => MENTIONS_HANDLER.update(timestamp, isForward),
       (updateStepDuration) => MAP.reset(updateStepDuration),
       (x) => MENTIONS_HANDLER.reset());
 
