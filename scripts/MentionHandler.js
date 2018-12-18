@@ -196,6 +196,13 @@ function gen_sourceTimeEvent_tree (mentions) {
      *  !!! in-place modification of treeA (?)
      */
 function concat_sourceTimeEvent_trees (treeA, treeB) {
+    if (treeA.size <= 0 && treeB.size <= 0) {
+        return new Map()
+    } else if (treeB.size <= 0 ){
+        return treeA
+    } else {
+        return treeB
+    }
     //warn("merging :\ntreeA:", treeA, "\ntreeB:", treeB)
     treeB.forEach( (timeEventMap, sourceName) => {
         if (treeA.has(sourceName)) {
@@ -229,31 +236,81 @@ export class MentionHandler {
 
     // Initializes path variables
     constructor(eventsDataBroker, worldmap) {
-    	this.loader = new DataLoader();
+
+            // data access
+        this.loader = new DataLoader();
+
+            // core data structure :
+        this.sourceTimeEventTree = new Map();   // Map( SourceName => Map(timestamp => eventsId))
+        this.loadedTimestamps = new Map();      // Map( timestamp => mentions )
+        this.currentTime = undefined
+
+            // Access to events storage, needed for latLong queries
+        this.eventsBroker = eventsDataBroker;
+            // To request redraws / masks
+        this.worldmap = worldmap;
+
+            // visulization parameter : number of displayed source graphs
+        this.k = 5;
+
             // for mentions counting
     	this.loadedMentions = {};          // mention loaded in memory, but possibly after the viz's current time
     	this.historyMentions = {};         //
     	this.cumulativeMentions = [];      // All mentions that happened before the viz's current time and that have been processed
     	this.currentTimestamps = [];       // all timestamps before/equal to the viz's current time
-        this.k = 5;
-            // tree for source-time-event tracking
-        this.sourceTimeEventTree = new Map();
-            // Access to events storage, needed for latLong queries
-        this.eventsBroker = eventsDataBroker;
-            // To request redraws / masks
-        this.worldmap = worldmap;
     }
+
+    /*  Update data structures to a new currentTime
+     */
+    update(timestamp, isForward) {
+        if (isForward) {
+            if ( ! this.loadedTimestamps.has(timestamp)) {
+                info("Loading mentions file for timestamp : " + timestamp);
+                const mentions_promise = this.loader.loadMentions(timestamp);
+                mentions_promise
+                .then( (result) => {    // update data structures
+                    const new_sourceTimeEvent = gen_sourceTimeEvent_tree (result)
+                    this.sourceTimeEventTree = concat_sourceTimeEvent_trees(this.sourceTimeEventTree, new_sourceTimeEvent)
+                    this.currentTime = timestamp
+                    this.loadedTimestamps.set(timestamp, result)
+                })
+                .then( (result) => {
+                    err ("here, we should call redraw")
+                });
+            } else {
+                info("Mention file already loaded (forward) for timestamp : " + timestamp);
+                this.currentTime = timestamp;
+            }
+        } else {
+            info("Mention file already loaded (backward) for timestamp : " + timestamp);
+            this.currentTime = timestamp;
+        }
+    }
+
+    // UNTESTED
+    /*  Returns in an array all elapsed timestamps from time 0 to currentTime
+     *  Be default, will use this.currentTime, but can also accept it as argument
+     */
+    getElapsedTimestamps (time=undefined) {
+        if (time == undefined) {
+            return this.loadedTimestamps.filter ( (t) => t<=this.currentTime)
+        } else {
+            return this.loadedTimestamps.filter ( (t) => t<=time)
+        }
+    }
+
 
     /*  Update mentions
     */
     updateMentions(timestamp, isForward) {
+        this.update(timestamp, isForward)
         if (isForward) {
             if ( !( (Object.keys(this.loadedMentions).includes(timestamp) && (timestamp in this.currentTimestamps)) )) {
                 info("Loading mentions file " + timestamp);
                 let mentions_promise = this.loader.loadMentions(timestamp);
                 mentions_promise.then( (result) => {
                     this.updateMentionsForward(timestamp, result)
-                    this.updateSourceTimeEventTracking(timestamp, result)
+                    this.updateSourceTimeEventTree(timestamp, result)
                 });
             } else {
                 this.updateMentionsForward(timestamp, undefined)
@@ -281,7 +338,7 @@ export class MentionHandler {
     }
 
 
-    updateSourceTimeEventTracking (timestamp, result=undefined) {
+    updateSourceTimeEventTree (timestamp, result=undefined) {
         if (result != undefined) {
             let new_sourceTimeEvent = gen_sourceTimeEvent_tree (this.loadedMentions[timestamp])
             concat_sourceTimeEvent_trees(this.sourceTimeEventTree, new_sourceTimeEvent)
@@ -321,6 +378,13 @@ export class MentionHandler {
       clean_sources(true)
     }
 
+    prepare_v2 () {
+        display_source(top_history_cumulative,              // Map( sourceName => Map(timestamp => count) )
+                        top_frequency_cumulative,           // Map( sourceName => overallCount )
+                        currentTimestamps,                  // list of timestamps to display
+                        this.countryColorChart.bind(this))  // country colormap callback function
+    }
+
     prepare_mentions_for_sources_to_visualize(  cumulativeMentions,
                                                 loadedMentions,
                                                 historyMentions,
@@ -353,9 +417,22 @@ export class MentionHandler {
     }
 
 
-        /*  Returns the array    [eventId, lat, long]
-         *  with *only* the events for which we found a Lat/long, i.e those
-         *  that bave been added on the map
+
+
+
+
+
+
+
+
+
+/*=================================================================================================================
+    Display stuff
+    =============*/
+
+        /*  Queries the EventsDataBroker for events reported by the source
+         *  Returns :
+         *      SortedArray(Events) (unique elements)
          */
     events_for_source (sourceName) {
         let coveredEventsIds = new SortedArray([], true)

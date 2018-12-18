@@ -80,6 +80,9 @@ var SortedArray = (function () {
 
             return -1;
         },
+        contains: function(element) {
+            return this.search(element) >= 0
+        },
         remove: function (element) {
             var index = this.search(element);
             if (index >= 0) this.array.splice(index, 1);
