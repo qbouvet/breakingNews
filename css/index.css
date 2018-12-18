@@ -3,137 +3,42 @@
 ----------------------------------------------------- */
 
 :root {
---color-bg: #000000;
---color-primary: #E75B10;
---color-accent: #EE801E;
---color-darkgray: #333333;
---color-gray: #888888;
---color-lightgray: #E3E0DD;
+  --bg: #000000;
+  --darkgray: #333333;
+  --gray: #888888;
+  --lightgray: #E3E0DD;
+  --light: #FFA500;
+  --darker: #FF8C00;
 }
 
 /* ---------------------------------------------------
   OVERALL PAGE STYLE
 ----------------------------------------------------- */
 
-  /* Background color
-   */
-.panels-container {
-  background-color : var(--color-darkgray);
-}
-
-  /*  Background style
-   */
+/*  Background style
+ */
 body {
   height : 100%;
   width : 100%;
   overflow: auto;
-  background-color : var(--color-darkgray);
+  background-color : var(--gray);
+}
+
+  /* Background color
+   */
+.panels-container {
+  background-color : var(--gray);
 }
 
   /*  Top level blocks of the visualization :
    *  map, graph panel, settings
    */
 .app-panel{
-    margin : 2px;
-    padding : 2px;
-    border : solid black 2px;
-    border-radius : 4px;
+  margin : 2px;
+  padding : 2px;
+  border : solid black 1px;
+  border-radius : 4px;
 }
-
-/* ----
- side panel for sources visualization
----*/
-
-.visualize-source-container {
-  /*display: table;*/
-  overflow: hidden;
-  /*clear: both;*/
-  border: solid black 2px;
-  border-radius: 4px;
-  height: calc(100% / 5);
-  /*height: 200px;*/
-}
-
-.visualize-source-mention-container {
-  /*display: table;*/
-  overflow: hidden;
-  /*clear: both;*/
-  border: solid black 2px;
-  border-radius: 4px;
-
-  width: 30%;
-  height: 100%;
-  float: left;
-  position: relative;
-  /*height: calc(100% / 5);*/
-  /*height: 200px;*/
-}
-
-.visualize-source-mention-text {
-  background-color: yellow;
-  width: 100%;
-  height: 70%;
-  float: top;
-  word-wrap: break-word;
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 5px;
-  background-image: white;
-  /*overflow: hidden;*/
-  /*text-overflow: ellipsis;*/
-  /*font-size: 1;*/
-}
-
-.visualize-source-mention-num {
-  background-color: pink;
-  width: 100%;
-  height: 30%;
-  float: bottom;
-
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 5px;
-  /*overflow: hidden;*/
-  /*text-overflow: ellipsis;*/
-  /*font-size: 1;*/
-}
-
-.visualize-source-mention-chart {
-  background-color: red;
-  width: 70%;
-  height: 100%;
-  float: right;
-
-}
-
-
-.visualize-source-mention-chart svg path {
-  fill: none;
-}
-/*
-  line charts for sources and mentions
-*/
-.line {
-    fill: none;
-    stroke: #ffab00;
-    stroke-width: 3;
-}
-
-/* Style the dots by assigning a fill and stroke */
-.dot {
-    fill: #ffab00;
-    stroke: #fff;
-}
-/*.bar-chart{
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-}
-.clear{
-  clear:both;
-}*/
 
     /* generic style for icon-button */
 .btn-icon {
@@ -187,7 +92,7 @@ button:focus{
   xtouch-action: none;    /* avoid browser level touch actions */
       /* positioning      */
   position : absolute;
-  height : 90;
+  height : 90%;
   padding: 0;
   margin: 0;
   width : 100%;
@@ -200,10 +105,10 @@ button:focus{
   width: 10px;
   min-height: 200px;
       /* Styling */
-  background: url("../css/icons/splitter.png") center center no-repeat var(--color-darkgray);
+  background: url("../css/icons/splitter.png") center center no-repeat var(--darkgray);
   background-size: 10px 40px;
-  background-color : var(--color-bg);
-  border: solid var(--color-bg) 1px;
+  background-color : var(--bg);
+  border: solid var(--bg) 1px;
       /* resize behaviour */
   cursor: col-resize;
 }
@@ -241,6 +146,12 @@ button:focus{
 #mapdiv {
     flex : 1 1 75%;
     height : 70%;
+    padding: 5px;
+
+    background: #959595;
+    background: -moz-linear-gradient(left, var(--darkgray) 0%, var(--bg) 50%, var(--darkgray) 100%);
+    background: -webkit-linear-gradient(left, var(--darkgray) 0%,var(--bg) 50%,var(--darkgray) 100%);
+    background: linear-gradient(to right, var(--darkgray) 0%,var(--bg) 50%,var(--darkgray) 100%);
 }
 
 #settingsdiv {
@@ -248,48 +159,13 @@ button:focus{
   /*height : 22%;*/
       /*will be toggled by the collapse-settings button
           visibility : collapse would be better, but unsupported by chrome */
-  display : block;
-  background-color: var(--color-bg);
-  color: var(--color-lightgray);
-  height: 25%;
-}
+  display : inline-block;
 
-/* ---------------------------------------------------
-    SIDEBAR-RELATED STYLING
------------------------------------------------------ */
+  background: #0e0e0e;
+  background: -moz-linear-gradient(top, var(--bg) 0%, var(--darkgray) 100%);
+  background: -webkit-linear-gradient(top, var(--bg) 0%,var(--darkgray) 100%);
+  background: linear-gradient(to bottom, var(--bg) 0%,var(--darkgray) 100%);
 
-#menubar { /* typically inherits from one-line-menu */
-      /* left-right align children - NB works with flex */
-  justify-content: space-between;
-}
-
-#btn-info {
-   position : relative;
-   height: 30px;
-   width: 30px;
-
-   top : 0px;
-   background-image: url(../css/icons/info.svg);
-}
-
-@font-face {
-  font-family: "SomeCoolFont";
-  src: url("../css/fonts/Library 3 am.otf");
-}
-
-#menubar p {
-    /* vh = viewport-related units https://stackoverflow.com/questions/16056591/font-scaling-based-on-width-of-container#answer-19818026 */
-    /* TODO : use svg instead ? https://css-tricks.com/fitting-text-to-a-container/ */
-        /* remove interline */
-    padding: 0;
-    margin: 0;
-    margin-left: 1vw;
-        /* font config */
-    font-size : 2.5vw;
-    font-family: "SomeCoolFont";  /* "must be the last value specified" */
-}
-
-#sidebardiv {
-    background-color: green;
-    height : 100%;
+  color: var(--lightgray);
+  /*height: 25%;*/
 }

@@ -34,7 +34,6 @@ export class Worldmap {
             .translateExtent([[0, 0], [w, h]])
             .on("zoom", this.applyZoom.bind(this))
         this.svg.call(this.zoom_handler)
-        this.zoomScalingRatio = 1.0;
 
         // Define outline and behavior when it resolves
         this.countriesFillMin = "#888888"
