@@ -321,7 +321,13 @@ export class MentionHandler {
       clean_sources(true)
     }
 
-    prepare_mentions_for_sources_to_visualize(cumulativeMentions, loadedMentions, historyMentions, currentTimestamps, k, timestamp, isBackward=false) {
+    prepare_mentions_for_sources_to_visualize(  cumulativeMentions,
+                                                loadedMentions,
+                                                historyMentions,
+                                                currentTimestamps,
+                                                k,
+                                                timestamp,
+                                                isBackward=false) {
             // prepare [sourceName => nbMentions]
         let source_cumulative_frequency = count_mentions(cumulativeMentions);
         let source_frequency = count_mentions(loadedMentions[timestamp]);
@@ -340,10 +346,10 @@ export class MentionHandler {
             top_history_cumulative = take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps)
         }
 
-        display_source(top_history_cumulative,
-                        top_frequency_cumulative,
-                        currentTimestamps,
-                        this.countryColorChart.bind(this))
+        display_source(top_history_cumulative,              // Map( sourceName => Map(timestamp => count) )
+                        top_frequency_cumulative,           // Map( sourceName => overallCount )
+                        currentTimestamps,                  // list of timestamps to display
+                        this.countryColorChart.bind(this))  // country colormap callback function
     }
 
 
