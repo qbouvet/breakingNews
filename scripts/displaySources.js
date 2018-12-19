@@ -8,14 +8,14 @@ const d3h = new D3Handler()
 
 
     /*  Display the top k sources as graphs in the sidebar-
-     *      data : for the top k sources :
-     *          [sourceName, Map(timestamp => mentionsCount)]
-     *      cumulative_data : for the top k sources :
-     *          [sourceName, totalMentions]
-     *      timestamps :
-     *          list of all elapsed timestamps
-     *      sourceGraphClickCallback :
-     *          callback function to be used when clicking on a source graph
+     *  timeseriesData : for the top k sources :
+     *      [sourceName, Map(timestamp => mentionsCount)]
+     *  cumulative_data : for the top k sources :
+     *      [sourceName, totalMentions]
+     *  timestamps :
+     *      list of all elapsed timestamps
+     *  sourceGraphClickCallback :
+     *      callback function to be used when clicking on a source graph
      */
 function display_source(timeseriesData, perSourceCumulativeCount, timestamps, sourceGraphClickCallback){
 
@@ -41,7 +41,7 @@ function display_source(timeseriesData, perSourceCumulativeCount, timestamps, so
         .selectAll('*')
             .remove()
 
-    // enter selection has 2 children -> 2 sub-selections
+    // Generate container / textbox / svg for each displayed source
     const enterTopLevel = enterSel
         .append('div')
             .attr('class', "sourcegraph-container")
@@ -64,7 +64,12 @@ function display_source(timeseriesData, perSourceCumulativeCount, timestamps, so
     let width = parentDiv.clientWidth - margin.left - margin.right;
     let height = parentDiv.clientHeight - margin.top - margin.bottom;
 
-    function drawChart(sourceName, timeseriesData) { // https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
+    const maxMentions = [...timeseriesData.values()].reduce( (acc, value) => {
+        const maxMentionsForSource = [...value.values()].reduce( (acc, e) => Math.max(acc,e), 0 )
+        return Math.max(acc, maxMentionsForSource)
+    }, 0)
+
+    function drawChart(sourceName, timeseriesData, maxMentions) { // https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
 
         // data
         let datepoints = [...[...timeseriesData.values()][0].keys()].sort()
@@ -76,10 +81,10 @@ function display_source(timeseriesData, perSourceCumulativeCount, timestamps, so
         datepoints = datepoints.map( (elem) => {
             return ( (parseInt(elem) % 10**6) / 10**2 ).toString()
         });
-        const maxMentions = timeseriesArrayData.reduce( (acc, curr) => {
+        /*const maxMentions = timeseriesArrayData.reduce( (acc, curr) => {
               if (curr[1] > acc) { return curr[1] }
               else { return acc }
-        }, 0)
+        }, 0)*/
         let digits_length = Math.log(maxMentions) * Math.LOG10E + 1 | 0;
         let x_axis_space = digits_length * 6
 
@@ -146,7 +151,7 @@ function display_source(timeseriesData, perSourceCumulativeCount, timestamps, so
 
     const sourcesNames = [...perSourceCumulativeCount.keys()]
     sourcesNames.forEach( (name) => {
-        drawChart(name, timeseriesData)
+        drawChart(name, timeseriesData, maxMentions)
     })
 }
 

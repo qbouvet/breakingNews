@@ -4,7 +4,7 @@
 
 :root {
   --color-bg: #000000;
-  --color-primary: #E75B10;
+  --color-primary: #FFA500;
   --color-accent: #EE801E;
   --color-darkgray: #222222;
   --color-gray: #888888;
@@ -24,26 +24,34 @@
 #btn-info {
      background-image: url(../css/icons/info.png);
      position : relative;
+     height: 30px;
+     width: 30px;
      top : 0px;
      left : -5px;
 }
 
+/*
 @font-face {
   font-family: "SomeCoolFont";
   src: url("../css/fonts/Library 3 am.otf");
 }
+*/
 
-#menubar p {
+#menubar {
+  padding-left: 3vmin;
+}
+
+#menubar span {
     /* vh = viewport-related units https://stackoverflow.com/questions/16056591/font-scaling-based-on-width-of-container#answer-19818026 */
     /* TODO : use svg instead ? https://css-tricks.com/fitting-text-to-a-container/ */
         /* remove interline */
     padding: 0;
     margin: 0;
     margin-left: 1vw;
-        /* font config */
-    font-size : 2.5vw;
-    font-family: "SomeCoolFont";  /* "must be the last value specified" */
-    color:#FFA500;
+      /* font config */
+  font-size : 2vw;
+  font-family: 'Jura', sans-serif;
+  color:#FFA500;
 }
 
 #sidebardiv {
@@ -66,7 +74,7 @@
     /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
 }
 #sidebardiv::-webkit-scrollbar-thumb {
-  background-color: var(--color-accent);
+  background-color: var(--light);
   outline: 0px solid green;
 }
 
@@ -78,23 +86,64 @@
 #informationdiv {
   height:93%;
   display:block;
-  background-color: var(--color-bg);
+
+  background: #0e0e0e;
+  background: -moz-linear-gradient(top, var(--color-bg) 0%, var(--color-darkgray) 100%);
+  background: -webkit-linear-gradient(top, var(--color-bg) 0%,var(--color-darkgray) 100%);
+  background: linear-gradient(to bottom, var(--color-bg) 0%,var(--color-darkgray) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#333333',GradientType=0 );
+
   font-family: 'Jura', sans-serif;
   font-size: 1.5vmin;
   text-align: justify;
   text-justify: inter-word;
-  color: var(--color-lightgray);
+  color: var(--lightgray);
 }
+
 
 .info-paragraph {
   margin: 1vmin;
   padding: 1vmin;
 }
 
-.info-section {
+#info-text {
+  height: 100%;
+}
+
+.section-header {
+
+  display:flex;
+  align-items: center;
+
+  height: 3vmin;
+  margin-top: 2vmin;
+  margin-left: 3vmin;
+  margin-right: 3vmin;
+
+  border-radius:2px;
+  background: #ff8c00;
+  background: -moz-linear-gradient(top, var(--darker) 0%, var(--light) 99%);
+  background: -webkit-linear-gradient(top, var(--darker) 0%,var(--light) 99%);
+  background: linear-gradient(to bottom, var(--darker) 0%,var(--light) 99%);
+}
+
+.section-text {
+  margin-left: 1vmin;
+  font-size: 2vmin;
+  font-weight: bold;
+  color: var(--bg);
+}
+
+.info-paragraph {
+  padding: 1.5vmin;
+  padding-left: 3vmin;
+  padding-right: 3vmin;
 
 }
 
+.info-paragraph a {
+  color: #FFA500;
+}
 
 
 
@@ -113,9 +162,9 @@
         /* spacing */
     margin-bottom : 35px;
         /* Color & border */
-    background-color: var(--color-gray);
+    background-color: var(--gray);
     margin : 4px 4px 25px 4px;
-    border: solid var(--color-gray) 4px;
+    border: solid var(--gray) 4px;
     border-radius: 4px;
 }
 
@@ -137,13 +186,14 @@
     width: 100%;
     height: 20%;
         /* font color & content properties */
-    color : var(--color-bg);
+    color : var(--bg);
     font-size: 125%;
     font-weight: bold;
     text-align:center;
     overflow: hidden;
     pointer-events: none;
 }
+
 
     /*  graph/chart area for a sourcegraph
      *  previously .visualize-source-mention-chart
@@ -154,50 +204,12 @@
     height: 80%;
         /* color & content properties */
     pointer-events: none;
-    background-color: var(--color-gray);
+    background-color: var(--gray);
 }
 
 
-.visualize-source-mention-text {
-  background-color: yellow;
-  width: 100%;
-  height: 70%;
-  float: top;
-  word-wrap: break-word;
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 5px;
-  background-image: white;
-  /*overflow: hidden;*/
-  /*text-overflow: ellipsis;*/
-  /*font-size: 1;*/
-}
-
-.visualize-source-mention-num {
-  background-color: pink;
-  width: 100%;
-  height: 30%;
-  float: bottom;
-
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 5px;
-  /*overflow: hidden;*/
-  /*text-overflow: ellipsis;*/
-  /*font-size: 1;*/
-}
-
-
-
-.visualize-source-mention-chart svg path {
-  fill: none;
-}
-
-/*
-  line charts for sources and mentions
-*/
+    /*line charts for sources and mentions
+     */
 .line {
     fill: none;
     stroke: #ffab00;

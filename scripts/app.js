@@ -12,11 +12,13 @@ import {MentionHandler} from './MentionHandler.js';
 import {Controller} from './Controller.js';
 import {SelectionMenu} from './SelectionMenu.js';
 import {EventsDataBroker} from "./EventsDataBroker.js";
+import {InfoPanel} from "./InfoPanelSelections.js";
 
 async function main() {
 
     const EVENTSBROKER = new EventsDataBroker(new DataLoader());
 
+    const INFO_PANEL = new InfoPanel();
     const MAP = new Worldmap(EVENTSBROKER);
     const MENTIONS_HANDLER = new MentionHandler(EVENTSBROKER, MAP);
 

@@ -155,7 +155,7 @@ export class MentionHandler {
         this.worldmap = worldmap;
 
             // visulization parameter : number of displayed source graphs
-        this.k = 5;
+        this.k = 20;
     }
 
     /*  Update data structures to a new currentTime
