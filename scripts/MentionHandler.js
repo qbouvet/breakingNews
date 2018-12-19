@@ -3,13 +3,14 @@ import {SortedArray} from './utils.js'
 import {MapOrElse} from './utils.js'
 
 import {DataLoader} from './DataLoader.js';
-import {display_source} from './displaySources.js'
+import {SourceGrapher} from './displaySources.js'
 import {TimeManager} from './TimeManager.js';
 
 
 
 
 const timeMgr = new TimeManager()
+const sourceGrapher = new SourceGrapher()
 
 
 
@@ -281,10 +282,12 @@ export class MentionHandler {
         const liveTimestamps = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
         const timeseries = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
 
-        display_source(timeseries,          // Map( sourceName => Map(timestamp => count) )
+        sourceGrapher.display_source(
+                        timeseries,          // Map( sourceName => Map(timestamp => count) )
                         cumulatedMentions,            // Map( sourceName => overallCount )
                         liveTimestamps,            // list of timestamps to display
-                        this.countryColorChart.bind(this))      // country colormap callback function
+                        this.countryColorChart.bind(this)      // country colormap callback function
+        )
     }
 
 
