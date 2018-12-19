@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!-- saved from url=(0064)https://bl.ocks.org/d3noob/raw/402dd382a51a4f6eea487f9a35566de0/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style> /* set the CSS */
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+</style>
+</head><body>
+
+<!-- load the d3.js library -->    	
+<script src="./bl.ocks.org_files/d3.v4.min.js"></script>
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// parse the date / time
+var parseTime = d3.timeParse("%d-%b-%y");
+
+// set the ranges
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
+
+// define the line
+var valueline = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.close); });
+
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+d3.csv("data.csv", function(error, data) {
+  if (error) throw error;
+
+  // format the data
+  data.forEach(function(d) {
+      d.date = parseTime(d.date);
+      d.close = +d.close;
+  });
+
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain([0, d3.max(data, function(d) { return d.close; })]);
+
+  // Add the valueline path.
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .attr("d", valueline);
+
+  // Add the X Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // Add the Y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+});
+
+</script><svg width="960" height="500"><g transform="translate(50,20)"><path class="line" d="M890,408.8851515961209L865.2777777777777,411.8204108577087L791.1111111111111,402.6114769815947L766.3888888888889,386.5559624664037L741.6666666666667,379.97815255489365L716.9444444444445,357.8540779277934L692.2222222222223,332.0945255646543L618.0555555555555,283.80066956918097L593.3333333333333,205.67326281376234L568.6111111111111,136.42943589582387L543.8888888888889,65.4456721625827L519.1666666666667,39.6790468855603L445,21.926033038366654L420.27777777777777,9.520142086981139L395.55555555555554,7.094132624994074L370.83333333333337,5.509799915125029L346.11111111111114,0L247.22222222222223,1.8035930402527924L222.5,8.430913348946206L197.77777777777777,4.887383493390757L173.05555555555557,12.44832843468555L98.88888888888889,25.943448124106112L74.16666666666666,18.651273910378336L49.44444444444444,13.162692736903352L24.72222222222222,15.383587696273366L0,20.688273108781402"></path><g transform="translate(0,450)" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle"><path class="domain" stroke="#000" d="M0.5,6V0.5H890.5V6"></path><g class="tick" opacity="1" transform="translate(25.22222222222222,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Tue 27</text></g><g class="tick" opacity="1" transform="translate(74.66666666666666,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Thu 29</text></g><g class="tick" opacity="1" transform="translate(124.11111111111111,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Sat 31</text></g><g class="tick" opacity="1" transform="translate(148.83333333333331,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">April</text></g><g class="tick" opacity="1" transform="translate(198.27777777777777,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Tue 03</text></g><g class="tick" opacity="1" transform="translate(247.72222222222223,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Thu 05</text></g><g class="tick" opacity="1" transform="translate(297.16666666666663,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Sat 07</text></g><g class="tick" opacity="1" transform="translate(346.61111111111114,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Mon 09</text></g><g class="tick" opacity="1" transform="translate(396.05555555555554,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Wed 11</text></g><g class="tick" opacity="1" transform="translate(445.5,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Fri 13</text></g><g class="tick" opacity="1" transform="translate(494.94444444444446,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Apr 15</text></g><g class="tick" opacity="1" transform="translate(544.3888888888889,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Tue 17</text></g><g class="tick" opacity="1" transform="translate(593.8333333333333,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Thu 19</text></g><g class="tick" opacity="1" transform="translate(643.2777777777777,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Sat 21</text></g><g class="tick" opacity="1" transform="translate(692.7222222222223,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Mon 23</text></g><g class="tick" opacity="1" transform="translate(742.1666666666667,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Wed 25</text></g><g class="tick" opacity="1" transform="translate(791.6111111111111,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Fri 27</text></g><g class="tick" opacity="1" transform="translate(841.0555555555555,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">Apr 29</text></g><g class="tick" opacity="1" transform="translate(890.5,0)"><line stroke="#000" y2="6"></line><text fill="#000" y="9" dy="0.71em">May</text></g></g><g fill="none" font-size="10" font-family="sans-serif" text-anchor="end"><path class="domain" stroke="#000" d="M-6,450.5H0.5V0.5H-6"></path><g class="tick" opacity="1" transform="translate(0,450.5)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">0</text></g><g class="tick" opacity="1" transform="translate(0,415.13543058327963)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">50</text></g><g class="tick" opacity="1" transform="translate(0,379.77086116655926)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">100</text></g><g class="tick" opacity="1" transform="translate(0,344.4062917498389)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">150</text></g><g class="tick" opacity="1" transform="translate(0,309.0417223331185)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">200</text></g><g class="tick" opacity="1" transform="translate(0,273.6771529163982)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">250</text></g><g class="tick" opacity="1" transform="translate(0,238.3125834996778)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">300</text></g><g class="tick" opacity="1" transform="translate(0,202.94801408295743)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">350</text></g><g class="tick" opacity="1" transform="translate(0,167.58344466623703)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">400</text></g><g class="tick" opacity="1" transform="translate(0,132.2188752495167)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">450</text></g><g class="tick" opacity="1" transform="translate(0,96.85430583279634)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">500</text></g><g class="tick" opacity="1" transform="translate(0,61.489736416075914)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">550</text></g><g class="tick" opacity="1" transform="translate(0,26.1251669993556)"><line stroke="#000" x2="-6"></line><text fill="#000" x="-9" dy="0.32em">600</text></g></g></g></svg>
+
+</body></html>

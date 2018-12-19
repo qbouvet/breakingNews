@@ -3,12 +3,12 @@
 ----------------------------------------------------- */
 
 :root {
-  --color-bg: #000000;
-  --color-primary: #E75B10;
-  --color-accent: #EE801E;
-  --color-darkgray: #222222;
-  --color-gray: #888888;
-  --color-lightgray: #E3E0DD;
+  --bg: #000000;
+  --darkgray: #333333;
+  --gray: #888888;
+  --lightgray: #E3E0DD;
+  --light: #FFA500;
+  --darker: #FF8C00;
 }
 
 /* ---------------------------------------------------
@@ -18,7 +18,7 @@
 #map-canva {
     height : 100%;
     width : 100%;
-    background : var(--color-bg);
+    background : var(--bg);
         /* for children positioning*/
     position : relative;
 }
@@ -31,7 +31,7 @@
 }
 
 path {
-    stroke: var(--color-darkgray);
+    stroke: var(--darkgray);
     /* fill done in JS depending on mentions count */
     stroke-width: 1.5px;
     stroke-linecap: round;
@@ -50,15 +50,15 @@ div.tooltip {
   border: 1px solid;
   border-radius: 6px;
   padding: 7px;
-  color: var(--color-lightgray);
+  color: var(--lightgray);
 }
 
 div.tooltip b {
-  color: var(--color-accent);
+  color: var(--light);
 }
 
 circle:hover {
-  fill: var(--color-lightgray) !important;
+  fill: var(--lightgray) !important;
 }
 
 
@@ -75,26 +75,29 @@ circle:hover {
 }
 
 #clock-border {
-  fill: var(--color-darkgray);
-  stroke: var(--color-primary);
-  stroke-width: 5px;
+  fill: var(--bg);
+  stroke: var(--darker);
+  stroke-width: 3px;
 }
 
 #display-date {
-  fill: var(--color-accent);
+  fill: var(--darker);
+  font-family: 'Jura', sans-serif;
+  font-weight: bold;
 }
 
 #digital-clock path {
-  fill: var(--color-darkgray);
+  fill: var(--bg);
+  stroke: var(--bg);
 }
 
 #digital-clock circle {
-  fill: var(--color-accent);
+  fill: var(--light);
 }
 
 #digital-clock .lit {
-  fill: var(--color-accent);
-  stroke: var(--color-accent);
+  fill: var(--light);
+  stroke: var(--light);
   stroke-opacity: 1;
 }
 
@@ -117,8 +120,9 @@ circle:hover {
   margin:0px 0px 0px 0px;
 
   text-align:center;
+  font-family: 'Jura', sans-serif;
   line-height:40%;
-  color: var(--color-primary);
+  color: var(--darker);
 }
 
 #control-menu-border {
@@ -126,9 +130,13 @@ circle:hover {
   width: 100%;
   height:70%;
 
-	background-color: var(--color-darkgray);
+  background: #959595;
+  background: -moz-linear-gradient(top, var(--darkgray) 0%, var(--bg) 50%, var(--darkgray) 100%);
+  background: -webkit-linear-gradient(top, var(--darkgray) 0%,var(--bg) 50%,var(--darkgray) 100%);
+  background: linear-gradient(to bottom, var(--darkgray) 0%,var(--bg) 50%,var(--darkgray) 100%);
+
 	border-radius:10px;
-	border:2px solid var(--color-primary);
+	border: 1px solid var(--darker);
 }
 
 #backward-btn {
@@ -171,42 +179,42 @@ circle:hover {
   width: 25%;
   height:100%;
   float: left;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 1px;
+  padding-right: 1px;
 
   font-family: 'Jura', sans-serif;
 }
 
 .quadclass-header {
-  width:100%;
-  height:18%;
-  margin-top: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-  background-color: var(--color-darkgray);
-  border-radius:10px;
-  border:2px solid var(--color-primary);
-}
+  display:flex;
+  align-items: center;
 
-.quadclass-header .checkbox-text {
-  display: inline-block;
-  margin-left: 10px;
-  font-size: 2vmin;
-  transform: translateY(-0.4vh);
+  width:100%;
+  height: 35px;
+
+  border-radius:2px;
+  background: #ff8c00;
+  background: -moz-linear-gradient(top, var(--darker) 0%, var(--light) 99%);
+  background: -webkit-linear-gradient(top, var(--darker) 0%,var(--light) 99%);
+  background: linear-gradient(to bottom, var(--darker) 0%,var(--light) 99%);
 }
 
 .class-checkbox {
   position:relative;
-  display: inline-block;
 
-  top:3px;
-  left:3px;
-  width: 15px;
-  height: 15px;
-  background: var(--color-lightgray);
+  left: 15px;
+  width: 20px;
+  height: 20px;
+  background: var(--lightgray);
 
   border-radius: 100%;
   box-shadow: 0px 1px 3px rgba(0,0,0,0.5);
+}
+
+.quadclass-header .checkbox-text {
+  margin-left: 25px;
+  font-size: 17px;
+  color: var(--bg);
 }
 
 .class-checkbox input {
@@ -218,8 +226,8 @@ circle:hover {
 
   top: 2px;
   left: 2px;
-  width: 11px;
-  height: 11px;
+  width: 16px;
+  height: 16px;
   background: #333;
 
   transition: all .5s ease;
@@ -230,50 +238,46 @@ circle:hover {
   box-shadow:inset 0px 1px 3px rgba(0,0,0,0.5);
 }
 
-.event-code-container {
-  margin: 0px;
-  padding: 0px;
+.type-list {
+  height: 100%;
+  padding:2px;
 }
 
-.code-list {
-  list-style: none;
-  padding-left: 10px;
-  font-size: 0.8vw;
+.type-container {
+  display:flex;
+  align-items: center;
+  margin-left: 17px;
+  height: 13%;
 }
 
-.event-code {
+.type-checkbox {
   position:relative;
   display: block;
 
-  margin: 10px;
-
-  top:-3px;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   background: #E3E0DD;
 
   border-radius: 100%;
   box-shadow: 0px 1px 3px rgba(0,0,0,0.5);
 }
 
-.code-list .checkbox-text {
-  display: inline-block;
-  margin-left: 5px;
-  transform: translateY(-0.8vh);
-  font-size: 1.5vmin;
+.type-container .checkbox-text {
+  margin-left: 10px;
+  font-size: 14px;
 }
 
-.event-code input {
+.type-checkbox input {
   visibility: hidden;
 }
 
-.event-code label {
+.type-checkbox label {
   position: absolute;
 
-  top: 1px;
-  left: 1px;
-  width: 6px;
-  height: 6px;
+  top: 2px;
+  left: 2px;
+  width: 8px;
+  height: 8px;
   background: #333;
 
   transition: all .5s ease;

@@ -3,13 +3,152 @@ import {SortedArray} from './utils.js'
 import {MapOrElse} from './utils.js'
 
 import {DataLoader} from './DataLoader.js';
-import {display_source} from './displaySources.js'
+import {display_source, clean_sources} from './displaySources.js'
 import {TimeManager} from './TimeManager.js';
 
 
 
 
+/*******************************************************************************
+                    Mentions counter (for graphs)
+*******************************************************************************/
+
 const timeMgr = new TimeManager()
+
+function sortMapByKeys(history_value) {
+  const mapSort1 = new Map([...history_value.entries()].sort((a, b) => {
+    return a[0] - b[0] }
+      ));
+  return mapSort1;
+}
+
+
+function sortHistory(history) {
+  history.forEach((value, key) => {
+    value = sortMapByKeys(value)
+    history[key] = value
+  })
+  return history
+}
+
+    // THIS SEEMS BROKEN ?
+    // (run is in debugger, mapSort1 is always undefined)
+    /*  Counts the number of mentions per source,
+     *  ---returns a map [SourceName -> mentionCount] sorted by mentioncount---
+     *  returns a map [SourceName -> [nbMentions, Map[MentionTime => SortedArray(EVENTIDS)]] ]
+     *  sorted by decreasing nbMentions
+     */
+function count_mentions(mentions) {
+    if (mentions.length > 0){
+        var counts = {}
+        info("counting")
+        mentions.reduce(function (acc, curr) {
+            acc[curr['MentionSourceName']] ? acc[curr['MentionSourceName']]++ : acc[curr['MentionSourceName']] = 1;
+            return acc;
+        },counts);
+
+        // sorted mentions
+        var mapCounts = new Map(Object.entries(counts))
+        const mapSort1 = new Map([...mapCounts.entries()].sort((a, b) => {
+            return b[1] - a[1]
+        }));
+        return mapSort1
+    } else {
+         return new Map()
+    }
+}
+
+    /*  Extends the "historic" mention map with the given number of mentions at the given timestamp.
+     *  Historic mentions map is :
+     *      Map( sourceName => Map(timestamp, mentionsCount))
+     */
+function make_history(mentions, historyMentions, currentTimestamps) {
+
+     let timestamps = Array.from(currentTimestamps)
+     const current = timestamps[timestamps.length-1]
+
+     //console.log("history mentions: ", historyMentions)
+     //console.log("current: ", current)
+
+     mentions.forEach( // mention is made of [key => value] == [sourceName => Map[MentionTime => SortedArray[EventIds]]]
+     	(value, key) => {
+     		if (key in historyMentions) {
+     			historyMentions[key].set(current, value)
+     		} else {
+     			historyMentions[key] = new Map([[current, value]])
+     		}
+     })
+
+     return historyMentions
+}
+
+
+    /*  Returns a map of the top 5 sources :
+     *      Map( sourceName => Map(timestamp, mentionsCount) )
+     *  Filter historyMentions by only keeping sources in top_mentions.
+     */
+function take_top_history(top_mentions, historyMentions) {
+    var top_mentions_map = new Map()
+    top_mentions.forEach(
+        (value, mention) => {
+            if (mention in historyMentions) {
+                top_mentions_map.set(mention, historyMentions[mention])
+            } else {
+                console.log("there is a big problem")
+            }
+    })
+
+    return top_mentions_map
+}
+
+
+    /*  Adds (timestamp, 0) for each missing timestamp in 'top_history_cumulative'
+     *  Returns :
+     *      Map( sourceName => Map(timestamp => count) )
+     */
+function add_timestamps_to_top_history_map(top_history_cumulative, currentTimestamps) {
+         top_history_cumulative.forEach((value, source) => {
+             currentTimestamps.forEach( time => {
+                 if (value.has(time)){
+                     // console.log(value.get(time))
+                 } else {
+                     value.set(time, 0)
+                 }
+             })
+         })
+         top_history_cumulative = sortHistory(top_history_cumulative)
+         return top_history_cumulative
+     }
+
+
+    /* (?) Trims out of top_history_cumulative entries whose timestamp is
+     * (?) after the current time
+     *     Used only then going backwards
+     *     returns (probably) :
+     * (?)     Map( sourceName => Map(timestamp => count) )
+     */
+function take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps) {
+  let top_history = new Map()
+  top_history_cumulative.forEach((value, source) => {
+    currentTimestamps.forEach( time => {
+      if (top_history.has(source)) {
+        if (value.has(time)) {
+          top_history.get(source).set(time, value.get(time))
+        }
+      } else {
+        if (value.has(time)) {
+          let my_map = new Map()
+          my_map.set(time, value.get(time))
+          top_history.set(source, my_map)
+        }
+      }
+    })
+  })
+  return sortHistory(top_history)
+}
+*/
+
+
 
 
 
@@ -155,7 +294,13 @@ export class MentionHandler {
         this.worldmap = worldmap;
 
             // visulization parameter : number of displayed source graphs
-        this.k = 20;
+        this.k = 5;
+
+            // for mentions counting
+    	this.loadedMentions = {};          // mention loaded in memory, but possibly after the viz's current time
+    	this.historyMentions = {};         //
+    	this.cumulativeMentions = [];      // All mentions that happened before the viz's current time and that have been processed
+    	this.currentTimestamps = [];       // all timestamps before/equal to the viz's current time
     }
 
     /*  Update data structures to a new currentTime
@@ -290,11 +435,148 @@ export class MentionHandler {
 
 
 
+/*=================================================================================================================
+    Update mentions
+    =============*/
+
+    /*  Update mentions
+    */
+    updateMentions(timestamp, isForward) {
+        this.update(timestamp, isForward)
+        if (isForward) {
+            if ( !( (Object.keys(this.loadedMentions).includes(timestamp) && (timestamp in this.currentTimestamps)) )) {
+                info("Loading mentions file " + timestamp);
+                let mentions_promise = this.loader.loadMentions(timestamp);
+                mentions_promise.then( (result) => {
+                    this.updateMentionsForward(timestamp, result)
+                    //this.updateSourceTimeEventTree(timestamp, result)
+                });
+            } else {
+                this.updateMentionsForward(timestamp, undefined)
+                this.updateSourceTimeEventTracking(timestamp, undefined)
+            }
+        } else { // backwards
+            this.updateMentionsBackward(timestamp);
+        }
+    }
+
+    updateMentionsForward (timestamp, fileLoadResult=undefined) {
+            // that mean we loaded a data file with a promise -> we need to update mentions
+        if (fileLoadResult != undefined) {
+            this.currentTimestamps.push(timestamp);
+            this.loadedMentions[timestamp] = fileLoadResult;
+        }
+            // updateMensionsForward :
+            // Update flatEvents with already loaded data
+        this.cumulativeMentions = this.cumulativeMentions.concat(this.loadedMentions[timestamp]);
+            // idem
+        if (fileLoadResult != undefined) {
+            // that mean we loaded a data file with a promise -> we need to update mentions
+            this.prepare_mentions_for_sources_to_visualize(this.cumulativeMentions, this.loadedMentions, this.historyMentions, this.currentTimestamps, this.k, timestamp)
+        }
+    }
+
+
+    updateSourceTimeEventTree (timestamp, result=undefined) {
+        if (result != undefined) {
+            let new_sourceTimeEvent = gen_sourceTimeEvent_tree (this.loadedMentions[timestamp])
+            concat_sourceTimeEvent_trees(this.sourceTimeEventTree, new_sourceTimeEvent)
+            //err(this.sourceTimeEventTree)
+        }
+        // else didn't load new file => nothing to do, data structure is built already
+    }
+
+    updateMentionsBackward(timestamp) {
+
+      // Remove timestamp from current ones
+      info("Removing from current " + timestamp);
+      this.currentTimestamps.pop();
+      this.cumulativeMentions = [];
+
+      if (this.currentTimestamps.length > 0){
+
+        let last_timestamp = this.currentTimestamps[this.currentTimestamps.length-1]
+        let result = []
+
+        result = this.loadedMentions[last_timestamp]
+            // Rebuild flatEvents
+        for (const timestamp of this.currentTimestamps) {
+          this.cumulativeMentions = this.cumulativeMentions.concat(this.loadedMentions[timestamp]);
+        }
+
+        this.prepare_mentions_for_sources_to_visualize(this.cumulativeMentions, this.loadedMentions, this.historyMentions, this.currentTimestamps, this.k, timestamp, true)
+
+      } else {
+        clean_sources(true)
+      }
+    }
+
+    reset() {
+      this.currentTimestamps = [];
+      this.cumulativeMentions = [];
+      clean_sources(true)
+    }
+
+    prepare_mentions_for_sources_to_visualize(  cumulativeMentions,
+                                                loadedMentions,
+                                                historyMentions,
+                                                currentTimestamps,
+                                                k,
+                                                timestamp,
+                                                isBackward=false) {
+
+        this.draw_graphs(timestamp, k)
+        return
+
+            // prepare [sourceName => nbMentions]
+        let source_cumulative_frequency = count_mentions(cumulativeMentions);
+        let source_frequency = count_mentions(loadedMentions[timestamp]);
+
+            // extend historyMentions (the argument) with the newly calculated [sourceName => nbMentions]
+        historyMentions = make_history(source_frequency, historyMentions, currentTimestamps)
+
+            // keep the k most busy sources over cumulative mentions, and take the matching history
+        var top_frequency_cumulative = new Map(Array.from(source_cumulative_frequency).slice(0, k));
+        var top_history_cumulative = take_top_history(top_frequency_cumulative, historyMentions)
+
+            // fill the gaps in timestamps with (timestamp, 0) pairs
+        top_history_cumulative = add_timestamps_to_top_history_map(top_history_cumulative, currentTimestamps)
+
+        if (isBackward) {
+            top_history_cumulative = take_top_history_up_to_current_timestamp(top_history_cumulative, currentTimestamps)
+        }
+
+        const sourcesEvents = this.getTopSourcesAndEvents(timestamp, k)     // Map( sourceName => Map( timestamp => [eventsID] )
+        const cumulatedMentions = this.getCumulatedMentions(timestamp, k)      // Map( sourceName => overallCount )
+        const liveTimestamps = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
+        const timeseries = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
+
+        display_source(timeseries,          // Map( sourceName => Map(timestamp => count) )
+                        cumulatedMentions,            // Map( sourceName => overallCount )
+                        liveTimestamps,            // list of timestamps to display
+                        this.countryColorChart.bind(this))      // country colormap callback function
+
+        return
+
+        /*display_source(top_history_cumulative,              // Map( sourceName => Map(timestamp => count) )
+                        top_frequency_cumulative,           // Map( sourceName => overallCount )
+                        currentTimestamps,                  // list of timestamps to display
+                        this.countryColorChart.bind(this))  // country colormap callback function*/
+    }
+
+
+
+
+
+
+
+
+
 
 
 /*=================================================================================================================
-    Viz stuff
-    =========*/
+    Display stuff
+    =============*/
 
         /*  Queries the EventsDataBroker for events reported by the source
          *  Returns :
