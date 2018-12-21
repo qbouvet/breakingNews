@@ -3,7 +3,7 @@
 
 ### Run this project 
 
-You can find our visualization on [github pages](https://atobywankenobi.github.io/data-viz-project/)
+You can run our visualization on [github pages](https://atobywankenobi.github.io/data-viz-project/)
 
 
 ### Project Description
