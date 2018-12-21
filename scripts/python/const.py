@@ -18,7 +18,3 @@ E_not_nan = ['Actor1', 'Actor2', 'Code', 'Class', 'Lat', 'Long']
 # Mentions
 M_cols = [0, 1, 2, 3, 4, 5]
 M_names = ['GLOBALEVENTID', 'EventTimeDate', 'MentionTimeDate', 'MentionType', 'MentionSourceName', 'MentionIdentifier']
-
-## TODO: remove events with null Action_Location
-## prepare final dataset
-##
