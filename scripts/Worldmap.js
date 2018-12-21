@@ -36,7 +36,7 @@ export class Worldmap {
         this.svg.call(this.zoom_handler)
 
         // Define outline and behavior when it resolves
-        this.countriesFillMin = "#888888"
+        this.countriesFillMin = "#444444"
         this.countriesFillMax= '#FFA500'
         this.outlinePromise = this.loader.loadMapOutline();
         this.outlinePromise.then( (result) => {

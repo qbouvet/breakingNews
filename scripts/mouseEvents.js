@@ -24,16 +24,10 @@ function eventOnMouseOver(d, tooltip, htmlContent=undefined) {
 function eventOnMouseOut(d, tooltip) {
   tooltip.transition()
         .duration(100)
-        //.style("opacity", 0)
         .style("visibility", "hidden");
 }
 
-// TODO: remove
 function eventOnMouseClick(d, that) {
-  console.log(that)
-  console.log("d: ", d)
-  console.log("event id: ", d.ID)
-
   // Open event in new tab
   window.open(d['Source']);
 }

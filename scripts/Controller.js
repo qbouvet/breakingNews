@@ -68,7 +68,8 @@ export class Controller {
   }
 
   startState() {
-    this.currentTime = 0;
+    // Current time initialized at -1 to start from time 0 with first update
+    this.currentTime = -1;
     this.speed = 1.0;
 
     this.CONTROLS.updateSpeed(this.speed);
@@ -85,6 +86,7 @@ export class Controller {
     this.CONTROLS.setPause();
 
     let intervalLength = this.UPDATE_INTERVAL / Math.abs(this.speed);
+    this.step(undefined);
     this.interval = setInterval((elapsed) => this.step(elapsed), intervalLength);
   }
 
@@ -123,8 +125,8 @@ export class Controller {
       }
 
       case 'end': {
-        //this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speed))
-        //this.mentionsReset();
+        this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speed))
+        this.mentionsReset();
         this.nextState('start');
         break;
       }
@@ -187,9 +189,9 @@ export class Controller {
       this.nextState('end');
 
     } else if (this.currentTime < 0) {
-
+      this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speed))
+      this.mentionsReset();
       this.nextState('start');
-
     } else {
 
       // Get new date

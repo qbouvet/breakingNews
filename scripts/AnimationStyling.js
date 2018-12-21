@@ -16,7 +16,7 @@ export class D3Handler {
      *  can pass it as "appendElem", and a merge selection will be returned
      *  as well
      */
-    mkSelections (domObjectSelection, data, enterAppend=undefined) {
+  mkSelections (domObjectSelection, data, enterAppend=undefined) {
         const updateSel = domObjectSelection.data(data);
         const exitSel = updateSel.exit()
         if (enterAppend == undefined) {
