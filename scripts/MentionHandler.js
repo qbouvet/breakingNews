@@ -28,13 +28,13 @@ function gen_sourceTimeEvent_tree (mentions) {
                     // Map(timestamp => SortedArray(eventsID) )
                 const sourceToMentionsMap = acc.get(currMention['MentionSourceName'])
                 if (sourceToMentionsMap.has(currMention["MentionTimeDate"])) {
-                    sourceToMentionsMap.get(currMention["MentionTimeDate"]).insert(currMention["GLOBALEVENTID"]);
+                    sourceToMentionsMap.get(currMention["MentionTimeDate"]).insert(currMention);
                 } else {
-                    sourceToMentionsMap.set( currMention["MentionTimeDate"], new SortedArray([currMention["GLOBALEVENTID"]]) )
+                    sourceToMentionsMap.set( currMention["MentionTimeDate"], new SortedArray([currMention]) )
                 }
             } else {
                 acc.set(currMention['MentionSourceName'],
-                        new Map([[ currMention["MentionTimeDate"], new SortedArray([currMention["GLOBALEVENTID"]]) ]]) );
+                        new Map([[ currMention["MentionTimeDate"], new SortedArray([currMention]) ]]) );
             }
             return acc;
         }, mentionsCountPerSource);
@@ -69,11 +69,11 @@ function concat_sourceTimeEvent_trees (treeA, treeB) {
     treeB.forEach( (timeEventMap, sourceName) => {
         if (treeA.has(sourceName)) {
             const sourceTree = treeA.get(sourceName)
-            timeEventMap.forEach( (eventIdsArray, mentionTime) => {
+            timeEventMap.forEach( (eventsArray, mentionTime) => {
                 if (sourceTree.has(mentionTime)) {
-                    eventIdsArray.forEach( (eventId) => {sourceTree.get(mentionTime).insert(eventId)} )
+                    eventsArray.forEach( (event) => {sourceTree.get(mentionTime).insert(event)} )
                 } else {
-                    sourceTree.set(mentionTime, eventIdsArray)
+                    sourceTree.set(mentionTime, eventsArray)
                 }
             })
         } else {
@@ -136,7 +136,7 @@ export class MentionHandler {
         this.loader = new DataLoader();
 
             // core data structures :
-        this.sourceTimeEventTree = new MapOrElse();     // Map( SourceName => Map(timestamp => eventsId))
+        this.sourceTimeEventTree = new MapOrElse();     // Map( SourceName => Map(timestamp => mentions))
                                                         // used to retrieve a source's eventsID at a given timestamp
         this.sourceCumulatedMentions = new MapOrElse(); // Map( sourceName => Map(timestamp => cumulatedMentionsCount)
                                                         // used to find the most prolific source at each timestamp
@@ -307,15 +307,17 @@ export class MentionHandler {
             this.sourceTimeEventTree.get(sourceName).forEach( (value, key) => {
                 //err("key:", key, "value:", value)
                 if (liveTimestamps.includes(key.toString())) {
-                    value.forEach( (eventId) => {
-                        coveredEventsIds.insert(eventId)
+                    value.forEach( (mention) => {
+                        coveredEventsIds.insert([mention["GLOBALEVENTID"], mention["EventTimeDate"]])
                     })
                 }
             })
         }
         info("Source : ", sourceName, "covered", coveredEventsIds.size(), "events.\nIDs : \n", coveredEventsIds)
-        let tmp = coveredEventsIds.map( (id) => {
-            const event = this.eventsBroker.getEventById(id)
+        let tmp = coveredEventsIds.map( (tupl) => {
+            const [id, time] = tupl
+            const event = this.eventsBroker.getEventById(id, time)
+            //const event = this.eventsBroker.getEventById(id)
             return event;
         })
         let coveredEvents = tmp.filter( (event) => event!=undefined)

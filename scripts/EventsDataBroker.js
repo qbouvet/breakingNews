@@ -26,7 +26,7 @@ class EventsDataBroker {
 
         // checks if events for a given timestampe have already been loaded
     has (timestamp) {
-        return this.loadedEventsMap.has(timestamp)
+        return this.loadedEventsMap.has(timestamp.toString())
     }
 
         // lists all loaded timestamps
@@ -78,8 +78,9 @@ class EventsDataBroker {
             return undefined
         }
         if (eventTimestamp!=undefined) {
+            eventTimestamp = eventTimestamp.toString()
             if (!this.has(eventTimestamp)) {
-                warn ("GetEventById() (with timestamp) : timestamp not loaded ")
+                warn ("GetEventById() (with timestamp) : timestamp not loaded : timestamp=", eventTimestamp)
                 return undefined
             }
             const eventsMapForTimestamp = this.loadedEventsMap.get(eventTimestamp)
