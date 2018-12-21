@@ -21,7 +21,7 @@ class EventsDataBroker {
         this.smallestEventID = 800011820
             // maximum point offset, 0.01° ~< 1km
             // overlap is worse than a little bit of inacuracy for what we want to show
-        this.maxPointOffset = 0.1
+        this.maxPointOffset = 0.1;
     }
 
         // checks if events for a given timestampe have already been loaded

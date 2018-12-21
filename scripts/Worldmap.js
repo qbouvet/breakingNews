@@ -37,7 +37,7 @@ export class Worldmap {
 
         // Define outline and behavior when it resolves
         this.countriesFillMin = "#444444"
-        this.countriesFillMax= '#FFA500'
+        this.countriesFillMax= '#FF0000'
         this.outlinePromise = this.loader.loadMapOutline();
         this.outlinePromise.then( (result) => {
 

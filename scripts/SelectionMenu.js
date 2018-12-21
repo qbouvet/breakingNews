@@ -8,12 +8,12 @@ export class SelectionMenu {
     this.CAMEO = new EventCodes();
 
     this.selectedTypes = new Set(Object.keys(this.CAMEO.types).map(Number));
-    
+
     this.colors = {
       1:"#69FFF1",
       2:"#35FF69",
-      3:"#FFF07C",
-      4:"#FF8360"
+      3:"#F3F315",
+      4:"#FF6600"
     };
 
     this.addCheckboxBehavior();

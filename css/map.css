@@ -335,8 +335,8 @@ input:checked + label.class-2 {
   background: #35FF69;
 }
 input:checked + label.class-3 {
-  background: #FFF07C;
+  background: #F3F315;
 }
 input:checked + label.class-4 {
-  background: #FF8360;
+  background: #FF6600;
 }

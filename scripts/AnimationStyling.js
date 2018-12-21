@@ -49,14 +49,14 @@ export class D3Handler {
         .attr("fill", (d) => colorMapping(d))
         .attr("stroke-width", 0.05)
         .attr("stroke", (d) => colorMapping(d))
-        .attr("r", 0.5);
+        .attr("r", 0.3);
   }
 
   updateCategorySelection(circles, selected, colorMapping, updateStepDuration) {
     circles.transition()
       .duration(updateStepDuration/2)
       .attr("fill", (d) => selected(d) ? colorMapping(d) : "gray")
-      .attr("r", (d) => selected(d) ? 0.5 : 0);
+      .attr("r", (d) => selected(d) ? 0.3 : 0);
 
     circles
       .attr("fill-opacity", this.EventPointOpacity)

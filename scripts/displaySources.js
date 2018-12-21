@@ -23,8 +23,10 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
                 .attr("width", bandPos[1]-bandPos[0])
                 .attr("x", bandPos[0])
                 .attr("y", 0)
-                .attr("opacity", 0.5)
-                .attr("fill", "black")
+                .attr("ry", 5)
+                .attr("rx", 5)
+                .attr("opacity", 0.3)
+                .attr("fill", "gray")
         }
 
         info ("Updating rect selection:\nBandPos:",bandPos, "\npos:", pos)
