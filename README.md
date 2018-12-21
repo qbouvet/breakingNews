@@ -20,6 +20,7 @@ The events are divided into 4 main categories:
 * Material conflict
 
 For each event category, a circle representing the event is displayed on the world map based on the geographical coordinates, with a different color for each category. Hovering over a circle displays a tooltip containing more information about the specific event and allows the user by clicking on it to open the first article related to the event. 
+
 In the right panel, there are different line charts that display the variation over time of the number of mentions for the top sources. They are ordered by overall number of mentions. It is possible to click-and-drag over a graph (band-selection) to show which countries a source covered events in, over that period of time, shown by a cloropleth map.
 
 
