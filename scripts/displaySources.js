@@ -2,48 +2,73 @@
 import {log, info, warn, err} from './utils.js'
 
 import {D3Handler} from './AnimationStyling.js'
+import {TimeManager} from './TimeManager.js'
 
 
+let dragManagerMaker = function (xScale, yScale) {
 
-export class SourceGrapher {
+    let bandPos = [undefined, undefined]
 
-    constructor () {
-        // Some data structures
-        this.d3h = new D3Handler()
+    function onDrag() {
 
-        this.drag = d3.drag()
-        this.drag.on("end", this.onDragEnd)
-        this.drag.on("drag", this.onDragStart)
+        const draggedElem = this
 
-        this.xScale = undefined
-        this.yScale = undefined
+        let pos = d3.mouse(this)[0];    // only care about x component
+        let svg = d3.select(this).select('svg')
+        function rectAttributes(selection){
+            err("Running rectAttributes")
+            warn("rect : ", bandPos)
+            selection
+                /*.attr("height", draggedElem.height)
+                .attr("width", bandPos[1]-bandPos[0])
+                .attr("x", bandPos[0])
+                .attr("y", 0)
+                .attr("opacity", 0.3)
+                .attr("fill", "black")*/
+                .attr("height", "97%")
+                .attr("width", bandPos[1]-bandPos[0])
+                .attr("x", bandPos[0])
+                .attr("y", 0)
+                .attr("opacity", 0.5)
+                .attr("fill", "black")
+        }
 
+        // If no drag currently registered, register
+        if (bandPos[0] == undefined) {
+            bandPos[0] = pos
+            bandPos[1] = pos
+
+            let selection = svg.append("rect")
+            rectAttributes(selection)
+
+        // Else, update registered drag move
+        } else {
+            if (pos<bandPos[0]) {
+                bandPos[0] = pos
+            } else {
+                bandPos[1] = pos
+            }
+
+            let selection = svg.select("rect")
+            rectAttributes(selection)
+        }
     }
 
+    function onDragEnd () {
 
-    onDragEnd () {
+        err ("DragEnd : ", bandPos)
+
         var pos = d3.mouse(this);
-        var x1 = x.invert(bandPos[0]);
-        var x2 = x.invert(pos[0]);
 
-        if (x1 < x2) {
-            zoomArea.x1 = x1;
-            zoomArea.x2 = x2;
-        } else {
-            zoomArea.x1 = x2;
-            zoomArea.x2 = x1;
+        if (xScale==undefined || yScale==undefined) {
+            warn ("dragEnd : scaled are undefined")
+            return
         }
 
-        var y1 = y.invert(pos[1]);
-        var y2 = y.invert(bandPos[1]);
+        var x1 = yScale.invert(bandPos[0]);
+        var x2 = yScale.invert(pos[0]);
 
-        if (x1 < x2) {
-            zoomArea.y1 = y1;
-            zoomArea.y2 = y2;
-        } else {
-            zoomArea.y1 = y2;
-            zoomArea.y2 = y1;
-        }
+        err ("Drag selected : ", x1, x2)
 
         bandPos = [-1, -1];
 
@@ -56,32 +81,25 @@ export class SourceGrapher {
         zoom();
     }
 
+    return {onDrag, onDragEnd}
 
-    onDragStart() {
-        var pos = d3.mouse(this);
+}
 
-        if (pos[0] < bandPos[0]) {
-            d3.select(".band").
-            attr("transform", "translate(" + (pos[0]) + "," + bandPos[1] + ")");
-        }
-        if (pos[1] < bandPos[1]) {
-            d3.select(".band").
-            attr("transform", "translate(" + (pos[0]) + "," + pos[1] + ")");
-        }
-        if (pos[1] < bandPos[1] && pos[0] > bandPos[0]) {
-            d3.select(".band").
-            attr("transform", "translate(" + (bandPos[0]) + "," + pos[1] + ")");
-        }
 
-        //set new position of band when user initializes drag
-        if (bandPos[0] == -1) {
-            bandPos = pos;
-            d3.select(".band").attr("transform", "translate(" + bandPos[0] + "," + bandPos[1] + ")");
-        }
+export class SourceGrapher {
 
-        d3.select(".band").transition().duration(1)
-            .attr("width", Math.abs(bandPos[0] - pos[0]))
-            .attr("height", Math.abs(bandPos[1] - pos[1]));
+    constructor () {
+        // Some data structures
+        this.d3h = new D3Handler()
+
+        this.xScale = undefined
+        this.yScale = undefined
+
+        this.drag = d3.drag()
+        this.dragger = dragManagerMaker(undefined, undefined)
+        this.drag.on("drag", this.dragger.onDrag)
+        this.drag.on("end", this.dragger.onDragEnd)
+
     }
 
 
@@ -124,6 +142,7 @@ export class SourceGrapher {
             .append('div')
                 .attr('class', "sourcegraph-container")
                 .on("click", (d) => sourceGraphClickCallback(d[0]) )
+                .call(this.drag);
         enterTopLevel.append('div')
                 .attr('class', "sourcegraph-text")
                 .text( (d) => d[0]+" - "+d[1])
@@ -132,9 +151,8 @@ export class SourceGrapher {
                 .attr('class', "sourcegraph-chart")
             .append('svg')
                 .attr('id', (d) => "sourcegraph-chart-"+d[0])
-                .attr('viewBox', "-20 0 500 220")
+                .attr('viewBox', "-20 20 530 170")
                 .attr('preserveAspectRatio', 'xMidYMid meet')
-                .call(this.drag);
         // exit selection
         exitSel.remove()
 
@@ -160,39 +178,46 @@ export class SourceGrapher {
              */
     drawChart(sourceName, timeseriesData, maxMentions, width, height, margin) { // https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
 
-            // data
+            // some data
         let datepoints = [...[...timeseriesData.values()][0].keys()].sort()
         let timeseriesArrayData = [...timeseriesData.get(sourceName).entries()]
             // keep only hh:mm
-        timeseriesArrayData = timeseriesArrayData.map( (elem) => {
+        /*timeseriesArrayData = timeseriesArrayData.map( (elem) => {
             return [( (parseInt(elem[0]) % 10**6) / 10**2 ).toString(), elem[1]]
         });
         datepoints = datepoints.map( (elem) => {
             return ( (parseInt(elem) % 10**6) / 10**2 ).toString()
-        });
-        /*const maxMentions = timeseriesArrayData.reduce( (acc, curr) => {
-            if (curr[1] > acc) { return curr[1] }
-            else { return acc }
-        }, 0)*/
+        });*/
         let digits_length = Math.log(maxMentions) * Math.LOG10E + 1 | 0;
         let x_axis_space = digits_length * 6
 
         // x-scale
         const maxTickNumber = 9
         const modulo = Math.ceil(datepoints.length/maxTickNumber)
-        const xAxis_ticks = datepoints.filter( (elem,index) => !(index % modulo) )
-        this.xScale = d3.scalePoint()
+        const xAxis_ticks = datepoints
+            .map( (elem) => ((parseInt(elem) % 10**6) / 10**2 ).toString() )
+            .filter( (elem,index) => !(index % modulo) )
+        this.xScale = d3.scaleTime()
+            .domain([ TimeManager.timestampToDate(datepoints[0]),
+                      TimeManager.timestampToDate(datepoints[datepoints.length-1]) ]) // input
+            .rangeRound([0, width-x_axis_space]); // output
+        /*this.xScale = d3.scalePoint()
             .domain(datepoints)
-            .rangeRound([0, width-x_axis_space]);
+            .rangeRound([0, width-x_axis_space]);*/
 
         // y-scale
         this.yScale = d3.scaleLinear()
             .domain([0, maxMentions]) // input
             .range([height - margin.bottom, 0]); // output
 
+        // with x and y scales, create dragManager
+        this.dragger = dragManagerMaker(this.xScale, this.yScale);
+        this.drag.on("drag", this.dragger.onDrag)
+        this.drag.on("end", this.dragger.onDragEnd)
+
         // Line generator
         var line = d3.line()
-            .x( (d) => { return this.xScale(d[0]); }) // set the x values for the line generator
+            .x( (d) => { return this.xScale(TimeManager.timestampToDate(d[0])); }) // set the x values for the line generator
             .y( (d) => { return this.yScale(d[1]); }) // set the y values for the line generator
             .curve(d3.curveMonotoneX) // apply smoothing to the line
 
@@ -224,14 +249,15 @@ export class SourceGrapher {
         // Add the X Axis
         svg.append("g")
             .attr("transform", "translate(0," + (height - margin.bottom) + ")")
-            .call(d3.axisBottom(this.xScale)
-                .tickValues(xAxis_ticks)
+            .call(d3.axisBottom(this.xScale).ticks(6)
+                // TODO  : here
+                /*.tickValues(xAxis_ticks)
                 .tickFormat( (d,i) => d.length<3 ?
                     "00:"+d[0]+d[1] :
                     d.length < 4 ?
                         "0"+d[0]+":"+d[1]+d[2] :
                         d[0]+d[1]+":"+d[2]+d[3]
-                )
+                )*/
             );
         // Add the Y Axis
         svg.append("g")

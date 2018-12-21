@@ -30,4 +30,11 @@ async function main() {
 
 }
 
+let xScale = d3.scaleTime()
+    .domain([ TimeManager.timestampToDate("20181115000000"),
+              TimeManager.timestampToDate("20181115010000") ]) // input
+    .rangeRound([0, 100]); // output
+err (TimeManager.timestampToDate("20181115000000"))
+
+
 whenDocumentLoaded(main);
