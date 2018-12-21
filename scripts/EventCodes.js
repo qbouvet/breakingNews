@@ -1,4 +1,4 @@
-
+// GDELT event codes
 export class EventCodes {
 
   constructor() {

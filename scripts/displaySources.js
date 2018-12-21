@@ -1,10 +1,9 @@
-
 import {log, info, warn, err} from './utils.js'
 
 import {D3Handler} from './AnimationStyling.js'
 import {TimeManager} from './TimeManager.js'
 
-
+// Handling of the band selection made with d3 mouse events
 let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
 
     let bandPos = [undefined, undefined]
@@ -13,7 +12,7 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
 
         const draggedElem = this
 
-        let pos = d3.mouse(this)[0];    // only care about x component
+        let pos = d3.mouse(this)[0];    // Only care about x component
         let svg = d3.select(this).select('svg')
 
         function rectAttributes(selection){
@@ -29,7 +28,7 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
                 .attr("fill", "gray")
         }
 
-        info ("Updating rect selection:\nBandPos:",bandPos, "\npos:", pos)
+        info ("Updating rect selection:\nBandPos:", bandPos, "\npos:", pos)
 
         // If no drag currently registered, register
         if (bandPos[0] == undefined) {
@@ -43,13 +42,13 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
 
         // Else, update registered drag move
         } else {
+
             if (pos<=bandPos[0]) {
-                //bandPos[1] = bandPos[0]
                 bandPos[0] = pos
             } else if (pos>=bandPos[1]) {
                 bandPos[1] = pos
             } else {
-                //update whichever end is closer
+                // Update whichever end is closer
                 if (bandPos[0]-pos < bandPos[1]-bandPos) {
                     bandPos[0] = pos
                 } else {
@@ -75,7 +74,7 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
             return
         }
 
-        let pos = d3.mouse(this)[0];    // only care about x component
+        let pos = d3.mouse(this)[0];    // Only care about x component
 
         if (xScale==undefined || yScale==undefined) {
             warn ("dragEnd : scaled are undefined")
@@ -95,7 +94,6 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
     }
 
     return {onDrag, onDragEnd}
-
 }
 
 
@@ -113,38 +111,36 @@ export class SourceGrapher {
         this.dragger = dragManagerMaker(undefined, undefined, this.worldmapRef)
         this.drag.on("drag", this.dragger.onDrag)
         this.drag.on("end", this.dragger.onDragEnd)
-
     }
 
 
-        /*  Display the top k sources as graphs in the sidebar-
-         *  timeseriesData : for the top k sources :
-         *      [sourceName, Map(timestamp => mentionsCount)]
-         *  cumulative_data : for the top k sources :
-         *      [sourceName, totalMentions]
-         *  timestamps :
-         *      list of all elapsed timestamps
-         *  sourceGraphClickCallback :
-         *      callback function to be used when clicking on a source graph
-         */
+    /*
+        Display the top k sources as graphs in the sidebar-
+        timeseriesData : for the top k sources :
+        [sourceName, Map(timestamp => mentionsCount)]
+        cumulative_data : for the top k sources :
+        [sourceName, totalMentions]
+        timestamps :
+        list of all elapsed timestamps
+        sourceGraphClickCallback :
+        callback function to be used when clicking on a source graph
+    */
     display_source(timeseriesData, perSourceCumulativeCount, timestamps, sourceInteractionCallback){
 
-            // divs data
+        // divs data
         let divData = [...perSourceCumulativeCount.entries()]
         const getSourceName = (thisElement) => thisElement.children[0].innerHTML.split(" - ")[0];
 
-            // Compute selections and update data
+        // Compute selections and update data
         let [enterSel, updateSel, exitSel] = this.d3h.mkSelections(
             d3.selectAll('#sidebardiv').selectAll("div.sourcegraph-container"),
             divData
         )
 
-        // update selection
-        //updateSel.on("click", (d) => sourceGraphClickCallback(d[0]) )
+        // Update selection
         updateSel.select(".sourcegraph-text")
                 .text( (d) => d[0]+" - "+d[1])
-        /*updateSel.select(".sourcegraph-chart")
-                .text( "updated") // just for proof of concept*/
+
         updateSel.select(".sourcegraph-chart")
             .select('svg')
                 .attr('id', (d) => "sourcegraph-chart-"+d[0])
@@ -168,19 +164,26 @@ export class SourceGrapher {
                 .attr('id', (d) => "sourcegraph-chart-"+d[0])
                 .attr('viewBox', "-20 0 530 170")
                 .attr('preserveAspectRatio', 'xMidYMid meet')
-        // exit selection
+
+        // Exit selection
         exitSel.remove()
 
+        // Define margins, widght and height for the line charts
         let parentDiv = $(".sourcegraph-chart")[0];
         let margin = {top: 10, right: 10, bottom: 10, left: 10}
         let width = parentDiv.clientWidth - margin.left - margin.right;
         let height = parentDiv.clientHeight - margin.top - margin.bottom;
 
-        const maxMentions = [...timeseriesData.values()].reduce( (acc, value) => {
-            const maxMentionsForSource = [...value.values()].reduce( (acc, e) => Math.max(acc,e), 0 )
-            return Math.max(acc, maxMentionsForSource)
-        }, 0)
+        // Take the current max mentions to scale the Y axis
+        const maxMentions = [...timeseriesData.values()].reduce(
+            (acc, value) => {
+                const maxMentionsForSource = [...value.values()].reduce(
+                    (acc, e) => Math.max(acc,e), 0)
+                    return Math.max(acc, maxMentionsForSource 
 
+            )}, 0)
+
+        // Make line charts for top sources based on number of cumulative mentions
         const sourcesNames = [...perSourceCumulativeCount.keys()]
         sourcesNames.forEach( (name) => {
             this.drawChart(name, timeseriesData, maxMentions, width, height, margin, sourceInteractionCallback)
@@ -188,57 +191,63 @@ export class SourceGrapher {
     }
 
 
-            /*  Given a source name, will find the suitable container div
-             *  and draw the source graph
-             */
-    drawChart(sourceName, timeseriesData, maxMentions, width, height, margin, sourceInteractionCallback) { // https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
+    /*
+        Given a source name, will find the suitable container div
+        and draw the source graph, which is a line chart
+    */
+    drawChart(sourceName, timeseriesData, maxMentions, width, height, margin, sourceInteractionCallback) {
+        /* 
+            maxMentions -> number of max mentions for current timestamps (not cumulative)
 
-            // some data
+            https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0            
+        */
+    
+        // Array of timestamps for the X axis
         let datepoints = [...[...timeseriesData.values()][0].keys()].sort()
         let timeseriesArrayData = [...timeseriesData.get(sourceName).entries()]
-            // keep only hh:mm
-        /*timeseriesArrayData = timeseriesArrayData.map( (elem) => {
-            return [( (parseInt(elem[0]) % 10**6) / 10**2 ).toString(), elem[1]]
-        });
-        datepoints = datepoints.map( (elem) => {
-            return ( (parseInt(elem) % 10**6) / 10**2 ).toString()
-        });*/
-        let digits_length = Math.log(maxMentions) * Math.LOG10E + 1 | 0;
-        let x_axis_space = digits_length * 6
 
-        // x-scale
+        // Works only for positive integers
+        let number_digits = Math.log(maxMentions) * Math.LOG10E + 1 | 0;
+        // For each digit, we consider to have 6 pixels
+        let x_axis_space = number_digits * 6
+
+        // X-scale
         const maxTickNumber = 9
-        const modulo = Math.ceil(datepoints.length/maxTickNumber)
+        const modulo = Math.ceil(datepoints.length / maxTickNumber)
+
         this.xScale = d3.scaleTime()
             .domain([ TimeManager.timestampToDate(datepoints[0]),
                       TimeManager.timestampToDate(datepoints[datepoints.length-1]) ]) // input
             .rangeRound([0, width-x_axis_space]); // output
 
-        // y-scale
+        // Y-scale
         this.yScale = d3.scaleLinear()
             .domain([0, maxMentions]) // input
             .range([height - margin.bottom, 0]); // output
 
-        // with x and y scales, create dragManager
+        // With x and y scales, create dragManager
         this.dragger = dragManagerMaker(this.xScale, this.yScale, sourceInteractionCallback);
         this.drag.on("drag", this.dragger.onDrag)
         this.drag.on("end", this.dragger.onDragEnd)
 
         // Line generator
         var line = d3.line()
-            .x( (d) => { return this.xScale(TimeManager.timestampToDate(d[0])); }) // set the x values for the line generator
-            .y( (d) => { return this.yScale(d[1]); }) // set the y values for the line generator
-            .curve(d3.curveMonotoneX) // apply smoothing to the line
+            .x((d) => { return this.xScale(TimeManager.timestampToDate(d[0])); }) // Set the x values for the line generator
+            .y((d) => { return this.yScale(d[1]); }) // Set the y values for the line generator
+            .curve(d3.curveMonotoneX) // Apply smoothing to the line
 
         // Data and selections
         let svg = document.getElementById("sourcegraph-chart-"+sourceName)
+
         svg = d3.select(svg)
             .append('g')
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
         let selPath = svg.selectAll("path")
-            .data([timeseriesArrayData])  // here, []
+            .data([timeseriesArrayData])  // Here, we need array  []
+
         let selCircles = svg.selectAll("circle")
-            .data(timeseriesArrayData)    // here, no []
+            .data(timeseriesArrayData)    // Here, there is no need for array []
 
         // Update viz
         selPath
@@ -247,6 +256,7 @@ export class SourceGrapher {
             .merge(selPath)
                 .attr("class", "line")
                 .attr("d", line);
+
         selCircles
             .enter()
                 .append("circle")
@@ -255,7 +265,8 @@ export class SourceGrapher {
                 .attr("cx", (d) => { return this.xScale(TimeManager.timestampToDate(d[0]))})
                 .attr("cy", (d) => { return this.yScale(d[1])})
                 .attr("r", 2)
-        // Add the X Axis
+
+        // Add the X Axis in format hh:mm
         svg.append("g")
             .attr("transform", "translate(0," + (height - margin.bottom) + ")")
             .call(d3.axisBottom(this.xScale)
@@ -269,9 +280,9 @@ export class SourceGrapher {
                                         d[0]+d[1]+":"+d[2]+d[3]
                     })
             );
-        // Add the Y Axis
+
+        // Add the Y Axis (0< y_value < maxMentions)
         svg.append("g")
             .call(d3.axisLeft(this.yScale).ticks(3));
     }
-
 }

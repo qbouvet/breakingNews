@@ -1,9 +1,9 @@
-
 import {log, info, warn, err} from './utils.js'
 
-/*  Use this class to get the paths to data files. If project directory structure changes, this is the only place to modify.
- *  !!! This is not exported (yet) (only DataLoader is) !!!
- */
+/*
+    Use this class to get the paths to data files. If project directory structure changes, this is the only place to modify.
+    !!! This is not exported (yet) (only DataLoader is) !!!
+*/
 class DataPaths {
 
     // Initializes path variables
@@ -43,9 +43,7 @@ class DataPaths {
 }
 
 
-/*
-    This class loads the json files containing data and returns promises with the data
- */
+// This class loads the json files containing data and returns promises with the data
 export class DataLoader {
 
     constructor() {

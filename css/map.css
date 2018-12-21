@@ -19,25 +19,27 @@
     height : 100%;
     width : 100%;
     background : var(--bg);
-        /* for children positioning*/
+    /* For children positioning*/
     position : relative;
 }
 
 #mainSvg{
-        /* size, relative to parent (#map-canva)
-            (parents size needs to be defined, else, oveflow)*/
+    /*
+      Size, relative to parent (#map-canva)
+      (parents size needs to be defined, else, oveflow)
+    */
     height : 100% ;
     width : 100%;
 }
 
 path {
     stroke: var(--darkgray);
-    /* fill done in JS depending on mentions count */
+    /* Fill done in JS depending on mentions count */
     stroke-width: 1.5px;
     stroke-linecap: round;
     stroke-linejoin: round;
     fill-opacity: 1;
-        /* keeps width fixed when zooming */
+    /* Keeps width fixed when zooming */
     vector-effect: non-scaling-stroke;
 }
 

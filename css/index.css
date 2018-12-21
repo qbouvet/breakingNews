@@ -15,24 +15,24 @@
   OVERALL PAGE STYLE
 ----------------------------------------------------- */
 
-  /*  Background style
-   */
+/*
+  Background style
+*/
 body {
-  /*height : 100%;*/
-  /*width : 100%;*/
   overflow: auto;
   background-color : var(--gray);
 }
 
-  /* Background color
-   */
+/* 
+  Background color
+*/
 .panels-container {
   background-color : var(--gray);
 }
 
-  /*  Top level blocks of the visualization :
-   *  map, graph panel, settings
-   */
+/*  Top level blocks of the visualization :
+ *  map, graph panel, settings
+ */
 .app-panel{
   margin : 2px;
   padding : 2px;
@@ -40,40 +40,42 @@ body {
   border-radius : 4px;
 }
 
-    /* generic style for icon-button */
+/* Generic style for icon-button */
 .btn-icon {
-    /* positioning */
+  /* Positioning */
   margin : 3px 3px 3px 3px;
   width : 40px;
   height : 40px;
-      /* Style -> fullsize background-image */
+
   background-color: transparent;
   background-repeat: no-repeat;
   background-position: 0px 0px;
   background-size : 100% 100%;
-      /*   */
+  
   border:none;
 }
 
-    /* Fix the 'blue border on click' */
+/* Fix the 'blue border on click' */
 button:focus{
   outline:none;
 }
 
-/*  Container that lays-out its children horizontally,
+/*  
+  Container that lays-out its children horizontally,
   left-aligned by default (use container-distribute-horizontally)
 */
 .container-lay-horizontally {
-      /* generic height for all such menues */
+  /* Generic height for all such menues */
   height : 50px;
-      /* children positioning */
+  /* Children positioning */
   display : flex;
   flex-direction: row;
   align-items: center;
 }
 
-/*  Container that horizontally aligns & distributes its content
-    typically used with one-line-menu
+/*  
+  Container that horizontally aligns & distributes its content
+  typically used with one-line-menu
 */
 .container-distribute-horizontally {
   display: flex;
@@ -85,12 +87,12 @@ button:focus{
 ----------------------------------------------------- */
 
 .panels-container {
-      /* children layout */
+  /* Children layout */
   display: flex;
   flex-direction: row;
   overflow: hidden;
-  xtouch-action: none;    /* avoid browser level touch actions */
-      /* positioning      */
+  xtouch-action: none;    /* Avoid browser level touch actions */
+  /* Positioning  */
   position : absolute;
   height : 90%;
   padding: 0;
@@ -100,30 +102,30 @@ button:focus{
 }
 
 .splitter {
-      /* position & size */
+  /* Position & size */
   flex: 0 0 auto;
   width: 10px;
   min-height: 200px;
   height : 100%;
-      /* Styling */
+  /* Styling */
   background: url("../css/icons/splitter.png") center center no-repeat var(--darkgray);
   background-size: 10px 40px;
   background-color : var(--bg);
   border: solid var(--bg) 1px;
-      /* resize behaviour */
+  /* Resize behaviour */
   cursor: col-resize;
 }
 
 .left-panel-split {
-      /* position & size */
+  /* Position & size */
   flex: 0 0 auto;
   min-width: 66%;
   max-width: 80%;
   height : 100%;
-      /* misc style */
+  /* Misc style */
   white-space: nowrap;
   padding: 2px;
-      /* divide space between children */
+  /* Divide space between children */
   display : flex;
   flex-direction: column;
 }
@@ -157,9 +159,11 @@ button:focus{
 
 #settingsdiv {
   flex : 0 0 25%;
-  /*height : 22%;*/
-      /*will be toggled by the collapse-settings button
-          visibility : collapse would be better, but unsupported by chrome */
+
+  /*
+    It will be toggled by the collapse-settings button
+    visibility : collapse would be better, but unsupported by chrome 
+  */
   display : inline-block;
 
   background: #0e0e0e;
@@ -168,5 +172,4 @@ button:focus{
   background: linear-gradient(to bottom, var(--bg) 0%,var(--darkgray) 100%);
 
   color: var(--lightgray);
-  /*height: 25%;*/
 }

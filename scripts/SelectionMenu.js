@@ -1,74 +1,73 @@
 import {EventCodes} from './EventCodes.js';
 
+/*
+    Handles all logic of events selections to visualized on the world map 
+    based on the type of event. There are 4 main kind of events, each one of them with its
+    own categories.
+*/
 export class SelectionMenu {
 
-  constructor(mapSelectionCallback) {
+    constructor(mapSelectionCallback) {
 
-    this.mapUpdate = mapSelectionCallback;
-    this.CAMEO = new EventCodes();
+        this.mapUpdate = mapSelectionCallback;
+        this.CAMEO = new EventCodes();
 
-    this.selectedTypes = new Set(Object.keys(this.CAMEO.types).map(Number));
+        this.selectedTypes = new Set(Object.keys(this.CAMEO.types).map(Number));
 
-    this.colors = {
-      1:"#69FFF1",
-      2:"#35FF69",
-      3:"#F3F315",
-      4:"#FF6600"
-    };
+        this.colors = {
+            1: "#69FFF1",
+            2: "#35FF69",
+            3: "#F3F315",
+            4: "#FF6600"
+        };
 
-    this.addCheckboxBehavior();
-
-  }
-
-  addCheckboxBehavior() {
-
-    for (let c of Object.keys(this.CAMEO.classes).map(Number)) {
-
-      let masterCheckbox = d3.select("#class-" + c);
-      let childrenCheckboxes = d3.selectAll(".class-" + c);
-
-      masterCheckbox.on("change", () => {
-        let checked = masterCheckbox.property("checked");
-        childrenCheckboxes.property("checked", checked);
-        checked ? this.add(this.CAMEO.classes[c]['types']) : this.remove(this.CAMEO.classes[c]['types']);
-      });
-
-      childrenCheckboxes.on("change", (d, i) => {
-        let type = this.CAMEO.classes[c]['types'][i];
-        let checked = d3.select("#type-" + type).property("checked");
-        checked ? this.add([type]) : this.remove([type]);
-      });
+        this.addCheckboxBehavior();
 
     }
-  }
 
-  checkSelected(d) {
-    return this.selectedTypes.has(this.CAMEO.codes[d['Code']]['type']);
-  }
+    addCheckboxBehavior() {
 
-  colorMapping(d) {
-    return this.colors[d['Class']]
-  }
+        for (let c of Object.keys(this.CAMEO.classes).map(Number)) {
 
-  remove(typeList) {
+            let masterCheckbox = d3.select("#class-" + c);
+            let childrenCheckboxes = d3.selectAll(".class-" + c);
 
-    typeList.forEach((d, i) => {
-      this.selectedTypes.delete(d);
-    });
+            masterCheckbox.on("change", () => {
+                let checked = masterCheckbox.property("checked");
+                childrenCheckboxes.property("checked", checked);
+                checked ? this.add(this.CAMEO.classes[c]['types']) : this.remove(this.CAMEO.classes[c]['types']);
+            });
 
-    this.mapUpdate((d) => this.checkSelected(d), (d) => this.colorMapping(d));
-  }
+            childrenCheckboxes.on("change", (d, i) => {
+                let type = this.CAMEO.classes[c]['types'][i];
+                let checked = d3.select("#type-" + type).property("checked");
+                checked ? this.add([type]) : this.remove([type]);
+            });
 
-  add(typeList) {
+        }
+    }
 
-    typeList.forEach((d, i) => {
-      this.selectedTypes.add(d);
-    });
+    checkSelected(d) {
+        return this.selectedTypes.has(this.CAMEO.codes[d['Code']]['type']);
+    }
 
-    this.mapUpdate((d) => this.checkSelected(d), (d) => this.colorMapping(d));
-  }
+    colorMapping(d) {
+        return this.colors[d['Class']]
+    }
 
+    remove(typeList) {
+        typeList.forEach((d, i) => {
+            this.selectedTypes.delete(d);
+        });
 
+        this.mapUpdate((d) => this.checkSelected(d), (d) => this.colorMapping(d));
+    }
 
+    add(typeList) {
+        typeList.forEach((d, i) => {
+            this.selectedTypes.add(d);
+        });
 
+        this.mapUpdate((d) => this.checkSelected(d), (d) => this.colorMapping(d));
+    }
 }

@@ -1,4 +1,3 @@
-
 import {log, info, warn, err} from './utils.js';
 import {whenDocumentLoaded} from './utils.js';
 import {sleep} from './utils.js';
@@ -14,6 +13,7 @@ import {SelectionMenu} from './SelectionMenu.js';
 import {EventsDataBroker} from "./EventsDataBroker.js";
 import {InfoPanel} from "./InfoPanelSelections.js";
 
+
 async function main() {
 
     const EVENTSBROKER = new EventsDataBroker(new DataLoader());
@@ -25,11 +25,12 @@ async function main() {
     const MENTIONS_HANDLER = new MentionHandler(EVENTSBROKER, MAP, TIMEMGR);
 
     const CONTROLLER = new Controller(
-      MAP.updateZoomTranslateExtent.bind(MAP),
-      (timestamp, isForward, updateStepDuration) => MAP.updateEvents(timestamp, isForward, updateStepDuration),
-      (timestamp, isForward) => MENTIONS_HANDLER.update(timestamp, isForward),
-      (updateStepDuration) => MAP.reset(updateStepDuration),
-      _ => MENTIONS_HANDLER.reset_graphs());
+        MAP.updateZoomTranslateExtent.bind(MAP),
+        (timestamp, isForward, updateStepDuration) => MAP.updateEvents(timestamp, isForward, updateStepDuration),
+        (timestamp, isForward) => MENTIONS_HANDLER.update(timestamp, isForward),
+        (updateStepDuration) => MAP.reset(updateStepDuration),
+        _ => MENTIONS_HANDLER.reset_graphs()
+    );
 }
 
 whenDocumentLoaded(main);
