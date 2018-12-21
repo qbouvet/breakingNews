@@ -182,8 +182,7 @@ export class Controller {
     // Update current value
     this.currentTime = (this.speed > 0) ? this.currentTime + 1 : this.currentTime - 1;
 
-    //if (this.currentTime > this.TIME_MANAGER.NUM_UPDATES) {
-    if (this.currentTime > 4) {
+    if (this.currentTime > this.TIME_MANAGER.NUM_UPDATES) {
 
       this.nextState('end');
 
