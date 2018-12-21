@@ -15,9 +15,9 @@
     SIDEBAR-RELATED STYLING
 ----------------------------------------------------- */
 
-#menubar { 
+#menubar {
     /*
-        Typically inherits from one-line-menu 
+        Typically inherits from one-line-menu
         left-right align children - NB works with flex
     */
     justify-content: space-between;
@@ -145,7 +145,7 @@
     GRAPHS STYLING
 ----------------------------------------------------- */
 
-/*  
+/*
     Container that holds the sourceGraph text and graph
     previously .visualize-source-container
 */
@@ -193,7 +193,7 @@
 .sourcegraph-chart {
     /* Size & position */
     position : relative;
-    width: 90%;
+    width: 100%;
     height: 80%;
     margin:auto;
     /* Color & content properties */

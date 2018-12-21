@@ -162,7 +162,7 @@ export class SourceGrapher {
                 .attr('class', "sourcegraph-chart")
             .append('svg')
                 .attr('id', (d) => "sourcegraph-chart-"+d[0])
-                .attr('viewBox', "-20 0 530 170")
+                .attr('viewBox', "-20 5 500 185")
                 .attr('preserveAspectRatio', 'xMidYMid meet')
 
         // Exit selection
@@ -179,7 +179,7 @@ export class SourceGrapher {
             (acc, value) => {
                 const maxMentionsForSource = [...value.values()].reduce(
                     (acc, e) => Math.max(acc,e), 0)
-                    return Math.max(acc, maxMentionsForSource 
+                    return Math.max(acc, maxMentionsForSource
 
             )}, 0)
 
@@ -196,12 +196,12 @@ export class SourceGrapher {
         and draw the source graph, which is a line chart
     */
     drawChart(sourceName, timeseriesData, maxMentions, width, height, margin, sourceInteractionCallback) {
-        /* 
+        /*
             maxMentions -> number of max mentions for current timestamps (not cumulative)
 
-            https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0            
+            https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
         */
-    
+
         // Array of timestamps for the X axis
         let datepoints = [...[...timeseriesData.values()][0].keys()].sort()
         let timeseriesArrayData = [...timeseriesData.get(sourceName).entries()]
