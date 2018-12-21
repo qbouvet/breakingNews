@@ -90,7 +90,7 @@ export class TimeManager {
     }
 
     clampBelow (timestamp) {
-        const smallest = this.allTimestamps[0]
+        const smallest = this.allTimestamps.get(0)
         if (timestamp==undefined || parseInt(timestamp)<parseInt(smallest)){
             return smallest
         } else {
@@ -99,7 +99,7 @@ export class TimeManager {
     }
 
     clampAbove (timestamp) {
-        const biggest = this.allTimestamps[this.allTimestamps.length-1]
+        const biggest = this.allTimestamps.get(this.allTimestamps.length-1)
         if (timestamp==undefined || parseInt(timestamp)>parseInt(biggest)){
             return biggest
         } else {
