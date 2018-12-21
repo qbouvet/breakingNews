@@ -123,8 +123,8 @@ export class Controller {
       }
 
       case 'end': {
-        //this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speed))
-        //this.mentionsReset();
+        this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speed))
+        this.mentionsReset();
         this.nextState('start');
         break;
       }
@@ -182,7 +182,8 @@ export class Controller {
     // Update current value
     this.currentTime = (this.speed > 0) ? this.currentTime + 1 : this.currentTime - 1;
 
-    if (this.currentTime > this.TIME_MANAGER.NUM_UPDATES) {
+    //if (this.currentTime > this.TIME_MANAGER.NUM_UPDATES) {
+    if (this.currentTime > 4) {
 
       this.nextState('end');
 
