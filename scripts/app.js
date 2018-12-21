@@ -25,6 +25,7 @@ async function main() {
     const MENTIONS_HANDLER = new MentionHandler(EVENTSBROKER, MAP, TIMEMGR);
 
     const CONTROLLER = new Controller(
+      MAP.updateZoomTranslateExtent.bind(MAP),
       (timestamp, isForward, updateStepDuration) => MAP.updateEvents(timestamp, isForward, updateStepDuration),
       (timestamp, isForward) => MENTIONS_HANDLER.update(timestamp, isForward),
       (updateStepDuration) => MAP.reset(updateStepDuration),

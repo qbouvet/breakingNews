@@ -1,13 +1,16 @@
 
 export class ControlMenu {
 
-    constructor() {
+    constructor(updateZoomCallback) {
 
       // D3 selections
       this.speedText = d3.select('#simulation-speed');
       this.playBtn = d3.select('#play-btn');
       this.forwardBtn = d3.select('#forward-btn');
       this.backwardBtn = d3.select('#backward-btn');
+
+      // references
+      this.updateZoomCallback = updateZoomCallback
 
       // UI
       this.updateSpeed(0);
@@ -130,6 +133,7 @@ export class ControlMenu {
           const settingsdiv = document.querySelector("#settingsdiv")
           const display = settingsdiv.style.display
           settingsdiv.style.display = (display === "none") ? "block" : "none";
+          this.updateZoomCallback()
       });
 
       let maxBtn = d3.select('#btn-maximize');
