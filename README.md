@@ -11,10 +11,12 @@ Tobia, Quentin, Gauthier
 Project *Breaking News* for EPFL course *COM-480 Data Visualization* given by professor K. Benzi.
 The projects is an interactive visualization displaying evolution over time of world events and online reports over the course of a day on a 2D world map.
 The events are divided into 4 main categories: 
+
 * Verbal cooperation
 * Material cooperation
 * Verbal conflict
 * Material conflict
+
 For each event category, a circle representing the event is displayed on the world map based on the geographical coordinates, with a different color for each category. Hovering over a circle generates a tooltip which displays more information about the specific event and allows the user by clicking on it to open the source. 
 In the right panel, there are different line charts ordered by total number of mentions per source, displaying the variation over time of the number of metions for the top 20 sources. It is possible to drag the mouse and make a band selection of the time period we are interested in for a specific source over the line chart in order to display the countries from which most mentions were originated.
 
