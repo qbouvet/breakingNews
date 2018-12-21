@@ -197,8 +197,8 @@ export class Controller {
 
       // Update viz accordingly
       this.CLOCK.update(updateDate);
-      this.mapUpdate(this.TIME_MANAGER.dateToTimestamp(updateDate), this.speed > 0, this.UPDATE_INTERVAL / Math.abs(this.speed));
-      this.mentionsUpdate(this.TIME_MANAGER.dateToTimestamp(updateDate), this.speed > 0)
+      this.mapUpdate(TimeManager.dateToTimestamp(updateDate), this.speed > 0, this.UPDATE_INTERVAL / Math.abs(this.speed));
+      this.mentionsUpdate(TimeManager.dateToTimestamp(updateDate), this.speed > 0)
     }
   }
 }
