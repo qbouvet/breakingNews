@@ -4,7 +4,7 @@ import {TimeManager} from './TimeManager.js';
 
 export class Controller {
 
-  constructor(mapUpdateCallback, mentionsUpdateCallback, mapResetCallback, mentionsResetCallback) {
+  constructor(updateZoomCallback, mapUpdateCallback, mentionsUpdateCallback, mapResetCallback, mentionsResetCallback) {
 
       // Init callbacks
       this.mapUpdate = mapUpdateCallback;
@@ -15,7 +15,7 @@ export class Controller {
       // Init components
       this.TIME_MANAGER = new TimeManager();
       this.CLOCK = new Clock(this.TIME_MANAGER.INIT_DATE);
-      this.CONTROLS = new ControlMenu();
+      this.CONTROLS = new ControlMenu(updateZoomCallback);
 
       // Speed components
       this.UPDATE_INTERVAL = 2000;

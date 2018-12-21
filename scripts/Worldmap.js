@@ -107,35 +107,6 @@ export class Worldmap {
         this.colorchartShown = true;
     }
 
-    /*toggleCountryColorChart (count, max) {
-        if (!this.masked) {
-            info ("worldmap : masking (colorChart)")
-                // hide events on the map
-            // TODO
-                // apply new data to outline and obtain selections
-            const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
-                this.g.selectAll("path"), this.outlineData.features, "path")
-            exitSel.remove()
-            function cname (countryFeature) {
-                return matchCountryNames(countryFeature["properties"]["sovereignt"].toLowerCase())
-            }
-            mergeSel
-                .attr("d", this.path)
-                .attr("fill", (features) => {
-                    //if ( ! count.has(cname)) { warn ("colormap : count : country not found : ", cname) }
-                    const frac = count.getOrElse(cname(features), 0) / max;
-                    return this.countriesColorPalette(frac)
-                })
-                .on('mouseover', (features) => eventOnMouseOver(features, this.tooltip, cname(features)+":\n"+count.getOrElse(cname(features), 0)+" events reported" ))
-                .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
-            this.masked = true;
-        } else {
-            info ("worldmap : unmasking (colorChart)")
-            this.drawOutline()
-            this.masked=false
-        }
-    }*/
-
     reset(updateStepDuration) {
       this.currentTimestamps = [];
       this.flatEvents = [];
@@ -201,6 +172,13 @@ export class Worldmap {
         this.g.attr('transform', transform);
     }
 
+    updateZoomTranslateExtent () {
+        let w = this.svg.style("width").replace("px", "");
+        let h = this.svg.style("height").replace("px", "");
+        info ("New map size : ",w,"x",h)
+        this.zoom_handler.translateExtent([[0, 0], [w, h]])
+    }
+
 
         /*  Draws the countries outline
          *  If a colormap = [Country => int in [0,1] ] is given, this.palette will
@@ -242,7 +220,7 @@ export class Worldmap {
 
 
 
-        // OLD STUFF
+        // Legacy visualization
 
         /*  Mask :
          *  Masks the points on the map according to the mask passed as argument,
