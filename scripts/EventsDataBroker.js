@@ -71,10 +71,23 @@ class EventsDataBroker {
     }
 
         //  Returns the lattitude / longitude of an event, if this event is loaded
-        // ! exhaustive search
-    getEventById(eventId) {
+        //      !! Exhaustive search on all timestamps,
+        //          unless eventimestamp is provided
+    getEventById(eventId, eventTimestamp=undefined) {
         if (eventId < this.smallestEventID) {
             return undefined
+        }
+        if (eventTimestamp!=undefined) {
+            if (!this.has(eventTimestamp)) {
+                warn ("GetEventById() (with timestamp) : timestamp not loaded ")
+                return undefined
+            }
+            const eventsMapForTimestamp = this.loadedEventsMap.get(eventTimestamp)
+            for (let i=0; i < eventsMapForTimestamp.length; i++) {
+                if (eventsMapForTimestamp[i]["ID"] == eventId) {
+                    return eventsMapForTimestamp[i];
+                }
+            }
         }
         for (const timestamp of this.loadedEventsMap.keys()) {
             const eventsMapForTimestamp = this.loadedEventsMap.get(timestamp)
