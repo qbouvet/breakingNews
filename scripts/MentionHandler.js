@@ -10,7 +10,6 @@ import {TimeManager} from './TimeManager.js';
 
 
 const timeMgr = new TimeManager()
-const sourceGrapher = new SourceGrapher()
 
 
 
@@ -154,6 +153,8 @@ export class MentionHandler {
         this.eventsBroker = eventsDataBroker;
             // To request redraws / masks
         this.worldmap = worldmap;
+            // draw graphs
+        this.sourceGrapher = new SourceGrapher(worldmap)
 
             // visulization parameter : number of displayed source graphs
         this.k = 20;
@@ -282,7 +283,7 @@ export class MentionHandler {
         const liveTimestamps = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
         const timeseries = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
 
-        sourceGrapher.display_source(
+        this.sourceGrapher.display_source(
                         timeseries,          // Map( sourceName => Map(timestamp => count) )
                         cumulatedMentions,            // Map( sourceName => overallCount )
                         liveTimestamps,            // list of timestamps to display

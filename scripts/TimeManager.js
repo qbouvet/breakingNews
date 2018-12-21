@@ -22,7 +22,7 @@ export class TimeManager {
         this.allTimestamps = new SortedArray([], true);
         for (let i=0; i<this.NUM_UPDATES; i++){
             const clk = this.getUpdateDate(i)
-            const tsp = this.dateToTimestamp(clk)
+            const tsp = TimeManager.dateToTimestamp(clk)
             this.allTimestamps.insert(tsp)
         }
     }
@@ -31,7 +31,7 @@ export class TimeManager {
       return new Date(this.INIT_DATE.getTime() + this.msPerUpdate*clockValue);
     }
 
-    dateToTimestamp(date) {
+    static dateToTimestamp(date) {
         // Transform to string with leading zeros
         let pad = (num, size) => {
             let s = num+"";

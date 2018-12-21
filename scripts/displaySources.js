@@ -5,7 +5,7 @@ import {D3Handler} from './AnimationStyling.js'
 import {TimeManager} from './TimeManager.js'
 
 
-let dragManagerMaker = function (xScale, yScale) {
+let dragManagerMaker = function (xScale, yScale, worldmapRef) {
 
     let bandPos = [undefined, undefined]
 
@@ -15,6 +15,7 @@ let dragManagerMaker = function (xScale, yScale) {
 
         let pos = d3.mouse(this)[0];    // only care about x component
         let svg = d3.select(this).select('svg')
+
         function rectAttributes(selection){
             err("Running rectAttributes")
             warn("rect : ", bandPos)
@@ -56,29 +57,30 @@ let dragManagerMaker = function (xScale, yScale) {
 
     function onDragEnd () {
 
-        err ("DragEnd : ", bandPos)
-
-        var pos = d3.mouse(this);
+        let pos = d3.mouse(this)[0];    // only care about x component
+        let svg = d3.select(this).select('svg')
 
         if (xScale==undefined || yScale==undefined) {
             warn ("dragEnd : scaled are undefined")
             return
         }
 
-        var x1 = yScale.invert(bandPos[0]);
-        var x2 = yScale.invert(pos[0]);
+        var x1 = xScale.invert(bandPos[0]);
+        var x2 = xScale.invert(bandPos[1]);
 
         err ("Drag selected : ", x1, x2)
 
         bandPos = [-1, -1];
 
-        d3.select(".band").transition()
+        svg.select("rect").remove()
+
+        /*d3.select(".band").transition()
             .attr("width", 0)
             .attr("height", 0)
             .attr("x", bandPos[0])
             .attr("y", bandPos[1]);
 
-        zoom();
+        zoom();*/
     }
 
     return {onDrag, onDragEnd}
@@ -88,15 +90,16 @@ let dragManagerMaker = function (xScale, yScale) {
 
 export class SourceGrapher {
 
-    constructor () {
+    constructor (worldmapRef) {
         // Some data structures
         this.d3h = new D3Handler()
+        this.worldmapRef = worldmapRef;
 
         this.xScale = undefined
         this.yScale = undefined
 
         this.drag = d3.drag()
-        this.dragger = dragManagerMaker(undefined, undefined)
+        this.dragger = dragManagerMaker(undefined, undefined, this.worldmapRef)
         this.drag.on("drag", this.dragger.onDrag)
         this.drag.on("end", this.dragger.onDragEnd)
 
@@ -151,7 +154,7 @@ export class SourceGrapher {
                 .attr('class', "sourcegraph-chart")
             .append('svg')
                 .attr('id', (d) => "sourcegraph-chart-"+d[0])
-                .attr('viewBox', "-20 20 530 170")
+                .attr('viewBox', "-20 0 530 170")
                 .attr('preserveAspectRatio', 'xMidYMid meet')
         // exit selection
         exitSel.remove()
@@ -194,16 +197,10 @@ export class SourceGrapher {
         // x-scale
         const maxTickNumber = 9
         const modulo = Math.ceil(datepoints.length/maxTickNumber)
-        const xAxis_ticks = datepoints
-            .map( (elem) => ((parseInt(elem) % 10**6) / 10**2 ).toString() )
-            .filter( (elem,index) => !(index % modulo) )
         this.xScale = d3.scaleTime()
             .domain([ TimeManager.timestampToDate(datepoints[0]),
                       TimeManager.timestampToDate(datepoints[datepoints.length-1]) ]) // input
             .rangeRound([0, width-x_axis_space]); // output
-        /*this.xScale = d3.scalePoint()
-            .domain(datepoints)
-            .rangeRound([0, width-x_axis_space]);*/
 
         // y-scale
         this.yScale = d3.scaleLinear()
@@ -211,7 +208,7 @@ export class SourceGrapher {
             .range([height - margin.bottom, 0]); // output
 
         // with x and y scales, create dragManager
-        this.dragger = dragManagerMaker(this.xScale, this.yScale);
+        this.dragger = dragManagerMaker(this.xScale, this.yScale, this.worldmapRef);
         this.drag.on("drag", this.dragger.onDrag)
         this.drag.on("end", this.dragger.onDragEnd)
 
@@ -249,15 +246,16 @@ export class SourceGrapher {
         // Add the X Axis
         svg.append("g")
             .attr("transform", "translate(0," + (height - margin.bottom) + ")")
-            .call(d3.axisBottom(this.xScale).ticks(6)
-                // TODO  : here
-                /*.tickValues(xAxis_ticks)
-                .tickFormat( (d,i) => d.length<3 ?
-                    "00:"+d[0]+d[1] :
-                    d.length < 4 ?
-                        "0"+d[0]+":"+d[1]+d[2] :
-                        d[0]+d[1]+":"+d[2]+d[3]
-                )*/
+            .call(d3.axisBottom(this.xScale)
+                    .ticks(5)
+                    .tickFormat( (d,i) => {
+                        d = TimeManager.dateToTimestamp(d).toString().slice(8,12)
+                        return d.length<3 ?
+                                    "00:"+d[0]+d[1] :
+                                    d.length < 4 ?
+                                        "0"+d[0]+":"+d[1]+d[2] :
+                                        d[0]+d[1]+":"+d[2]+d[3]
+                    })
             );
         // Add the Y Axis
         svg.append("g")
