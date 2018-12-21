@@ -3,13 +3,8 @@ import {SortedArray} from './utils.js'
 import {MapOrElse} from './utils.js'
 
 import {DataLoader} from './DataLoader.js';
-import {display_source} from './displaySources.js'
+import {SourceGrapher} from './displaySources.js'
 import {TimeManager} from './TimeManager.js';
-
-
-
-
-const timeMgr = new TimeManager()
 
 
 
@@ -98,7 +93,7 @@ function concat_sourceTimeEvent_trees (treeA, treeB) {
      *      Map(SourceName -> Map(timestamp => SortedArray[EVENTIDS]) )
      *  contains new mentions
      */
-function updateCumulativeMentions (cumulativeMentions, newMentions, timestamp) {
+function updateCumulativeMentions (timeMgr, cumulativeMentions, newMentions, timestamp) {
         // add the content of newMentions to cumulativeMentions
     newMentions.forEach ( (value, key) => { // key=sourceName, Map(timestamp => SortedArray[EVENTIDS])
         if (cumulativeMentions.has(key)) {
@@ -135,7 +130,7 @@ function updateCumulativeMentions (cumulativeMentions, newMentions, timestamp) {
 export class MentionHandler {
 
     // Initializes path variables
-    constructor(eventsDataBroker, worldmap) {
+    constructor(eventsDataBroker, worldmap, timeManagerRef) {
 
             // data access
         this.loader = new DataLoader();
@@ -153,6 +148,10 @@ export class MentionHandler {
         this.eventsBroker = eventsDataBroker;
             // To request redraws / masks
         this.worldmap = worldmap;
+            // draw graphs
+        this.sourceGrapher = new SourceGrapher(worldmap)
+            // query timestamp
+        this.timeManagerRef = timeManagerRef
 
             // visulization parameter : number of displayed source graphs
         this.k = 20;
@@ -169,7 +168,7 @@ export class MentionHandler {
                 .then( (result) => {    // update data structures
                     const new_sourceTimeEvent = gen_sourceTimeEvent_tree (result)
                     this.sourceTimeEventTree = concat_sourceTimeEvent_trees(this.sourceTimeEventTree, new_sourceTimeEvent)
-                    this.sourceCumulatedMentions = updateCumulativeMentions (this.sourceCumulatedMentions, new_sourceTimeEvent, timestamp)
+                    this.sourceCumulatedMentions = updateCumulativeMentions (this.timeManagerRef, this.sourceCumulatedMentions, new_sourceTimeEvent, timestamp)
                     this.currentTime = timestamp
                     this.loadedTimestamps.set(timestamp, result)
                 })
@@ -281,10 +280,12 @@ export class MentionHandler {
         const liveTimestamps = this.getElapsedTimestamps(timestamp)         // list of timestamps to display
         const timeseries = this.getTopSourcesTimeSeries(timestamp, k)   // Map( sourceName => Map(timestamp => count) )
 
-        display_source(timeseries,          // Map( sourceName => Map(timestamp => count) )
+        this.sourceGrapher.display_source(
+                        timeseries,          // Map( sourceName => Map(timestamp => count) )
                         cumulatedMentions,            // Map( sourceName => overallCount )
                         liveTimestamps,            // list of timestamps to display
-                        this.countryColorChart.bind(this))      // country colormap callback function
+                        this.countryColorChart.bind(this)      // country colormap callback function
+        )
     }
 
 
@@ -300,14 +301,16 @@ export class MentionHandler {
          *  Returns :
          *      SortedArray(Events) (unique elements)
          */
-    events_for_source (sourceName) {
+    events_for_source (sourceName, liveTimestamps) {
         let coveredEventsIds = new SortedArray([], true)
         if (this.sourceTimeEventTree.has(sourceName)) {
             this.sourceTimeEventTree.get(sourceName).forEach( (value, key) => {
                 //err("key:", key, "value:", value)
-                value.forEach( (eventId) => {
-                    coveredEventsIds.insert(eventId)
-                })
+                if (liveTimestamps.includes(key.toString())) {
+                    value.forEach( (eventId) => {
+                        coveredEventsIds.insert(eventId)
+                    })
+                }
             })
         }
         info("Source : ", sourceName, "covered", coveredEventsIds.size(), "events.\nIDs : \n", coveredEventsIds)
@@ -347,9 +350,37 @@ export class MentionHandler {
         return [count, max];
     }
 
-    countryColorChart (sourceName) {
-        const events = this.events_for_source(sourceName)
+    countryColorChart (sourceName, timeStart, timeEnd) {
+            // find the matching timestamps
+        function roundTimestamp (date, round="down") {
+            let tsp = TimeManager.dateToTimestamp(date)
+            let fixedPart = tsp.slice(0, 10)
+            let min = parseInt(tsp.slice(10, 12))
+            if (round=="up") {
+                return min>=45 ? fixedPart+"4500" :
+                        min>= 30 ? fixedPart+"3000" :
+                            min>=15 ? fixedPart+"1500" : fixedPart+"0000"
+            } else {
+                return min<=15 ? fixedPart+"0000" :
+                        min<= 30 ? fixedPart+"1500" :
+                            min<=45 ? fixedPart+"3000" : fixedPart+"4500"
+            }
+        }
+        const timestampStart = roundTimestamp(timeStart, "down")
+        const timestampEnd = roundTimestamp(timeEnd, "up")
+        info ("Coloring countries, timestamps", timestampStart, timestampEnd)
+        let liveTimestamps = []
+        liveTimestamps.push(timestampStart)
+        let lastTimestamp = liveTimestamps[liveTimestamps.length-1]
+        while (lastTimestamp != timestampEnd) {
+            lastTimestamp = this.timeManagerRef.nextTimestamp(lastTimestamp)
+            liveTimestamps.push(lastTimestamp)
+        }
+            // count events for selected timestamps
+        const events = this.events_for_source(sourceName, liveTimestamps)
+        info ("Found", events.length, "events\n", events)
         const [count, max] = this.countEventsByCountry(events)
-        this.worldmap.toggleCountryColorChart (count, max)
+            // call to draw with the data
+        this.worldmap.drawCountryColorChart (count, max)
     }
 }
