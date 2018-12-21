@@ -8,7 +8,7 @@ Tobia, Quentin, Gauthier
 
 ## Project Description
 
-Project \textit{Breaking News} for EPFL course \textit{COM-480 Data Visualization} given by professor K. Benzi.
+Project *Breaking News* for EPFL course *COM-480 Data Visualization* given by professor K. Benzi.
 The projects is an interactive visualization displaying evolution over time of world events and online reports over the course of a day on a 2D world map.
 The events are divided into 4 main categories: 
 * Verbal cooperation
