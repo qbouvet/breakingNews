@@ -123,8 +123,8 @@ export class Controller {
       }
 
       case 'end': {
-        //this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speed))
-        //this.mentionsReset();
+        this.mapReset(this.UPDATE_INTERVAL / Math.abs(this.speed))
+        this.mentionsReset();
         this.nextState('start');
         break;
       }

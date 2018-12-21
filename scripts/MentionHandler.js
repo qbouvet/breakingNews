@@ -187,6 +187,10 @@ export class MentionHandler {
         }
     }
 
+    reset () {
+
+    }
+
     // SHOULD BE BUG FREE
     /*  Returns in an array all elapsed timestamps from time 0 to currentTime
      *  Be default, will use this.currentTime, but can also accept it as argument
@@ -288,7 +292,9 @@ export class MentionHandler {
         )
     }
 
-
+    reset_graphs () {
+        d3.selectAll(".sourcegraph-container").remove()
+    }
 
 
 
