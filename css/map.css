@@ -46,14 +46,54 @@ path {
 ----------------------------------------------------- */
 
 div.tooltip {
-  font-family:"avenir next", Arial, sans-serif;
+  font-family: 'Jura', sans-serif;
   border: 1px solid;
   border-radius: 6px;
   padding: 7px;
   color: var(--lightgray);
 }
 
-div.tooltip b {
+.tooltip-box {
+
+}
+
+.tooltip-title {
+
+  display:flex;
+  align-items: center;
+
+  border-radius:2px;
+  background: #ff8c00;
+  background: -moz-linear-gradient(top, var(--darker) 0%, var(--light) 99%);
+  background: -webkit-linear-gradient(top, var(--darker) 0%,var(--light) 99%);
+  background: linear-gradient(to bottom, var(--darker) 0%,var(--light) 99%);
+  color: var(--bg);
+  font-weight: bold;
+}
+
+.tooltip-title-text {
+  display: table;
+  margin: auto;
+}
+
+.tooltip-content {
+
+}
+
+.tooltip-names {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.tooltip-values {
+  display: inline-block;
+}
+
+.tooltip-elem {
+
+}
+
+.tooltip-elem b {
   color: var(--light);
 }
 

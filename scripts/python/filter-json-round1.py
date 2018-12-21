@@ -18,9 +18,6 @@ for h in ["%.2d" % i for i in range(24)]:
 
         print("About to do ", (h + mi + '00.json ...'))
 
-        #e = pd.read_json(base_path + events + day + h + mi + '00.json', orient='records')
-        #m = pd.read_json(base_path + mentions + day + h + mi + '00.json', orient='records')
-
         # Events
         with open(base_path + events + day + h + mi + '00.json') as f:
             euf = json.load(f)
