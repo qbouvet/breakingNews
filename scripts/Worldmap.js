@@ -78,34 +78,14 @@ export class Worldmap {
         info ("Constructed worldmap");
     }
 
-        /*  Mask :
-         *  Masks the points on the map according to the mask passed as argument,
-         *  E.G. all points in the mask will stay normal, while points not in the
-         *  mask will go grey
-         *  Unmask :
-         *  restore visualization
+        /*
+         *  Draw the country color chart for a given source. Takes as args :
+         *      - liveTimestamps, the array of all timestamps to consider
+         *      - counts : the per-contry mention count for the source
+         *      - max : The maximum number of mentions in a country
          */
-    toggleEasyHeatmap (pointsArray) {
-        if (!this.masked) {
-            info ("worldmap : masking (easyHeatmap)")
-            //alert ("showing : "+pointsArray.length+" events")
-                // apply new data and obtain selections
-            let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
-                this.g.selectAll("circle"), pointsArray, "circle")
-                // update visuals
-            this.D3.easyHeatMap(mergeSel, this.projection, 0.03, 8, 6)
-            exitSel.remove()
-            this.masked = true;
-        } else {
-            info ("worldmap : unmasking (easyHeatmap)")
-                // apply new data and obtain selections
-            let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
-                this.g.selectAll("circle"), this.flatEvents, "circle")
-                // update visuals
-            exitSel.remove()
-            this.D3.applyEventPointStyleStatic(mergeSel, this.projection, (d) => this.SELECTION.colorMapping(d))
-            this.masked=false
-        }
+    drawCountryColorChart (counts, max) {
+        
     }
 
     toggleCountryColorChart (count, max) {
@@ -236,6 +216,44 @@ export class Worldmap {
       this.D3.pulseEntrance(enterSel, (d) => this.SELECTION.checkSelected(d),
         (d) => this.SELECTION.colorMapping(d),
         updateStepDuration);
+    }
+
+
+
+
+
+
+
+        // OLD STUFF
+
+        /*  Mask :
+         *  Masks the points on the map according to the mask passed as argument,
+         *  E.G. all points in the mask will stay normal, while points not in the
+         *  mask will go grey
+         *  Unmask :
+         *  restore visualization
+         */
+    toggleEasyHeatmap (pointsArray) {
+        if (!this.masked) {
+            info ("worldmap : masking (easyHeatmap)")
+            //alert ("showing : "+pointsArray.length+" events")
+                // apply new data and obtain selections
+            let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+                this.g.selectAll("circle"), pointsArray, "circle")
+                // update visuals
+            this.D3.easyHeatMap(mergeSel, this.projection, 0.03, 8, 6)
+            exitSel.remove()
+            this.masked = true;
+        } else {
+            info ("worldmap : unmasking (easyHeatmap)")
+                // apply new data and obtain selections
+            let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+                this.g.selectAll("circle"), this.flatEvents, "circle")
+                // update visuals
+            exitSel.remove()
+            this.D3.applyEventPointStyleStatic(mergeSel, this.projection, (d) => this.SELECTION.colorMapping(d))
+            this.masked=false
+        }
     }
 
 }

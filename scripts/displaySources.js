@@ -5,7 +5,7 @@ import {D3Handler} from './AnimationStyling.js'
 import {TimeManager} from './TimeManager.js'
 
 
-let dragManagerMaker = function (xScale, yScale, worldmapRef) {
+let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
 
     let bandPos = [undefined, undefined]
 
@@ -65,22 +65,15 @@ let dragManagerMaker = function (xScale, yScale, worldmapRef) {
             return
         }
 
-        var x1 = xScale.invert(bandPos[0]);
-        var x2 = xScale.invert(bandPos[1]);
-
-        err ("Drag selected : ", x1, x2)
+        var timeStart = xScale.invert(bandPos[0]);
+        var timeEnd = xScale.invert(bandPos[1]);
+        err ("Drag selected : ", timeStart, timeEnd)
 
         bandPos = [-1, -1];
-
         svg.select("rect").remove()
 
-        /*d3.select(".band").transition()
-            .attr("width", 0)
-            .attr("height", 0)
-            .attr("x", bandPos[0])
-            .attr("y", bandPos[1]);
-
-        zoom();*/
+        const sourceName = this.innerText.split(" ")[0]
+        bandselectCallback(sourceName, timeStart, timeEnd)
     }
 
     return {onDrag, onDragEnd}
@@ -116,7 +109,7 @@ export class SourceGrapher {
          *  sourceGraphClickCallback :
          *      callback function to be used when clicking on a source graph
          */
-    display_source(timeseriesData, perSourceCumulativeCount, timestamps, sourceGraphClickCallback){
+    display_source(timeseriesData, perSourceCumulativeCount, timestamps, sourceBandselectCallback){
 
             // divs data
         let divData = [...perSourceCumulativeCount.entries()]
@@ -129,7 +122,7 @@ export class SourceGrapher {
         )
 
         // update selection
-        updateSel.on("click", (d) => sourceGraphClickCallback(d[0]) )
+        //updateSel.on("click", (d) => sourceGraphClickCallback(d[0]) )
         updateSel.select(".sourcegraph-text")
                 .text( (d) => d[0]+" - "+d[1])
         /*updateSel.select(".sourcegraph-chart")
@@ -171,7 +164,7 @@ export class SourceGrapher {
 
         const sourcesNames = [...perSourceCumulativeCount.keys()]
         sourcesNames.forEach( (name) => {
-            this.drawChart(name, timeseriesData, maxMentions, width, height, margin)
+            this.drawChart(name, timeseriesData, maxMentions, width, height, margin, sourceBandselectCallback)
         })
     }
 
@@ -179,7 +172,7 @@ export class SourceGrapher {
             /*  Given a source name, will find the suitable container div
              *  and draw the source graph
              */
-    drawChart(sourceName, timeseriesData, maxMentions, width, height, margin) { // https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
+    drawChart(sourceName, timeseriesData, maxMentions, width, height, margin, sourceBandselectCallback) { // https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
 
             // some data
         let datepoints = [...[...timeseriesData.values()][0].keys()].sort()
@@ -208,7 +201,7 @@ export class SourceGrapher {
             .range([height - margin.bottom, 0]); // output
 
         // with x and y scales, create dragManager
-        this.dragger = dragManagerMaker(this.xScale, this.yScale, this.worldmapRef);
+        this.dragger = dragManagerMaker(this.xScale, this.yScale, sourceBandselectCallback);
         this.drag.on("drag", this.dragger.onDrag)
         this.drag.on("end", this.dragger.onDragEnd)
 
