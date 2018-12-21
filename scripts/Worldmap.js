@@ -70,7 +70,7 @@ export class Worldmap {
             .style("opacity", 0);
 
         // fields used for maskings
-        this.masked = false;
+        this.colorchartShown = false;
         this.countriesColorPalette = (t) => d3.scaleLinear().domain([0,1])
             .interpolate(d3.interpolateHcl)
             .range([d3.rgb(this.countriesFillMin), d3.rgb(this.countriesFillMax)]) (t);
@@ -104,7 +104,7 @@ export class Worldmap {
             })
             .on('mouseover', (features) => eventOnMouseOver(features, this.tooltip, cname(features)+":\n"+count.getOrElse(cname(features), 0)+" events reported" ))
             .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
-        this.masked = true;
+        this.colorchartShown = true;
     }
 
     /*toggleCountryColorChart (count, max) {
@@ -219,9 +219,8 @@ export class Worldmap {
     /*  Draws the overlay, with or without new data, complete data update sequence
      */
     drawOverlay(updateStepDuration) {
-      if (this.masked) {
-          this.toggleCountryColorChart()
-          return
+      if (this.colorchartShown) {
+          this.drawOutline()
       }
         // apply new data and obtain selections
       let [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(

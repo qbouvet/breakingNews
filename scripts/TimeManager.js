@@ -52,7 +52,6 @@ export class TimeManager {
         const hour =  timestamp.slice(8,10)
         const min =  timestamp.slice(10,12)
         const sec = timestamp.slice(12,14)
-        info ("timestamp conversion : ", year+"-"+month+"-"+day+"T"+hour+":"+min+":"+sec)
         return new Date(year+"-"+month+"-"+day+"T"+hour+":"+min+":"+sec)
     }
 
