@@ -56,7 +56,7 @@
 
 #sidebardiv {
   display: none;
-  height : 93%;
+  height : 99.99%;
 
   background: var(--bg);
 
@@ -70,7 +70,7 @@
 ----------------------------------------------------- */
 
 #informationdiv {
-  height:93%;
+  height:99.99%;
   display:block;
 
   background: #0e0e0e;
@@ -159,7 +159,7 @@
 /*.visualize-source-container {*/
 .sourcegraph-container {
         /* Position & dimension */
-    height: 28%;
+    /*height: 28%;*/
     position:relative;
         /* spacing */
     padding: 4px;
@@ -243,6 +243,10 @@
 
 .tick line {
   stroke: var(--lightgray);
+}
+
+.circle {
+  stroke: white;
 }
 
     /*line charts for sources and mentions

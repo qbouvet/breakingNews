@@ -29,7 +29,7 @@ async function main() {
       (timestamp, isForward, updateStepDuration) => MAP.updateEvents(timestamp, isForward, updateStepDuration),
       (timestamp, isForward) => MENTIONS_HANDLER.update(timestamp, isForward),
       (updateStepDuration) => MAP.reset(updateStepDuration),
-      (x) => MENTIONS_HANDLER.reset_graphs());
+      _ => MENTIONS_HANDLER.reset_graphs());
 }
 
 whenDocumentLoaded(main);

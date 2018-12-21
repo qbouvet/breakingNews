@@ -20,7 +20,7 @@ export class TimeManager {
         this.NUM_UPDATES = (this.END_DATE - this.INIT_DATE)/this.msPerUpdate;
 
         this.allTimestamps = new SortedArray([], true);
-        for (let i=0; i<this.NUM_UPDATES; i++){
+        for (let i=0; i<=this.NUM_UPDATES; i++){
             const clk = this.getUpdateDate(i)
             const tsp = TimeManager.dateToTimestamp(clk)
             this.allTimestamps.insert(tsp)
