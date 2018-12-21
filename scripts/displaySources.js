@@ -17,15 +17,8 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
         let svg = d3.select(this).select('svg')
 
         function rectAttributes(selection){
-            err("Running rectAttributes")
-            warn("rect : ", bandPos)
+            info("Running rectAttributes")
             selection
-                /*.attr("height", draggedElem.height)
-                .attr("width", bandPos[1]-bandPos[0])
-                .attr("x", bandPos[0])
-                .attr("y", 0)
-                .attr("opacity", 0.3)
-                .attr("fill", "black")*/
                 .attr("height", "97%")
                 .attr("width", bandPos[1]-bandPos[0])
                 .attr("x", bandPos[0])
@@ -34,21 +27,34 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
                 .attr("fill", "black")
         }
 
+        info ("Updating rect selection:\nBandPos:",bandPos, "\npos:", pos)
+
         // If no drag currently registered, register
         if (bandPos[0] == undefined) {
             bandPos[0] = pos
             bandPos[1] = pos
+
+            info ("new bandpos:",bandPos)
 
             let selection = svg.append("rect")
             rectAttributes(selection)
 
         // Else, update registered drag move
         } else {
-            if (pos<bandPos[0]) {
+            if (pos<=bandPos[0]) {
+                //bandPos[1] = bandPos[0]
                 bandPos[0] = pos
-            } else {
+            } else if (pos>=bandPos[1]) {
                 bandPos[1] = pos
+            } else {
+                //update whichever end is closer
+                if (bandPos[0]-pos < bandPos[1]-bandPos) {
+                    bandPos[0] = pos
+                } else {
+                    bandPos[0] = pos
+                }
             }
+            info ("new bandpos:",bandPos)
 
             let selection = svg.select("rect")
             rectAttributes(selection)
@@ -57,8 +63,17 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
 
     function onDragEnd () {
 
+        info ("Running dragEnd()")
+
+        if (bandPos[0]==undefined || bandPos[1]==undefined) {
+            warn ("Drag ended without a valid band selection")
+            bandPos = [undefined, undefined];
+            let svg = d3.select(this).select('svg')
+            svg.select("rect").remove()
+            return
+        }
+
         let pos = d3.mouse(this)[0];    // only care about x component
-        let svg = d3.select(this).select('svg')
 
         if (xScale==undefined || yScale==undefined) {
             warn ("dragEnd : scaled are undefined")
@@ -69,7 +84,8 @@ let dragManagerMaker = function (xScale, yScale, bandselectCallback) {
         var timeEnd = xScale.invert(bandPos[1]);
         err ("Drag selected : ", timeStart, timeEnd)
 
-        bandPos = [-1, -1];
+        bandPos = [undefined, undefined];
+        let svg = d3.select(this).select('svg')
         svg.select("rect").remove()
 
         const sourceName = this.innerText.split(" ")[0]
@@ -109,7 +125,7 @@ export class SourceGrapher {
          *  sourceGraphClickCallback :
          *      callback function to be used when clicking on a source graph
          */
-    display_source(timeseriesData, perSourceCumulativeCount, timestamps, sourceBandselectCallback){
+    display_source(timeseriesData, perSourceCumulativeCount, timestamps, sourceInteractionCallback){
 
             // divs data
         let divData = [...perSourceCumulativeCount.entries()]
@@ -137,7 +153,8 @@ export class SourceGrapher {
         const enterTopLevel = enterSel
             .append('div')
                 .attr('class', "sourcegraph-container")
-                .on("click", (d) => sourceGraphClickCallback(d[0]) )
+                // TODO : for interaction on click 
+                //.on("click", (d) => sourceInteractionCallback(d[0]) )
                 .call(this.drag);
         enterTopLevel.append('div')
                 .attr('class', "sourcegraph-text")
@@ -164,7 +181,7 @@ export class SourceGrapher {
 
         const sourcesNames = [...perSourceCumulativeCount.keys()]
         sourcesNames.forEach( (name) => {
-            this.drawChart(name, timeseriesData, maxMentions, width, height, margin, sourceBandselectCallback)
+            this.drawChart(name, timeseriesData, maxMentions, width, height, margin, sourceInteractionCallback)
         })
     }
 
@@ -172,7 +189,7 @@ export class SourceGrapher {
             /*  Given a source name, will find the suitable container div
              *  and draw the source graph
              */
-    drawChart(sourceName, timeseriesData, maxMentions, width, height, margin, sourceBandselectCallback) { // https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
+    drawChart(sourceName, timeseriesData, maxMentions, width, height, margin, sourceInteractionCallback) { // https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
 
             // some data
         let datepoints = [...[...timeseriesData.values()][0].keys()].sort()
@@ -201,7 +218,7 @@ export class SourceGrapher {
             .range([height - margin.bottom, 0]); // output
 
         // with x and y scales, create dragManager
-        this.dragger = dragManagerMaker(this.xScale, this.yScale, sourceBandselectCallback);
+        this.dragger = dragManagerMaker(this.xScale, this.yScale, sourceInteractionCallback);
         this.drag.on("drag", this.dragger.onDrag)
         this.drag.on("end", this.dragger.onDragEnd)
 

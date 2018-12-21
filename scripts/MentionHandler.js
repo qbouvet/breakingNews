@@ -381,6 +381,6 @@ export class MentionHandler {
         info ("Found", events.length, "events\n", events)
         const [count, max] = this.countEventsByCountry(events)
             // call to draw with the data
-        this.worldmap.toggleCountryColorChart (count, max)
+        this.worldmap.drawCountryColorChart (count, max)
     }
 }

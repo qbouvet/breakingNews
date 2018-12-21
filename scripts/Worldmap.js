@@ -84,11 +84,30 @@ export class Worldmap {
          *      - counts : the per-contry mention count for the source
          *      - max : The maximum number of mentions in a country
          */
-    drawCountryColorChart (counts, max) {
-        
+    drawCountryColorChart (count, max) {
+        info ("worldmap : masking (colorChart)")
+            // hide events on the map
+        // TODO
+            // apply new data to outline and obtain selections
+        const [enterSel, updateSel, mergeSel, exitSel] = this.D3.mkSelections(
+            this.g.selectAll("path"), this.outlineData.features, "path")
+        exitSel.remove()
+        function cname (countryFeature) {
+            return matchCountryNames(countryFeature["properties"]["sovereignt"].toLowerCase())
+        }
+        mergeSel
+            .attr("d", this.path)
+            .attr("fill", (features) => {
+                //if ( ! count.has(cname)) { warn ("colormap : count : country not found : ", cname) }
+                const frac = count.getOrElse(cname(features), 0) / max;
+                return this.countriesColorPalette(frac)
+            })
+            .on('mouseover', (features) => eventOnMouseOver(features, this.tooltip, cname(features)+":\n"+count.getOrElse(cname(features), 0)+" events reported" ))
+            .on('mouseout', (d) => eventOnMouseOut(d, this.tooltip))
+        this.masked = true;
     }
 
-    toggleCountryColorChart (count, max) {
+    /*toggleCountryColorChart (count, max) {
         if (!this.masked) {
             info ("worldmap : masking (colorChart)")
                 // hide events on the map
@@ -115,7 +134,7 @@ export class Worldmap {
             this.drawOutline()
             this.masked=false
         }
-    }
+    }*/
 
     reset(updateStepDuration) {
       this.currentTimestamps = [];
