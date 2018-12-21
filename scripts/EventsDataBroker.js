@@ -3,38 +3,35 @@ import {SortedArray} from './utils.js'
 
 import {DataLoader} from './DataLoader.js';
 
-
-    /* This class holds the event data in one place and provides function for Others
-     * classes to access it
-     */
+/* 
+    This class holds the event data in one place and provides function for Others
+    classes to access it
+*/
 class EventsDataBroker {
 
     constructor (dataLoader) {
-            // Dataloader for file access
+        // Dataloader for file access
         this.loader = dataLoader;
-            // timestamp => events map
+        // timestamp => events map
         this.loadedEventsMap = new Map();
-            // Not used yet
-        /*this.currentTimestamps = new SortedArray([], true);
-        this.flatEvents = [];*/
-            // hack to make getLatLong() faster
+        // Hack to make getLatLong() faster
         this.smallestEventID = 800011820
-            // maximum point offset, 0.01° ~< 1km
-            // overlap is worse than a little bit of inacuracy for what we want to show
+        // Maximum point offset, 0.01° ~< 1km
+        // Overlap is worse than a little bit of inacuracy for what we want to show
         this.maxPointOffset = 0.1;
     }
 
-        // checks if events for a given timestampe have already been loaded
+    // Checks if events for a given timestampe have already been loaded
     has (timestamp) {
         return this.loadedEventsMap.has(timestamp)
     }
 
-        // lists all loaded timestamps
+    // Lists all loaded timestamps
     loadedTimestamps () {
         return this.loadedEventsMap.keys()
     }
 
-        // return loaded events straight away or load then return if not loaded
+    // Return loaded events straight away or load then return if not loaded
     loadedEvents (timestamp) {
         if (this.loadedEventsMap.has(timestamp)) {
             return this.loadedEventsMap.get(timestamp)
@@ -43,17 +40,17 @@ class EventsDataBroker {
         }
     }
 
-        // loads a timestamp as a promise
+    // Loads a timestamp as a promise
     load (timestamp) {
         if (this.loadedEventsMap.has(timestamp)) {
-            // return with already loaded data
+            // Return with already loaded data
             return new Promise(function(resolve, reject) {
                 resolve(this.loadedEventsMap.get(timestamp))
             })
         } else {
             let p = this.loader.loadEvents(timestamp);
-            // cache data
-                // +/-0.01 in lattitude/longitude ~= +/- 1km
+            // Cache data
+            // +/-0.01 in lattitude/longitude ~= +/- 1km
             const randSmallOffset = () => this.maxPointOffset*(Math.random()-0.5)*2
             p.then( (results) => {
                 info("EventDataBroker loaded ", timestamp)
@@ -65,13 +62,13 @@ class EventsDataBroker {
                 this.loadedEventsMap.set(timestamp, results)
                 return results
             })
-            // return loading data
+            // Return loading data
             return p
         }
     }
 
-        //  Returns the lattitude / longitude of an event, if this event is loaded
-        // ! exhaustive search
+    //  Returns the lattitude / longitude of an event, if this event is loaded
+    // ! exhaustive search
     getEventById(eventId) {
         if (eventId < this.smallestEventID) {
             return undefined
@@ -90,13 +87,13 @@ class EventsDataBroker {
 }
 
 
-    /*  Maps country names from world.json to contry names of the event dataset
-     */
+// Maps country names from world.json to contry names of the event dataset
 const cmap = new Map([
     ["republic of congo", "democratic republic of the congo"],
     ["republic of serbia", "serbia (general),"],
     ["united states of america", "united states"]
 ])
+
 cmap.getOrElse = function (key, defaultVal) {
     if (this.has(key)) {
         return this.get(key)
@@ -104,10 +101,10 @@ cmap.getOrElse = function (key, defaultVal) {
         return defaultVal
     }
 }
+
 function matchCountryNames (cname) {
     const res = cmap.getOrElse (cname, cname)
     return res
 }
-
 
 export {EventsDataBroker, matchCountryNames}

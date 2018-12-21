@@ -15,54 +15,48 @@
     SIDEBAR-RELATED STYLING
 ----------------------------------------------------- */
 
-#menubar { /* typically inherits from one-line-menu */
-        /* left-right align children - NB works with flex */
+#menubar { 
+    /*
+        Typically inherits from one-line-menu 
+        left-right align children - NB works with flex
+    */
     justify-content: space-between;
     background-color : black;
 }
 
 #btn-info {
-     background-image: url(../css/icons/info.png);
-     position : relative;
-     height: 30px;
-     width: 30px;
-     top : 0px;
-     left : -5px;
+    background-image: url(../css/icons/info.png);
+    position : relative;
+    height: 30px;
+    width: 30px;
+    top : 0px;
+    left : -5px;
 }
-
-/*
-@font-face {
-  font-family: "SomeCoolFont";
-  src: url("../css/fonts/Library 3 am.otf");
-}
-*/
 
 #menubar {
-  padding-left: 3vmin;
+    padding-left: 3vmin;
 }
 
 #menubar span {
-  /* vh = viewport-related units https://stackoverflow.com/questions/16056591/font-scaling-based-on-width-of-container#answer-19818026 */
-  /* TODO : use svg instead ? https://css-tricks.com/fitting-text-to-a-container/ */
-      /* remove interline */
-  padding: 0;
-  margin: 0;
-  margin-left: 1vw;
-      /* font config */
-  font-size : 2vw;
-  font-family: 'Jura', sans-serif;
-  color: var(--light);
+    /* Remove interline */
+    padding: 0;
+    margin: 0;
+    margin-left: 1vw;
+    /* Font config */
+    font-size : 2vw;
+    font-family: 'Jura', sans-serif;
+    color: var(--light);
 }
 
 #sidebardiv {
-  display: none;
-  height : 93%;
+    display: none;
+    height : 99.99%;
 
-  background: var(--bg);
+    background: var(--bg);
 
-  overflow-y : overlay;
-  overflow-x : hidden;
-  scrollbar-gutter : auto;
+    overflow-y : overlay;
+    overflow-x : hidden;
+    scrollbar-gutter : auto;
 }
 
 /* ---------------------------------------------------
@@ -70,67 +64,65 @@
 ----------------------------------------------------- */
 
 #informationdiv {
-  height:93%;
-  display:block;
+    height:99.99%;
+    display:block;
 
-  background: #0e0e0e;
-  background: -moz-linear-gradient(top, var(--bg) 0%, var(--darkgray) 100%);
-  background: -webkit-linear-gradient(top, var(--bg) 0%,var(--darkgray) 100%);
-  background: linear-gradient(to bottom, var(--bg) 0%,var(--darkgray) 100%);
+    background: #0e0e0e;
+    background: -moz-linear-gradient(top, var(--bg) 0%, var(--darkgray) 100%);
+    background: -webkit-linear-gradient(top, var(--bg) 0%,var(--darkgray) 100%);
+    background: linear-gradient(to bottom, var(--bg) 0%,var(--darkgray) 100%);
 
-  font-family: 'Jura', sans-serif;
-  font-size: 2vmin;
-  text-align: justify;
-  text-justify: inter-word;
-  color: var(--lightgray);
+    font-family: 'Jura', sans-serif;
+    font-size: 2vmin;
+    text-align: justify;
+    text-justify: inter-word;
+    color: var(--lightgray);
 
-  overflow-y : overlay;
-  overflow-x : hidden;
-  scrollbar-gutter : auto;
+    overflow-y : overlay;
+    overflow-x : hidden;
+    scrollbar-gutter : auto;
 }
 
 .info-paragraph {
-  padding: 2vmin;
+    padding: 2vmin;
 }
 
 #info-text {
-  height: 100%;
+    height: 100%;
 }
 
 .section-header {
-  display:flex;
-  align-items: center;
+    display:flex;
+    align-items: center;
 
-  height: 3vmin;
-  margin-top: 1.5vmin;
-  margin-left: 3vmin;
-  margin-right: 3vmin;
+    height: 3vmin;
+    margin-top: 1.5vmin;
+    margin-left: 3vmin;
+    margin-right: 3vmin;
 
-  border-radius:2px;
-  background: #ff8c00;
-  background: -moz-linear-gradient(top, var(--darker) 0%, var(--light) 99%);
-  background: -webkit-linear-gradient(top, var(--darker) 0%,var(--light) 99%);
-  background: linear-gradient(to bottom, var(--darker) 0%,var(--light) 99%);
+    border-radius:2px;
+    background: #ff8c00;
+    background: -moz-linear-gradient(top, var(--darker) 0%, var(--light) 99%);
+    background: -webkit-linear-gradient(top, var(--darker) 0%,var(--light) 99%);
+    background: linear-gradient(to bottom, var(--darker) 0%,var(--light) 99%);
 }
 
 .section-text {
-  margin-left: 1vmin;
-  font-size: 2vmin;
-  font-weight: bold;
-  color: var(--bg);
+    margin-left: 1vmin;
+    font-size: 2vmin;
+    font-weight: bold;
+    color: var(--bg);
 }
 
 .info-paragraph {
-  padding: 1.5vmin;
-  padding-left: 3vmin;
-  padding-right: 3vmin;
-
+    padding: 1.5vmin;
+    padding-left: 3vmin;
+    padding-right: 3vmin;
 }
 
 .info-paragraph a {
-  color: var(--light);
+    color: var(--light);
 }
-
 
 /* ---------------------------------------------------
     SCROLLBAR
@@ -138,14 +130,14 @@
 
 #informationdiv::-webkit-scrollbar,
 #sidebardiv::-webkit-scrollbar {
-  width: 0.6em;
-  background: transparent;
+    width: 0.6em;
+    background: transparent;
 }
 
 #informationdiv::-webkit-scrollbar-track,
 #sidebardiv::-webkit-scrollbar-thumb {
-  height:30px;
-  background-color: transparent;
+    height:30px;
+    background-color: transparent;
 }
 
 
@@ -153,17 +145,15 @@
     GRAPHS STYLING
 ----------------------------------------------------- */
 
-    /*  Container that holds the sourceGraph text and graph
-     *  previously .visualize-source-container
-     */
-/*.visualize-source-container {*/
+/*  
+    Container that holds the sourceGraph text and graph
+    previously .visualize-source-container
+*/
 .sourcegraph-container {
-        /* Position & dimension */
-    height: 28%;
+    /* Position & dimension */
     position:relative;
-        /* spacing */
+    /* Spacing */
     padding: 4px;
-        /* Color & border */
 
     background: -moz-linear-gradient(top, var(--bg) 0%, var(--darkgray) 100%);
     background: -webkit-linear-gradient(top, var(--bg) 0%,var(--darkgray) 100%);
@@ -173,37 +163,22 @@
     border: solid var(--bg) 1px;
     border-radius: 4px;
     opacity: 100%;
-        /* Overlaying */
-    /*z-index: 0;*/
-
 }
 
-    /* Bottom delimiter for sourcegraph-container */
-/*.sourcegraph-container:after {
-    content : "";
-    position: absolute;
-    left    : 33%;
-    bottom  : 0;
-    height  : 3px;
-    width   : 33%;
-    border-top : 3px solid var(--color-gray);
-}*/
-
-    /*  Title/textbox for a source graph
-     */
+/*  Title/textbox for a source graph */
 .sourcegraph-text {
-        /* Position & dimensions */
+    /* Position & dimensions */
     position : relative;
     width: 100%;
     height: 20%;
-        /* font color & content properties */
+    /* Font color & content properties */
     color : var(--bg);
     font-size: 2.5vmin.;
     font-weight: bold;
     text-align:center;
     overflow: hidden;
     pointer-events: none;
-        /* Overlaying */
+    /* Overlaying */
     z-index: 1;
 
     font-family: 'Jura', sans-serif;
@@ -211,42 +186,46 @@
 }
 
 
-    /*  graph/chart area for a sourcegraph
-     *  previously .visualize-source-mention-chart
-     */
+/*
+    Graph/chart area for a sourcegraph
+    previously .visualize-source-mention-chart
+ */
 .sourcegraph-chart {
-        /* size & position */
+    /* Size & position */
     position : relative;
     width: 90%;
     height: 80%;
     margin:auto;
-        /* color & content properties */
-    /*pointer-events: none;*/
-        /* Overlaying */
+    /* Color & content properties */
+    /* Pointer-events: none;*/
+    /* Overlaying */
     z-index: 1;
 }
 
 .sourcegraph-chart>svg {
-        /* size & position */
+    /* Size & position */
     position : relative;
     width: 100%;
     height: 100%;
 }
 
 .domain {
-  stroke: var(--lightgray);
+    stroke: var(--lightgray);
 }
 
 .tick {
-  stroke: var(--lightgray);
+    stroke: var(--lightgray);
 }
 
 .tick line {
-  stroke: var(--lightgray);
+    stroke: var(--lightgray);
 }
 
-    /*line charts for sources and mentions
-     */
+.circle {
+    stroke: white;
+}
+
+/* Line charts for sources and mentions */
 .line {
     fill: none;
     stroke: var(--darker);
