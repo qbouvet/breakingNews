@@ -153,7 +153,7 @@ export class SourceGrapher {
         const enterTopLevel = enterSel
             .append('div')
                 .attr('class', "sourcegraph-container")
-                // TODO : for interaction on click 
+                // TODO : for interaction on click
                 //.on("click", (d) => sourceInteractionCallback(d[0]) )
                 .call(this.drag);
         enterTopLevel.append('div')
@@ -250,7 +250,7 @@ export class SourceGrapher {
                 .append("circle")
             .merge(selCircles)
                 .attr("class", "circle")
-                .attr("cx", (d) => { return this.xScale(d[0])})
+                .attr("cx", (d) => { return this.xScale(TimeManager.timestampToDate(d[0]))})
                 .attr("cy", (d) => { return this.yScale(d[1])})
                 .attr("r", 2)
         // Add the X Axis

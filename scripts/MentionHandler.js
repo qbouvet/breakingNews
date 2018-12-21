@@ -354,20 +354,29 @@ export class MentionHandler {
             // find the matching timestamps
         function roundTimestamp (date, round="down") {
             let tsp = TimeManager.dateToTimestamp(date)
-            let fixedPart = tsp.slice(0, 10)
+            let fixedPart = tsp.slice(0, 8)
+            let hour = tsp.slice(8, 10)
             let min = parseInt(tsp.slice(10, 12))
             if (round=="up") {
-                return min>=45 ? fixedPart+"4500" :
-                        min>= 30 ? fixedPart+"3000" :
-                            min>=15 ? fixedPart+"1500" : fixedPart+"0000"
+                return min>=45 ? fixedPart+parseInt(hour+1).toString+"0000" :
+                        min>= 30 ? fixedPart+hour+"4500" :
+                            min>=15 ? fixedPart+hour+"3000" : fixedPart+hour+"1500"
             } else {
-                return min<=15 ? fixedPart+"0000" :
-                        min<= 30 ? fixedPart+"1500" :
-                            min<=45 ? fixedPart+"3000" : fixedPart+"4500"
+                return min<=15 ? fixedPart+hour+"0000" :
+                        min<= 30 ? fixedPart+hour+"1500" :
+                            min<=45 ? fixedPart+hour+"3000" : fixedPart+hour+"4500"
             }
         }
-        const timestampStart = roundTimestamp(timeStart, "down")
-        const timestampEnd = roundTimestamp(timeEnd, "up")
+        let timestampStart = roundTimestamp(timeStart, "up")
+        let timestampEnd = roundTimestamp(timeEnd, "down")
+        timestampStart = this.timeManagerRef.clampBelow(timestampStart)
+        timestampEnd = this.timeManagerRef.clampAbove(timestampEnd)
+
+        if (parseInt(timestampEnd) < parseInt(timestampStart)) {
+            // This is normal if the user didn't select any datapoint in his band selection
+            warn ("band-select : no timestamp selected")
+            return
+        }
         info ("Coloring countries, timestamps", timestampStart, timestampEnd)
         let liveTimestamps = []
         liveTimestamps.push(timestampStart)
