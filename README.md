@@ -1,10 +1,9 @@
-## Authors
 
-Tobia, Quentin, Gauthier
-
-## data-viz-project
-
-[github pages](https://atobywankenobi.github.io/data-viz-project/)
+<h2 align=center >
+<a href=https://qbouvet.github.io/breakingNews/>
+Visit the interactive Website
+</a>
+</h2>
 
 ## Project Description
 
@@ -33,3 +32,7 @@ The project is hosted on github pages, and presents the events from one day, Nov
 In /scripts, there are both python files used to download and clean data from [gdelt](https://www.gdeltproject.org/), and javascript files which implement the logic of the visualization.
 
 In order to run it locally, fork/clone the repo and run a simple static server, like npm http-server and access index.html in google chrome.
+
+## Authors
+
+Tobia Albergoni, Quentin Bouvet, Gauthier Mueller
